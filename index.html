@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>تسجيل الطلاب - مدارس الأرتقاء الأهلية</title>
     <meta name="description" content="نموذج تسجيل الطلاب الجدد في مدارس الأرتقاء الأهلية للعام الدراسي الحالي">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#084c43">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- ===== تحسين الأداء: التحميل المسبق ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -703,6 +707,10 @@
             line-height: 1.8;
         }
 
+        /* ===== Toast ===== */
+        .toast{position:fixed;bottom:20px;right:20px;padding:14px 28px;border-radius:14px;font-weight:700;font-family:'Cairo',sans-serif;box-shadow:0 8px 25px rgba(0,0,0,0.2);z-index:9999;animation:fadeIn .3s ease;direction:rtl;max-width:90%}.toast.success{background:#38a169;color:#fff}.toast.error{background:#e53e3e;color:#fff}.toast.info{background:#3182ce;color:#fff}.toast.warning{background:#b49554;color:#fff}
+        @keyframes fadeIn{0%{opacity:0;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
+
         /* ===== Honeypot محسن ===== */
         .honeypot-wrapper {
             position: absolute !important;
@@ -1073,7 +1081,7 @@
     <!-- ========================================= -->
     <!-- تحميل مكتبة ضغط الصور بشكل متأخر (defer) -->
     <!-- ========================================= -->
-    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@1.0.16/dist/browser-image-compression.js" defer>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.4.0/dist/browser-image-compression.js" defer>
     </script>
 
     <!-- ========================================= -->
@@ -1092,7 +1100,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-        import { initializeFirestore, doc, setDoc, getDoc, collection, addDoc, persistentLocalCache, serverTimestamp, increment, updateDoc, runTransaction } from
+        import { initializeFirestore, doc, setDoc, getDoc, collection, addDoc, persistentLocalCache, serverTimestamp, increment, updateDoc, runTransaction, onSnapshot } from
             "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js";
         import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js";
@@ -1248,7 +1256,8 @@
                     } else if (id === 'dob') {
                         const date = new Date(val);
                         const now = new Date();
-                        const min = new Date(now.getFullYear() - 18, 0, 1);
+                        const min = new Date(now);
+                        min.setFullYear(min.getFullYear() - 18);
                         isValid = !isNaN(date) && date <= now && date >= min;
                     } else {
                         isValid = val !== '';
@@ -1288,7 +1297,8 @@
                         } else if (id === 'dob') {
                             const date = new Date(val);
                             const now = new Date();
-                            const min = new Date(now.getFullYear() - 18, 0, 1);
+                            const min = new Date(now);
+                            min.setFullYear(min.getFullYear() - 18);
                             isValid = !isNaN(date) && date <= now && date >= min;
                         } else if (id === 'gender' || id === 'grade') {
                             isValid = val !== '';
@@ -1342,49 +1352,54 @@
         });
         restoreDraft();
 
-        // ===== تاريخ الميلاد =====
+        // ===== تاريخ الميلاد (مدقق: 1–18 سنة بالضبط) =====
         function setupDateRange() {
             const dobInput = document.getElementById('dob');
             if (dobInput) {
                 const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                dobInput.max = `${year}-${month}-${day}`;
-                dobInput.min = `${year - 18}-01-01`;
+                const y = today.getFullYear();
+                const m = String(today.getMonth() + 1).padStart(2, '0');
+                const d = String(today.getDate()).padStart(2, '0');
+                dobInput.max = `${y}-${m}-${d}`;
+                // الحد الأدنى: 18 سنة بالضبط
+                const minDate = new Date(today);
+                minDate.setFullYear(minDate.getFullYear() - 18);
+                dobInput.min = minDate.toISOString().split('T')[0];
             }
         }
         setupDateRange();
 
-        // ===== جلب حالة التسجيل =====
-        async function checkRegistrationPortal() {
+        // ===== متابعة مباشرة لحالة التسجيل (onSnapshot) =====
+        let configUnsubscribe = null;
+
+        function watchRegistrationPortal() {
             try {
-                const snap = await getDoc(doc(db, "config", "settings"));
-                if (snap.exists()) {
-                    const data = snap.data();
-                    const isOpen = data.registrationOpen !== undefined ? data.registrationOpen : true;
-                    if (isOpen) {
+                configUnsubscribe = onSnapshot(doc(db, "config", "settings"), (snap) => {
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        const isOpen = data.registrationOpen !== undefined ? data.registrationOpen : true;
+                        closedMsg.style.display = isOpen ? 'none' : 'block';
+                        formContent.classList.toggle('disabled', !isOpen);
+                        if (data.currentAcademicYear) {
+                            activeAcademicYear = data.currentAcademicYear;
+                            yearBadgeLabel.textContent = data.currentAcademicYear;
+                        }
+                    } else {
                         closedMsg.style.display = 'none';
                         formContent.classList.remove('disabled');
-                    } else {
-                        closedMsg.style.display = 'block';
-                        formContent.classList.add('disabled');
                     }
-                    if (data.currentAcademicYear) {
-                        activeAcademicYear = data.currentAcademicYear;
-                        yearBadgeLabel.textContent = data.currentAcademicYear;
-                    }
-                } else {
+                }, (err) => {
+                    console.warn("⚠️ فشل متابعة حالة التسجيل:", err);
                     closedMsg.style.display = 'none';
                     formContent.classList.remove('disabled');
-                }
+                });
             } catch (e) {
-                console.error("فشل جلب حالة التسجيل:", e);
+                console.error("فشل بدء متابعة الحالة:", e);
                 closedMsg.style.display = 'none';
                 formContent.classList.remove('disabled');
             }
         }
-        checkRegistrationPortal();
+        watchRegistrationPortal();
 
         // ===== معالجة الأرقام العربية =====
         function normalizeArabicNumerals(str) {
@@ -1601,6 +1616,7 @@
                 uploadProgressText.textContent = 'جاري حفظ البيانات...';
                 uploadProgressFill.style.width = '100%';
 
+                const now = serverTimestamp();
                 const studentData = {
                     fullName: sName,
                     searchName: normalizeArabicName(sName),
@@ -1614,7 +1630,8 @@
                     phone: cleanPhone,
                     address: document.getElementById('address').value.trim() || 'غير مذكور',
                     notes: document.getElementById('notes').value.trim() || 'لا يوجد',
-                    registeredAt: serverTimestamp(),
+                    registeredAt: now,
+                    modifiedAt: now,
                     ...urls
                 };
 
@@ -1719,26 +1736,32 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // ===== Toast محسّن =====
+        // ===== Toast =====
         function showToast(message, type = 'success') {
-            const colors = { success: '#38a169', error: '#e53e3e', info: '#3182ce', warning: '#b49554' };
             const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed; bottom: 20px; right: 20px; 
-                background: ${colors[type] || colors.success}; 
-                color: #fff; padding: 14px 28px; border-radius: 14px; 
-                font-weight: 700; font-family: 'Cairo', sans-serif; 
-                box-shadow: 0 8px 25px rgba(0,0,0,0.2); z-index: 9999;
-                animation: fadeStep 0.3s ease; direction: rtl; max-width: 90%;
-            `;
+            toast.className = `toast ${type}`;
             toast.textContent = message;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3500);
         }
 
+        // ===== تنظيف المستمع عند مغادرة الصفحة =====
+        window.addEventListener('beforeunload', () => {
+            if (configUnsubscribe) configUnsubscribe();
+        });
+
         // ===== بدء النموذج =====
         updateProgress(1);
         console.log("🚀 نموذج التسجيل المحسّن جاهز!");
+
+        // ===== تسجيل Service Worker لتطبيق PWA =====
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                console.log('✅ SW registered:', reg.scope);
+            }).catch(err => {
+                console.warn('⚠️ SW registration failed:', err);
+            });
+        }
     </script>
 </body>
 </html>

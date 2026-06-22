@@ -2,60 +2,51 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ===== دوال المساعدة =====
     function isAdmin() {
-      return request.auth != null
-        && request.auth.token.admin == true;
+      return request.auth != null 
+        && request.auth.token.email == 'alartqaaschool@gmail.com';
     }
 
-    function isLoggedIn() {
-      return request.auth != null;
+    function isPortalOpen() {
+      return get(/databases/$(database)/documents/config/settings).data.registrationOpen == true;
     }
 
-    function isValidStudentData() {
-      return request.resource.data.keys().hasAll(['fullName', 'gender', 'grade', 'phone', 'parentName', 'registeredAt'])
-        && request.resource.data.fullName is string
-        && request.resource.data.fullName.size() >= 3
-        && request.resource.data.gender in ['ذكر', 'أنثى']
-        && request.resource.data.phone.size() >= 10
-        && request.resource.data.registeredAt == request.time;
+    function isValidStudentForm() {
+      let d = request.resource.data;
+      return
+        d.keys().hasAll([
+          'fullName', 'dob', 'gender', 'grade', 'parentName',
+          'phone', 'registeredAt'
+        ]) &&
+        d.fullName is string && d.fullName.size() >= 3 && d.fullName.size() <= 150 &&
+        d.parentName is string && d.parentName.size() >= 3 && d.parentName.size() <= 150 &&
+        d.phone is string && d.phone.size() >= 10 && d.phone.size() <= 20 &&
+        d.gender in ['ذكر', 'أنثى'] &&
+        d.grade is string &&
+        d.registeredAt == request.time;
     }
 
-    // ===== الطلاب =====
     match /students/{studentId} {
-
-      // القراءة: فقط المدير المسجل دخوله
-      allow read: if isAdmin();
-
-      // الإنشاء: أي شخص (النموذج العام) مع التحقق من صحة البيانات
-      allow create: if isLoggedIn() == false
-        && isValidStudentData()
-        && request.resource.data.size() <= 20;
-
-      // التحديث: فقط المدير
-      allow update: if isAdmin();
-
-      // الحذف: فقط المدير
-      allow delete: if isAdmin();
+      allow read, update, delete: if isAdmin();
+      allow create: if isPortalOpen() && isValidStudentForm();
     }
 
-    // ===== الإعدادات (config) =====
-    match /config/{setting} {
-
-      // القراءة: مسموحة للجميع (لعرض حالة التسجيل في النموذج)
+    match /config/settings {
       allow read: if true;
-
-      // الكتابة: فقط المدير المسجل دخوله
       allow write: if isAdmin();
     }
 
-    // ===== عداد الإحصائيات =====
     match /config/stats {
       allow read: if true;
-      allow write: if isAdmin();  // فقط المدير يعدّل العداد يدوياً
+      allow write: if isAdmin();
     }
 
-    // ===== رفض باقي المسارات =====
+    match /logs/{logId} {
+      allow read, delete: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

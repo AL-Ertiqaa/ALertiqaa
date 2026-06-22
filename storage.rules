@@ -2,26 +2,21 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // ===== صور الطلاب =====
-    match /students/{sessionUID}/{fileName} {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'alartqaaschool@gmail.com';
+    }
 
-      // الرفع: أي شخص (النموذج العام) بشرط:
-      // - الملف صورة (jpeg/png/webp)
-      // - الحجم أقل من 1 ميجابايت
+    match /students/{sessionUID}/{fileName} {
       allow create: if request.auth == null
         && request.resource.size < 1 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
 
-      // القراءة: فقط المدير المسجل دخوله
-      allow read: if request.auth != null
-        && request.auth.token.admin == true;
+      allow read, list: if isAdmin();
 
-      // الحذف: فقط المدير
-      allow delete: if request.auth != null
-        && request.auth.token.admin == true;
+      allow delete: if isAdmin();
     }
 
-    // ===== رفض الملفات الأخرى =====
     match /{allPaths=**} {
       allow read, write: if false;
     }
