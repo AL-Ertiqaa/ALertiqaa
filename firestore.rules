@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== دوال المساعدة =====
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.admin == true;
+    }
+
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function isValidStudentData() {
+      return request.resource.data.keys().hasAll(['fullName', 'gender', 'grade', 'phone', 'parentName', 'registeredAt'])
+        && request.resource.data.fullName is string
+        && request.resource.data.fullName.size() >= 3
+        && request.resource.data.gender in ['ذكر', 'أنثى']
+        && request.resource.data.phone.size() >= 10
+        && request.resource.data.registeredAt == request.time;
+    }
+
+    // ===== الطلاب =====
+    match /students/{studentId} {
+
+      // القراءة: فقط المدير المسجل دخوله
+      allow read: if isAdmin();
+
+      // الإنشاء: أي شخص (النموذج العام) مع التحقق من صحة البيانات
+      allow create: if isLoggedIn() == false
+        && isValidStudentData()
+        && request.resource.data.size() <= 20;
+
+      // التحديث: فقط المدير
+      allow update: if isAdmin();
+
+      // الحذف: فقط المدير
+      allow delete: if isAdmin();
+    }
+
+    // ===== الإعدادات (config) =====
+    match /config/{setting} {
+
+      // القراءة: مسموحة للجميع (لعرض حالة التسجيل في النموذج)
+      allow read: if true;
+
+      // الكتابة: فقط المدير المسجل دخوله
+      allow write: if isAdmin();
+    }
+
+    // ===== عداد الإحصائيات =====
+    match /config/stats {
+      allow read: if true;
+      allow write: if isAdmin();  // فقط المدير يعدّل العداد يدوياً
+    }
+
+    // ===== رفض باقي المسارات =====
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

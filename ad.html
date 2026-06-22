@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المدير - مدارس الأرتقاء الأهلية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:'Cairo',sans-serif;background:#f2f7f6;min-height:100vh;padding:20px}.container{max-width:1300px;margin:0 auto}
+        #loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:20px;text-align:center}#loginScreen i{font-size:70px;color:#b49554}#loginScreen h2{color:#084c43;font-size:28px;font-weight:800}#loginScreen p{color:#718096}#loginScreen input{padding:14px 25px;border:2px solid #e2e8f0;border-radius:16px;font-size:18px;width:320px;max-width:100%;font-family:'Cairo',sans-serif;text-align:center}#loginScreen input:focus{outline:none;border-color:#0f7264;box-shadow:0 0 0 5px rgba(15,114,100,.08)}#loginScreen button{padding:14px 50px;background:#084c43;color:#fff;border:none;border-radius:16px;font-size:18px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s}#loginScreen button:hover{background:#0f7264}#loginScreen button:disabled{opacity:.5;cursor:not-allowed}.login-error{color:#e53e3e;font-weight:600;display:none;margin-top:5px}.login-error.show{display:block}.login-error.warning{color:#b49554}
+        #dashboard{display:none}
+            .admin-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;background:linear-gradient(145deg,#084c43,#0f7264);padding:18px 28px;border-radius:20px;box-shadow:0 4px 15px rgba(0,0,0,0.08);margin-bottom:25px;border-bottom:4px solid #b49554}.admin-header .brand{display:flex;align-items:center;gap:15px}.admin-header .brand img{width:55px;height:55px;border-radius:50%;border:3px solid #b49554;background:#fff;padding:3px;object-fit:cover}.admin-header .brand h1{color:#fff;font-size:20px;font-weight:800}.admin-header .brand h1 small{display:block;font-size:12px;color:#e5dcb7;font-weight:400}.admin-header .actions{display:flex;gap:12px;flex-wrap:wrap}.admin-header .actions button{padding:8px 22px;border:none;border-radius:30px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;font-size:14px;transition:.2s}.btn-logout{background:#e53e3e;color:#fff}.btn-logout:hover{background:#c53030}.btn-export-all{background:#2b6cb0;color:#fff}.btn-export-all:hover{background:#2c5282}.btn-export-page{background:#38a169;color:#fff}.btn-export-page:hover{background:#2f855a}.btn-refresh{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2)!important}.btn-refresh:hover{background:rgba(255,255,255,0.25)}.btn-cleanup{background:#dd6b20;color:#fff}.btn-cleanup:hover{background:#c05621}.btn-backup{background:#3182ce;color:#fff}.btn-backup:hover{background:#2b6cb0}
+            .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin-bottom:25px}.stat-card{background:#fff;padding:18px 20px;border-radius:18px;box-shadow:0 4px 15px rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center;border-right:5px solid #b49554;transition:.2s}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.06)}.stat-card .stat-info h3{font-size:13px;color:#718096;font-weight:600;margin:0}.stat-card .stat-info p{font-size:28px;font-weight:800;color:#084c43;margin:2px 0 0}.stat-card .stat-icon{font-size:32px;color:#b49554;opacity:.7}.stat-card.today{border-right-color:#4299e1}.stat-card.today .stat-icon{color:#4299e1}.stat-card.male{border-right-color:#3182ce}.stat-card.male .stat-icon{color:#3182ce}.stat-card.female{border-right-color:#d53f8c}.stat-card.female .stat-icon{color:#d53f8c}
+        .control-section{background:#fff;border-radius:20px;padding:20px 25px;margin-bottom:25px;box-shadow:0 4px 15px rgba(0,0,0,0.04);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:15px}.control-section .label{font-weight:700;font-size:16px;color:#2d3748}.control-section .label i{color:#b49554;margin-left:8px}.switch-container{display:flex;align-items:center;gap:15px;font-weight:600}.switch{position:relative;display:inline-block;width:60px;height:34px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#e53e3e;transition:.3s;border-radius:34px}.slider:before{position:absolute;content:"";height:26px;width:26px;left:4px;bottom:4px;background-color:#fff;transition:.3s;border-radius:50%}.switch input:checked+.slider{background-color:#38a169}.switch input:checked+.slider:before{transform:translateX(26px)}.status-badge{padding:4px 18px;border-radius:30px;font-size:14px;font-weight:700}.status-badge.open{background:#c6f6d5;color:#22543d}.status-badge.closed{background:#fed7d7;color:#742a2a}
+        .filter-section{background:#fff;border-radius:20px;padding:18px 25px;margin-bottom:25px;box-shadow:0 4px 15px rgba(0,0,0,0.04);display:flex;flex-wrap:wrap;align-items:center;gap:15px}.filter-section .search-box{flex:1 1 250px;position:relative}.filter-section .search-box input{width:100%;padding:12px 20px 12px 45px;border:2px solid #e2e8f0;border-radius:14px;font-size:16px;font-family:'Cairo',sans-serif;background:#f7fafc;transition:.2s}.filter-section .search-box input:focus{outline:none;border-color:#0f7264;background:#fff}.filter-section .search-box i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#a0aec0}.filter-section select{padding:12px 20px;border:2px solid #e2e8f0;border-radius:14px;font-size:16px;font-family:'Cairo',sans-serif;background:#f7fafc;min-width:140px;cursor:pointer}.filter-section select:focus{outline:none;border-color:#0f7264}.filter-section .clear-btn{padding:10px 22px;background:#edf2f7;border:none;border-radius:14px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;color:#4a5568;transition:.2s}.filter-section .clear-btn:hover{background:#e2e8f0}
+        .bulk-actions-wrapper{display:none;background:#fffbf0;border:1px solid #b49554;padding:12px 20px;border-radius:15px;margin-bottom:15px;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}.bulk-actions-wrapper.show{display:flex}.bulk-actions-wrapper .bulk-info{font-weight:700;color:#084c43;font-size:14px}.bulk-actions-wrapper .bulk-btns{display:flex;gap:10px;flex-wrap:wrap}.bulk-actions-wrapper .bulk-btns button{border:none;padding:8px 18px;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:.2s}.btn-bulk-delete{background:#fed7d7;color:#9b2c2c}.btn-bulk-delete:hover{background:#feb2b2}.btn-bulk-export{background:#c6f6d5;color:#22543d}.btn-bulk-export:hover{background:#98f5e1}
+        .table-wrapper{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.04);overflow-x:auto;margin-bottom:20px}.table-wrapper table{width:100%;border-collapse:collapse;font-size:14px;min-width:800px}.table-wrapper thead{background:#084c43;color:#fff}.table-wrapper thead th{padding:14px 12px;text-align:center;white-space:nowrap;font-weight:700}.table-wrapper tbody td{padding:12px;text-align:center;border-bottom:1px solid #edf2f7;color:#2d3748;vertical-align:middle}.table-wrapper tbody tr:hover{background:#f7fafc}.table-wrapper tbody .empty-msg{text-align:center;padding:50px;color:#a0aec0;font-size:16px}.badge-grade{background:#e2e8f0;padding:3px 14px;border-radius:30px;font-size:12px;font-weight:600;color:#2d3748;display:inline-block}.action-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.action-btns button{border:none;padding:6px 14px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px;font-family:'Cairo',sans-serif;transition:.2s}.btn-view{background:#bee3f8;color:#2a69ac}.btn-view:hover{background:#90cdf4}.btn-delete{background:#fed7d7;color:#9b2c2c}.btn-delete:hover{background:#feb2b2}
+        .table-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0}.table-header .title{font-weight:700;color:#084c43;font-size:16px}.table-header .title i{color:#b49554;margin-left:8px}.table-header .count{font-size:14px;color:#718096}.last-updated-label{font-size:12px;color:#a0aec0;font-weight:600;display:inline-block;margin-right:10px}
+        .pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;padding:15px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;border-radius:0 0 20px 20px}.pagination .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.pagination button{padding:8px 16px;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;background:#084c43;color:#fff;transition:.2s;font-size:14px}.pagination button:hover:not(:disabled){background:#0f7264}.pagination button:disabled{opacity:.4;cursor:not-allowed}.pagination .page-number{padding:8px 14px;border-radius:12px;font-weight:600;cursor:pointer;background:#edf2f7;color:#2d3748;border:none;transition:.2s;font-size:14px;font-family:'Cairo',sans-serif}.pagination .page-number:hover{background:#e2e8f0}.pagination .page-number.active{background:#084c43;color:#fff}.pagination .info{color:#4a5568;font-weight:600;font-size:14px}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:1000;justify-content:center;align-items:center;padding:20px}.modal-overlay.show{display:flex;animation:fadeIn .3s ease}.modal-box{background:#fff;border-radius:32px;max-width:600px;width:100%;padding:35px;position:relative;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,0.3)}.modal-box .close-modal{position:absolute;top:15px;left:20px;font-size:28px;cursor:pointer;color:#a0aec0;transition:.2s;background:none;border:none}.modal-box .close-modal:hover{color:#e53e3e}.modal-box h2{color:#084c43;margin-bottom:20px;border-right:4px solid #b49554;padding-right:15px}
+        .modal-box .detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #edf2f7;font-size:15px}.modal-box .detail-row .key{font-weight:600;color:#4a5568;min-width:35%}.modal-box .detail-row .value{color:#1a202c;font-weight:500;text-align:left;max-width:60%;word-break:break-word}.modal-box .image-row{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:12px 0;border-bottom:1px solid #edf2f7;width:100%}.modal-box .image-row .key{font-weight:700;color:#4a5568}.modal-box .image-row .image-wrapper{display:flex;flex-wrap:wrap;gap:10px;align-items:center;width:100%}.modal-box .image-row .image-wrapper img{max-width:120px;max-height:120px;border-radius:12px;border:1px solid #e2e8f0;object-fit:cover;aspect-ratio:1/1;cursor:pointer}.modal-box .image-row .image-actions{display:flex;gap:8px;flex-wrap:wrap}.modal-box .image-row .image-actions button{padding:6px 16px;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;font-size:13px;transition:.2s}.btn-img-view{background:#3182ce;color:#fff}.btn-img-view:hover{background:#2c5282}.btn-img-download{background:#38a169;color:#fff}.btn-img-download:hover{background:#2f855a}.btn-img-print{background:#dd6b20;color:#fff}.btn-img-print:hover{background:#c05621}
+        .modal-actions-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}.btn-print-report,.btn-pdf-report{padding:8px 20px;color:#fff;border:none;border-radius:12px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;transition:.2s}.btn-print-report{background:#084c43}.btn-print-report:hover{background:#0f7264}.btn-pdf-report{background:#b49554}.btn-pdf-report:hover{background:#967e41}
+        .delete-modal .modal-box{max-width:420px;text-align:center}.delete-modal .modal-box i{font-size:50px;color:#e53e3e;margin-bottom:10px}.delete-modal .modal-box .btn-danger{background:#e53e3e;color:#fff;border:none;padding:12px 30px;border-radius:16px;font-weight:700;font-size:16px;cursor:pointer;font-family:'Cairo',sans-serif;margin:5px}.delete-modal .modal-box .btn-danger:hover{background:#c53030}.delete-modal .modal-box .btn-cancel{background:#edf2f7;color:#2d3748;border:none;padding:12px 30px;border-radius:16px;font-weight:700;font-size:16px;cursor:pointer;font-family:'Cairo',sans-serif;margin:5px}.delete-modal .modal-box .btn-cancel:hover{background:#e2e8f0}
+        .toast{position:fixed;bottom:20px;right:20px;padding:14px 28px;border-radius:14px;font-weight:700;font-family:'Cairo',sans-serif;box-shadow:0 8px 25px rgba(0,0,0,0.2);z-index:9999;animation:fadeIn .3s ease;direction:rtl;max-width:90%}.toast.success{background:#38a169;color:#fff}.toast.error{background:#e53e3e;color:#fff}.toast.info{background:#3182ce;color:#fff}.toast.warning{background:#b49554;color:#fff}
+        @keyframes fadeIn{0%{opacity:0;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
+        @media(max-width:700px){.admin-header{flex-direction:column;align-items:stretch;text-align:center}.admin-header .actions{justify-content:center;gap:8px}.filter-section{flex-direction:column;align-items:stretch}.filter-section .search-box{flex:1 1 100%}.control-section{flex-direction:column;align-items:center}.modal-box{padding:25px 20px}.modal-box .detail-row{flex-direction:column;align-items:flex-start;gap:4px}.modal-box .detail-row .value{max-width:100%;text-align:right}.modal-box .image-row .image-wrapper{flex-direction:column;align-items:flex-start}.pagination{flex-direction:column;align-items:center}.pagination .controls{justify-content:center}.stats-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}.table-header{flex-direction:column;text-align:center}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginScreen">
+            <i class="fas fa-user-shield"></i>
+            <h2>لوحة تحكم المدير</h2>
+            <p>أدخل البريد الإلكتروني وكلمة المرور للدخول إلى نظام الإدارة</p>
+            <input type="email" id="adminEmailInput" placeholder="البريد الإلكتروني" dir="ltr" autocomplete="email">
+            <input type="password" id="adminPassInput" placeholder="كلمة المرور" dir="ltr" autocomplete="current-password">
+            <button id="loginBtn">دخول</button>
+            <div class="login-error" id="loginError">❌ بيانات الدخول غير صحيحة</div>
+            <div class="login-error warning" id="loginBlockedError">⛔ تم حظر الحساب مؤقتاً بسبب كثرة المحاولات. انتظر دقيقة.</div>
+        </div>
+
+        <div id="dashboard">
+            <div class="admin-header">
+                <div class="brand">
+                    <img src="logo.jpg" alt="شعار مدارس الأرتقاء" loading="lazy" width="55" height="55">
+                    <div><h1>لوحة تحكم الأرتقاء <small>Al-Ertiqaa Private Schools</small></h1></div>
+                </div>
+                <div class="actions">
+                    <button class="btn-refresh" id="refreshBtn"><i class="fas fa-sync-alt"></i> تحديث</button>
+                    <button class="btn-export-page" id="exportPageBtn"><i class="fas fa-file-export"></i> تصدير الصفحة</button>
+                    <button class="btn-export-all" id="exportAllBtn"><i class="fas fa-file-csv"></i> تصدير الكل</button>
+                    <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-info"><h3><i class="fas fa-users" style="color:#b49554;margin-left:6px;"></i> إجمالي الطلاب</h3><p id="totalCount">0</p></div><div class="stat-icon"><i class="fas fa-user-graduate"></i></div></div>
+                <div class="stat-card male"><div class="stat-info"><h3><i class="fas fa-mars" style="color:#3182ce;margin-left:6px;"></i> الذكور</h3><p id="maleCount">0</p></div><div class="stat-icon"><i class="fas fa-male"></i></div></div>
+                <div class="stat-card female"><div class="stat-info"><h3><i class="fas fa-venus" style="color:#d53f8c;margin-left:6px;"></i> الإناث</h3><p id="femaleCount">0</p></div><div class="stat-icon"><i class="fas fa-female"></i></div></div>
+                <div class="stat-card today"><div class="stat-info"><h3><i class="fas fa-calendar-day" style="color:#4299e1;margin-left:6px;"></i> مسجل اليوم</h3><p id="todayCount">0</p></div><div class="stat-icon"><i class="fas fa-calendar-check"></i></div></div>
+            </div>
+
+            <div style="background:#fff;border-radius:20px;padding:20px 25px;margin-bottom:25px;box-shadow:0 4px 15px rgba(0,0,0,0.04);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px;">
+                    <i class="fas fa-chart-bar" style="color:#b49554;font-size:20px;"></i>
+                    <span style="font-weight:700;color:#084c43;font-size:16px;">توزيع الصفوف الدراسية</span>
+                    <span style="font-size:12px;color:#a0aec0;font-weight:600;"><i class="fas fa-sync-alt"></i> محدث آنياً</span>
+                </div>
+                <div id="gradeChart"><p style="color:#a0aec0;font-size:13px;">جاري التحميل...</p></div>
+            </div>
+
+            <div class="control-section">
+                <div class="label"><i class="fas fa-toggle-on"></i> حالة بوابة التسجيل</div>
+                <div class="switch-container">
+                    <span style="color:#38a169;font-weight:700;">مفتوح</span>
+                    <label class="switch"><input type="checkbox" id="toggleSwitch"><span class="slider"></span></label>
+                    <span style="color:#e53e3e;font-weight:700;">مغلق</span>
+                    <span id="statusBadge" class="status-badge open">مفتوح ✅</span>
+                </div>
+                <p style="font-size:13px;color:#718096;margin:0;flex:1 1 100%;text-align:center;"><i class="fas fa-sync-alt"></i> ينعكس فوراً على استمارة التسجيل</p>
+            </div>
+
+            <div class="filter-section">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث بالاسم الكامل للطالب (يبدأ بـ)..."></div>
+                <select id="filterGrade"><option value="">جميع الصفوف</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option><option>الثالث ابتدائي</option><option>الرابع ابتدائي</option><option>الخامس ابتدائي</option><option>السادس ابتدائي</option><option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option></select>
+                <select id="filterGender"><option value="">الجميع</option><option value="ذكر">ذكور</option><option value="أنثى">إناث</option></select>
+                <select id="filterAcademicYear"><option value="">كل السنوات</option><option value="2026-2027">2026-2027</option></select>
+                <button class="clear-btn" id="clearFiltersBtn"><i class="fas fa-undo"></i> إعادة ضبط</button>
+            </div>
+
+            <div class="bulk-actions-wrapper" id="bulkActionsBar">
+                <span class="bulk-info" id="bulkSelectedCount">تم تحديد 0 طالب</span>
+                <div class="bulk-btns">
+                    <button class="btn-bulk-export" id="bulkExportBtn"><i class="fas fa-file-csv"></i> تصدير المحدد</button>
+                    <button class="btn-bulk-delete" id="bulkDeleteBtn"><i class="fas fa-trash"></i> حذف المحدد</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <div class="table-header">
+                    <span class="title"><i class="fas fa-users"></i> سجلات الطلاب <span id="lastUpdated" class="last-updated-label">آخر تحديث: لم يتم الجلب بعد</span></span>
+                    <span class="count" id="resultCount">(عرض 0 طالب)</span>
+                </div>
+                <table>
+                    <thead><tr><th><input type="checkbox" id="selectAllCheck" style="width:18px;height:18px;cursor:pointer;"></th><th>#</th><th>الاسم الكامل</th><th>الصف</th><th>الجنس</th><th>ولي الأمر</th><th>الجوال</th><th>تاريخ التسجيل</th><th>الإجراءات</th></tr></thead>
+                    <tbody id="studentsTableBody"><tr><td colspan="9" class="empty-msg"><i class="fas fa-spinner fa-spin"></i> جاري جلب السجلات...</td></tr></tbody>
+                </table>
+                <div class="pagination">
+                    <div class="controls">
+                        <button id="prevPageBtn" disabled><i class="fas fa-chevron-right"></i> السابق</button>
+                        <button id="nextPageBtn" disabled>التالي <i class="fas fa-chevron-left"></i></button>
+                    </div>
+                    <span class="info" id="pageInfo">الصفحة 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-box">
+            <button class="close-modal" data-close="detailModal"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-user-graduate" style="color:#b49554;"></i> بيانات الطالب المرفقة</h2>
+            <div class="modal-actions-bar">
+                <button class="btn-print-report" onclick="printStudentReport()"><i class="fas fa-print"></i> طباعة</button>
+                <button class="btn-pdf-report" onclick="saveAsPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay delete-modal" id="deleteModal">
+        <div class="modal-box">
+            <button class="close-modal" data-close="deleteModal"><i class="fas fa-times"></i></button>
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3 style="margin-bottom:10px;color:#742a2a;">تأكيد الحذف النهائي</h3>
+            <p style="color:#4a5568;margin-bottom:20px;">هل أنت متأكد من حذف هذا الطالب وسجلاته وصوره نهائياً؟</p>
+            <div><button class="btn-danger" id="confirmDeleteBtn">نعم، احذف</button><button class="btn-cancel" data-close="deleteModal">إلغاء</button></div>
+            <input type="hidden" id="deleteDocId">
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js",
+                "firebase/storage": "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js",
+                "firebase/app-check": "https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { initializeFirestore, doc, setDoc, getDoc, deleteDoc, where, collection, query, orderBy, limit, startAfter, getDocs, persistentLocalCache, writeBatch, onSnapshot, increment, updateDoc, runTransaction } from "firebase/firestore";
+        import { getStorage, ref, listAll, deleteObject, getDownloadURL } from "firebase/storage";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+        import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPk7T-rD_DffpMP13ra7Q_gkOByBNqi5s",
+            authDomain: "alertiqaa.firebaseapp.com",
+            projectId: "alertiqaa",
+            storageBucket: "alertiqaa.firebasestorage.app",
+            messagingSenderId: "118590328758",
+            appId: "1:118590328758:web:2ac3aa05f9c364eb78fb17",
+            measurementId: "G-G9L6CT2XYS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+        const db = initializeFirestore(app, { localCache: persistentLocalCache() });
+        const statsRef = doc(db, "config", "stats");
+
+        const appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider('6LfRPCwtAAAAADOCiJh0X4UZKsCSG12LlffJoy38'),
+            isTokenAutoRefreshEnabled: true
+        });
+
+        // ===== دوال مساعدة =====
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+
+        function showToast(message, type = 'success') {
+            const colors = { success: '#38a169', error: '#e53e3e', info: '#3182ce', warning: '#b49554' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        // ===== عناصر الصفحة =====
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboard = document.getElementById('dashboard');
+        const adminEmailInput = document.getElementById('adminEmailInput');
+        const adminPassInput = document.getElementById('adminPassInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        const toggleSwitch = document.getElementById('toggleSwitch');
+        const statusBadge = document.getElementById('statusBadge');
+        const studentsBody = document.getElementById('studentsTableBody');
+        const totalCount = document.getElementById('totalCount');
+        const maleCount = document.getElementById('maleCount');
+        const femaleCount = document.getElementById('femaleCount');
+        const todayCount = document.getElementById('todayCount');
+        const searchInput = document.getElementById('searchInput');
+        const filterGrade = document.getElementById('filterGrade');
+        const filterGender = document.getElementById('filterGender');
+        const filterAcademicYear = document.getElementById('filterAcademicYear');
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const resultCount = document.getElementById('resultCount');
+        const lastUpdatedText = document.getElementById('lastUpdated');
+        const exportPageBtn = document.getElementById('exportPageBtn');
+        const exportAllBtn = document.getElementById('exportAllBtn');
+
+        // ===== متغيرات الترقيم =====
+        const PAGE_SIZE = 20;
+        let currentPage = 0;
+        let lastVisible = null;
+        let firstVisible = null;
+        let totalDocs = 0;
+        let pageSnapshots = [];
+        let searchTimeout = null;
+        let filterTimeout = null;
+
+        // ===== استخدام Set بدلاً من Array للتحسين =====
+        const selectedStudentIds = new Set();
+
+        // ===== كاش أسماء الطلاب للبحث المحلي (0 قراءة من Firestore) =====
+        const STUDENT_CACHE_KEY = 'studentSearchCache_v1';
+        let studentNameCache = [];
+        let unsubscribeStats = null;
+        let unsubscribeStudents = null;
+
+        // ===== دوال المصادقة =====
+        async function login() {
+            const email = adminEmailInput.value.trim();
+            const password = adminPassInput.value.trim();
+            if (!email || !password) { loginError.textContent = '❌ يرجى إدخال البريد الإلكتروني وكلمة المرور.';
+                loginError.classList.add('show'); return; }
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                loginError.classList.remove('show');
+                showToast('✅ مرحباً بك في لوحة التحكم.', 'success');
+                // onAuthStateChanged يتولى الباقي تلقائياً
+            } catch (error) {
+                let msg = '❌ فشل تسجيل الدخول.';
+                if (error.code === 'auth/user-not-found') msg = '❌ الحساب غير موجود.';
+                else if (error.code === 'auth/wrong-password') msg = '❌ كلمة المرور غير صحيحة.';
+                else if (error.code === 'auth/invalid-email') msg = '❌ البريد الإلكتروني غير صالح.';
+                else if (error.code === 'auth/too-many-requests') msg = '⛔ تم حظر الحساب مؤقتاً. انتظر دقيقة.';
+                else msg = '❌ حدث خطأ: ' + error.message;
+                loginError.textContent = msg;
+                loginError.classList.add('show');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'دخول';
+            }
+        }
+
+        async function logout() {
+            try { await signOut(auth); } catch (e) {}
+            if (unsubscribeStats) unsubscribeStats();
+            if (unsubscribeStudents) unsubscribeStudents();
+            if (unsubscribeConfig) unsubscribeConfig();
+            loginScreen.style.display = 'flex';
+            dashboard.style.display = 'none';
+            showToast('🔒 تم تسجيل الخروج.', 'info');
+        }
+
+        // ===== دوال حذف الصور =====
+        async function deleteStudentFiles(sessionUID) {
+            if (!sessionUID) return;
+            try {
+                const folderRef = ref(storage, `students/${sessionUID}`);
+                const folderContent = await listAll(folderRef);
+                const deletePromises = folderContent.items.map(fileRef => deleteObject(fileRef));
+                await Promise.all(deletePromises);
+                console.log(`🧹 تم حذف صور الطالب ${sessionUID}`);
+            } catch (err) {
+                console.error("فشل حذف صور الطالب:", err);
+            }
+        }
+
+        // ===== الإعدادات via onSnapshot (بث مباشر) =====
+        let unsubscribeConfig = null;
+
+        function setupConfigListener() {
+            if (unsubscribeConfig) unsubscribeConfig();
+            unsubscribeConfig = onSnapshot(doc(db, "config", "settings"), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const isOpen = data.registrationOpen !== undefined ? data.registrationOpen : true;
+                    toggleSwitch.checked = isOpen;
+                    updateStatusBadge(isOpen);
+                }
+            }, (err) => {
+                console.warn("⚠️ خطأ في استماع الإعدادات:", err);
+            });
+        }
+
+        // ===== تحقق من صلاحية المدير =====
+        async function checkAdminPermission() {
+            const user = auth.currentUser;
+            if (!user) {
+                showToast('❌ يرجى تسجيل الدخول.', 'error');
+                return false;
+            }
+            try {
+                const tokenResult = await user.getIdTokenResult();
+                if (!tokenResult.claims.admin) {
+                    showToast('❌ ليس لديك صلاحية لإجراء هذه العملية.', 'error');
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error("خطأ في التحقق من الصلاحية:", error);
+                showToast('❌ حدث خطأ في التحقق من الصلاحية.', 'error');
+                return false;
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginScreen.style.display = 'none';
+                dashboard.style.display = 'block';
+                loadDashboardData();
+            } else {
+                loginScreen.style.display = 'flex';
+                dashboard.style.display = 'none';
+            }
+        });
+
+        loginBtn.addEventListener('click', login);
+        adminPassInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') login(); });
+        logoutBtn.addEventListener('click', logout);
+
+        // ===== البحث المحلي (0 قراءة من Firestore) =====
+        function normalizeForSearch(str) {
+            return String(str).replace(/[أإآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ّ/g, '').trim();
+        }
+        function localSearch() {
+            const term = searchInput.value.trim();
+            if (!term || studentNameCache.length === 0) return null;
+            const normalizedTerm = normalizeForSearch(term);
+            return studentNameCache.filter(s =>
+                normalizeForSearch(s.name).includes(normalizedTerm)
+            ).map(s => s.id);
+        }
+
+        // ===== بناء قيود الاستعلام (محسّن بدون select) =====
+        function buildConstraints(isLocalSearch = false) {
+            const constraints = [];
+            const grade = filterGrade.value;
+            const gender = filterGender.value;
+            const year = filterAcademicYear.value;
+
+            if (year) constraints.push(where("academicYear", "==", year));
+            if (grade) constraints.push(where("grade", "==", grade));
+            if (gender) constraints.push(where("gender", "==", gender));
+
+            if (!isLocalSearch) {
+                constraints.push(orderBy("registeredAt", "desc"));
+            }
+            return constraints;
+        }
+
+        // ===== تحميل الطلاب مع الترقيم + دعم البحث المحلي =====
+        async function loadStudents(resetPage = true) {
+            if (resetPage) {
+                currentPage = 0;
+                lastVisible = null;
+                firstVisible = null;
+                pageSnapshots = [];
+            }
+            try {
+                studentsBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align:center;padding:40px;">
+                            <i class="fas fa-spinner fa-spin" style="font-size:32px;color:#0f7264;"></i>
+                            <p style="margin-top:10px;color:#718096;">جاري تحميل البيانات...</p>
+                        </td>
+                    </tr>
+                `;
+
+                // ✅ البحث المحلي أولاً (0 قراءة من Firestore)
+                const searchResults = localSearch();
+                const isLocalSearch = searchResults !== null;
+
+                if (isLocalSearch) {
+                    // بحث محلي: نجلب جميع الطلاب المطابقين (بدون pagination)
+                    const BATCH_SIZE = 10;
+                    let allDocs = [];
+                    for (let i = 0; i < searchResults.length; i += BATCH_SIZE) {
+                        const batch = searchResults.slice(i, i + BATCH_SIZE);
+                        const snaps = await Promise.all(batch.map(id => getDoc(doc(db, "students", id))));
+                        allDocs = allDocs.concat(snaps.filter(s => s.exists()));
+                    }
+                    totalDocs = allDocs.length;
+                    renderTable(allDocs);
+                    // تعطيل pagination أثناء البحث
+                    prevPageBtn.disabled = true;
+                    nextPageBtn.disabled = true;
+                    pageInfo.textContent = `بحث: ${totalDocs} نتيجة`;
+                    // تحديث كاش الأسماء في الخلفية
+                    if (resetPage && allDocs.length > 0) {
+                        studentNameCache = studentNameCache.map(s => ({ ...s }));
+                        saveStudentNameCache();
+                    }
+                    return;
+                }
+
+                // ✅ استعلام عادي مع pagination (بدون select)
+                const constraints = buildConstraints();
+                constraints.push(limit(PAGE_SIZE));
+                if (lastVisible && pageSnapshots[currentPage - 1]) {
+                    constraints.push(startAfter(pageSnapshots[currentPage - 1].last));
+                } else if (lastVisible && currentPage > 0) {
+                    constraints.push(startAfter(lastVisible));
+                }
+
+                const q = query(collection(db, "students"), ...constraints);
+                const snapshot = await getDocs(q);
+                const docs = snapshot.docs;
+
+                if (resetPage) {
+                    // نقرأ العداد بدلاً من getCountFromServer
+                    try {
+                        const statsSnap = await getDoc(statsRef);
+                        totalDocs = statsSnap.exists() ? (statsSnap.data().total || 0) : 0;
+                    } catch (e) { totalDocs = 0; }
+                }
+
+                if (docs.length > 0) {
+                    lastVisible = docs[docs.length - 1];
+                    firstVisible = docs[0];
+                    pageSnapshots[currentPage] = { first: firstVisible, last: lastVisible, docs: docs };
+                } else {
+                    lastVisible = null;
+                    firstVisible = null;
+                }
+                renderTable(docs);
+                updatePagination(docs.length);
+
+                // ✅ تحديث كاش أسماء الطلاب في الخلفية
+                if (resetPage && !isLocalSearch) {
+                    refreshNameCache();
+                }
+            } catch (error) {
+                console.error(error);
+                studentsBody.innerHTML = `<tr><td colspan="9" class="empty-msg"><i class="fas fa-exclamation-triangle"></i> خطأ في التحميل: ${error.message}</td></tr>`;
+            }
+        }
+
+        // ===== تحديث كاش الأسماء (بحد أقصى 300 طالب للحفاظ على القراءات) =====
+        async function refreshNameCache() {
+            try {
+                let allNames = [];
+                let lastDoc = null;
+                const MAX_BATCHES = 3;
+                for (let i = 0; i < MAX_BATCHES; i++) {
+                    let q = query(collection(db, "students"), orderBy("registeredAt", "desc"), limit(100));
+                    if (lastDoc) q = query(q, startAfter(lastDoc));
+                    const snap = await getDocs(q);
+                    if (snap.docs.length === 0) break;
+                    snap.docs.forEach(d => allNames.push({ id: d.id, name: d.data().fullName || '' }));
+                    lastDoc = snap.docs[snap.docs.length - 1];
+                }
+                studentNameCache = allNames;
+                saveStudentNameCache();
+            } catch (e) { console.warn("⚠️ فشل تحديث كاش الأسماء:", e); }
+        }
+
+        function renderTable(docs) {
+            if (docs.length === 0) {
+                studentsBody.innerHTML = `<tr><td colspan="9" class="empty-msg"><i class="fas fa-inbox"></i> لا توجد سجلات مطابقة</td></tr>`;
+                resultCount.textContent = `(عرض 0 من ${totalDocs} طالب)`;
+                return;
+            }
+            let html = '';
+            let index = (currentPage * PAGE_SIZE) + 1;
+            docs.forEach((doc) => {
+                const data = doc.data();
+                const date = data.registeredAt ? new Date(data.registeredAt.toDate ? data.registeredAt.toDate() : data.registeredAt) : new Date();
+                const formattedDate = date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+                const time = date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                const safeName = escapeHTML(data.fullName || 'غير معروف');
+                const safeGrade = escapeHTML(data.grade || 'غير محدد');
+                const safeGender = escapeHTML(data.gender || '-');
+                const safeParent = escapeHTML(data.parentName || '-');
+                const safePhone = escapeHTML(data.phone || '-');
+
+                const isChecked = selectedStudentIds.has(doc.id) ? 'checked' : '';
+                html += `<tr><td><input type="checkbox" class="student-check" data-id="${doc.id}" style="width:18px;height:18px;cursor:pointer;" ${isChecked}></td><td>${index}</td><td><strong>${safeName}</strong></td><td><span class="badge-grade">${safeGrade}</span></td><td>${safeGender}</td><td>${safeParent}</td><td dir="ltr">${safePhone}</td><td style="font-size:12px;">${formattedDate}<br>${time}</td><td><div class="action-btns"><button class="btn-view" data-id="${doc.id}"><i class="fas fa-eye"></i> عرض</button><button class="btn-delete" data-id="${doc.id}"><i class="fas fa-trash"></i> حذف</button></div></td></tr>`;
+                index++;
+            });
+            studentsBody.innerHTML = html;
+            resultCount.textContent = `(عرض ${docs.length} من ${totalDocs} طالب)`;
+            lastUpdatedText.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}`;
+
+            // ربط الأحداث
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const id = this.dataset.id;
+                    const docSnap = await getDoc(doc(db, "students", id));
+                    if (docSnap.exists()) showDetails({ id: docSnap.id, ...docSnap.data() });
+                });
+            });
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('deleteDocId').value = this.dataset.id;
+                    document.getElementById('deleteModal').classList.add('show');
+                });
+            });
+
+            // ربط مربعات الاختيار الفردية
+            document.querySelectorAll('.student-check').forEach(chk => {
+                chk.addEventListener('change', function() {
+                    const id = this.dataset.id;
+                    if (this.checked) {
+                        selectedStudentIds.add(id);
+                    } else {
+                        selectedStudentIds.delete(id);
+                    }
+                    updateBulkActionsBar();
+                });
+            });
+
+            // تحديث شريط التحكم الجماعي
+            updateBulkActionsBar();
+        }
+
+        function updatePagination(currentCount) {
+            const totalPages = Math.ceil(totalDocs / PAGE_SIZE) || 1;
+            pageInfo.textContent = `الصفحة ${currentPage + 1} من ${totalPages}`;
+            prevPageBtn.disabled = currentPage === 0;
+            nextPageBtn.disabled = currentCount < PAGE_SIZE || currentPage >= totalPages - 1;
+        }
+
+        function nextPage() {
+            if (!lastVisible) return;
+            currentPage++;
+            loadStudents(false);
+        }
+
+        function prevPage() {
+            if (currentPage === 0) return;
+            const prev = currentPage - 1;
+            if (pageSnapshots[prev] && pageSnapshots[prev].docs) {
+                currentPage = prev;
+                lastVisible = pageSnapshots[prev].last;
+                firstVisible = pageSnapshots[prev].first;
+                renderTable(pageSnapshots[prev].docs);
+                updatePagination(pageSnapshots[prev].docs.length);
+                loadStudents(false);
+            } else {
+                currentPage = 0;
+                lastVisible = null;
+                firstVisible = null;
+                loadStudents(true);
+            }
+        }
+
+        prevPageBtn.addEventListener('click', prevPage);
+        nextPageBtn.addEventListener('click', nextPage);
+
+        // ===== تحديث الإحصائيات via onSnapshot (بث مباشر، 0 قراءات إضافية) =====
+        function setupStatsListener() {
+            if (unsubscribeStats) unsubscribeStats();
+            unsubscribeStats = onSnapshot(statsRef, (snap) => {
+                if (snap.exists()) {
+                    const d = snap.data();
+                    totalCount.textContent = d.total ?? 0;
+                    maleCount.textContent = d.male ?? 0;
+                    femaleCount.textContent = d.female ?? 0;
+                    todayCount.textContent = d.todayCount ?? 0;
+                    // رسم توزيع الصفوف
+                    renderGradeChart(d.gradeDistribution || {});
+                }
+            }, (err) => {
+                console.warn("⚠️ خطأ في استماع الإحصائيات:", err);
+            });
+        }
+
+        // ===== رسم بياني لتوزيع الصفوف (CSS بسيط بدون مكتبات) =====
+        function renderGradeChart(distribution) {
+            const chartContainer = document.getElementById('gradeChart');
+            if (!chartContainer) return;
+            const keys = Object.keys(distribution);
+            if (keys.length === 0) { chartContainer.innerHTML = '<p style="color:#a0aec0;font-size:13px;">لا توجد بيانات كافية للرسم البياني</p>'; return; }
+            const maxVal = Math.max(...Object.values(distribution), 1);
+            let html = '';
+            keys.forEach(key => {
+                const label = key.replace(/_/g, ' ');
+                const count = distribution[key] || 0;
+                const pct = (count / maxVal) * 100;
+                html += `
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;">
+                        <span style="min-width:100px;text-align:left;color:#4a5568;font-weight:600;">${label}</span>
+                        <div style="flex:1;height:22px;background:#edf2f7;border-radius:11px;overflow:hidden;">
+                            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#0f7264,#38a169);border-radius:11px;transition:width 0.6s ease;min-width:20px;"></div>
+                        </div>
+                        <span style="min-width:30px;text-align:center;color:#084c43;font-weight:700;">${count}</span>
+                    </div>`;
+            });
+            chartContainer.innerHTML = html;
+        }
+
+        // ===== Debounce للبحث المحلي (0 قراءة من Firestore) =====
+        function setupSearchDebounce() {
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 0;
+                    lastVisible = null;
+                    const results = localSearch();
+                    if (results !== null) {
+                        loadStudents(true);
+                    } else {
+                        loadStudents(true);
+                    }
+                }, 250);
+            });
+        }
+
+        function setupFilterDebounce() {
+            const filters = [filterGrade, filterGender, filterAcademicYear];
+            filters.forEach(filter => {
+                filter.addEventListener('change', () => {
+                    clearTimeout(filterTimeout);
+                    filterTimeout = setTimeout(() => {
+                        currentPage = 0;
+                        lastVisible = null;
+                        loadStudents(true);
+                    }, 300);
+                });
+            });
+        }
+
+        // ===== شريط التحكم الجماعي =====
+        function updateBulkActionsBar() {
+            const count = selectedStudentIds.size;
+            const bar = document.getElementById('bulkActionsBar');
+            const info = document.getElementById('bulkSelectedCount');
+            if (count > 0) {
+                bar.classList.add('show');
+                info.textContent = `تم تحديد عدد (${count}) طالب للتحكم السريع الجماعي`;
+                document.getElementById('selectAllCheck').checked = false;
+            } else {
+                bar.classList.remove('show');
+            }
+        }
+
+        // ===== اختيار الكل =====
+        document.getElementById('selectAllCheck').addEventListener('change', function() {
+            const checks = document.querySelectorAll('.student-check');
+            if (this.checked) {
+                checks.forEach(chk => {
+                    chk.checked = true;
+                    selectedStudentIds.add(chk.dataset.id);
+                });
+            } else {
+                checks.forEach(chk => {
+                    chk.checked = false;
+                    selectedStudentIds.delete(chk.dataset.id);
+                });
+            }
+            updateBulkActionsBar();
+        });
+
+        // ===== تحميل كاش أسماء الطلاب من localStorage =====
+        function loadStudentNameCache() {
+            try {
+                const cached = localStorage.getItem(STUDENT_CACHE_KEY);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (Date.now() - data.timestamp < 3600000) { // ساعة صلاحية
+                        studentNameCache = data.names || [];
+                    }
+                }
+            } catch (e) { studentNameCache = []; }
+        }
+
+        function saveStudentNameCache() {
+            try {
+                localStorage.setItem(STUDENT_CACHE_KEY, JSON.stringify({
+                    names: studentNameCache,
+                    timestamp: Date.now()
+                }));
+            } catch (e) { /* تجاهل */ }
+        }
+
+        // ===== تحميل بيانات اللوحة =====
+        function loadDashboardData() {
+            loadStudentNameCache();
+            setupStatsListener();
+            setupConfigListener();
+            loadStudents(true);
+            setupSearchDebounce();
+            setupFilterDebounce();
+        }
+
+        function updateStatusBadge(isOpen) {
+            statusBadge.className = `status-badge ${isOpen ? 'open' : 'closed'}`;
+            statusBadge.textContent = isOpen ? 'مفتوح ✅' : 'مغلق ❌';
+        }
+
+        // ===== عرض التفاصيل =====
+        function showDetails(student) {
+            const content = document.getElementById('detailContent');
+            content.innerHTML = '';
+
+            const rows = [
+                { key: 'الاسم الكامل', value: escapeHTML(student.fullName) || '-' },
+                { key: 'تاريخ الميلاد', value: escapeHTML(student.dob) || '-' },
+                { key: 'الجنس', value: escapeHTML(student.gender) || '-' },
+                { key: 'الصف الدراسي', value: escapeHTML(student.grade) || '-' },
+                { key: 'ولي الأمر', value: escapeHTML(student.parentName) || '-' },
+                { key: 'جهة العمل', value: escapeHTML(student.parentJob) || 'غير مذكور' },
+                { key: 'رقم الجوال', value: escapeHTML(student.phone) || '-' },
+                { key: 'العنوان', value: escapeHTML(student.address) || 'غير مذكور' },
+                { key: 'الملاحظات', value: escapeHTML(student.notes) || 'لا يوجد' },
+                { key: 'تاريخ التسجيل', value: student.registeredAt ? new Date(student.registeredAt.toDate ? student.registeredAt.toDate() : student.registeredAt).toLocaleString('ar-EG') : '-' },
+            ];
+
+            rows.forEach(row => {
+                const div = document.createElement('div');
+                div.className = 'detail-row';
+                const k = document.createElement('span');
+                k.className = 'key';
+                k.textContent = row.key;
+                const v = document.createElement('span');
+                v.className = 'value';
+                v.textContent = row.value;
+                div.appendChild(k);
+                div.appendChild(v);
+                content.appendChild(div);
+            });
+
+            const imageFields = [
+                { key: 'الصورة الشخصية', field: 'studentPhotoURL' },
+                { key: 'بطاقة الطالب', field: 'studentIdDocURL' },
+                { key: 'بطاقة الأب', field: 'fatherIdURL' },
+                { key: 'بطاقة الأم', field: 'motherIdURL' },
+                { key: 'بطاقة السكن', field: 'rentCardURL' }
+            ];
+
+            let hasImages = false;
+            imageFields.forEach(img => {
+                const url = student[img.field];
+                if (url && url.startsWith('http')) {
+                    hasImages = true;
+                    const fileName = `${student.fullName || 'طالب'}_${img.key}.jpg`;
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'image-row';
+                    const keySpan = document.createElement('span');
+                    keySpan.className = 'key';
+                    keySpan.textContent = img.key;
+                    rowDiv.appendChild(keySpan);
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'image-wrapper';
+                    const imgEl = document.createElement('img');
+                    imgEl.src = url;
+                    imgEl.alt = img.key;
+                    imgEl.loading = 'lazy';
+                    imgEl.style.cursor = 'pointer';
+                    imgEl.onclick = () => window.open(url, '_blank');
+                    wrapper.appendChild(imgEl);
+                    const actions = document.createElement('div');
+                    actions.className = 'image-actions';
+                    const viewBtn = document.createElement('button');
+                    viewBtn.className = 'btn-img-view';
+                    viewBtn.innerHTML = '<i class="fas fa-eye"></i> عرض';
+                    viewBtn.onclick = () => window.open(url, '_blank');
+                    actions.appendChild(viewBtn);
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'btn-img-download';
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> تحميل';
+                    downloadBtn.onclick = () => downloadImage(url, fileName);
+                    actions.appendChild(downloadBtn);
+                    const printBtn = document.createElement('button');
+                    printBtn.className = 'btn-img-print';
+                    printBtn.innerHTML = '<i class="fas fa-print"></i> طباعة';
+                    printBtn.onclick = () => printImage(url);
+                    actions.appendChild(printBtn);
+                    wrapper.appendChild(actions);
+                    rowDiv.appendChild(wrapper);
+                    content.appendChild(rowDiv);
+                }
+            });
+
+            if (!hasImages) {
+                const div = document.createElement('div');
+                div.className = 'detail-row';
+                const k = document.createElement('span');
+                k.className = 'key';
+                k.textContent = 'المستندات';
+                const v = document.createElement('span');
+                v.className = 'value';
+                v.textContent = 'لا توجد صور مرفقة';
+                div.appendChild(k);
+                div.appendChild(v);
+                content.appendChild(div);
+            }
+
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        // ===== دوال الصور =====
+        window.downloadImage = function(url, fileName) {
+            fetch(url).then(r => r.blob()).then(blob => {
+                const link = document.createElement('a');
+                const objectUrl = URL.createObjectURL(blob);
+                link.href = objectUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(objectUrl);
+                showToast('✅ تم تحميل الصورة.', 'success');
+            }).catch(() => showToast('❌ فشل تحميل الصورة.', 'error'));
+        };
+
+        window.printImage = function(url) {
+            const w = window.open('', '_blank', 'width=800,height=600');
+            if (!w) { showToast('❌ يرجى إلغاء حظر النوافذ المنبثقة.', 'error'); return; }
+            w.document.write(`<html><head><title>طباعة الصورة</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;height:100vh;background:#f0f0f0;}img{max-width:95%;max-height:95%;box-shadow:0 8px 30px rgba(0,0,0,0.2);border-radius:8px;}</style></head><body><img src="${url}"><script>window.onload=function(){window.print();};<\/script></body></html>`);
+            w.document.close();
+        };
+
+        window.printStudentReport = function() { showToast('⏳ جاري تحضير التقرير...', 'info'); };
+        window.saveAsPDF = function() { showToast('⏳ جاري تحضير PDF...', 'info'); };
+
+        // ===== أحداث الفلاتر =====
+        clearFiltersBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filterGrade.value = '';
+            filterGender.value = '';
+            filterAcademicYear.value = '';
+            currentPage = 0;
+            lastVisible = null;
+            loadStudents(true);
+            showToast('🧹 تم إعادة ضبط الفلاتر.', 'info');
+        });
+
+        refreshBtn.addEventListener('click', () => {
+            loadStudents(true);
+            updateStats(true);
+            loadConfigSettings();
+            showToast('🔄 تم تحديث البيانات.', 'info');
+        });
+
+        // ===== تغيير حالة التسجيل مع تأكيد =====
+        toggleSwitch.addEventListener('change', function() {
+            const isOpen = this.checked;
+            if (!confirm(`⚠️ هل أنت متأكد من ${isOpen ? 'فتح' : 'إغلاق'} التسجيل؟`)) {
+                this.checked = !isOpen;
+                return;
+            }
+            setDoc(doc(db, "config", "settings"), { registrationOpen: isOpen }, { merge: true })
+                .then(() => { updateStatusBadge(isOpen);
+                    showToast(isOpen ? '✅ تم فتح التسجيل.' : '⛔ تم إغلاق التسجيل.', 'success'); })
+                .catch((error) => { alert('❌ فشل تغيير الحالة: ' + error.message);
+                    toggleSwitch.checked = !isOpen; });
+        });
+
+        // ===== حذف طالب فردي مع خفض العداد =====
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            const id = document.getElementById('deleteDocId').value;
+            if (!id) return;
+
+            const hasPermission = await checkAdminPermission();
+            if (!hasPermission) return;
+
+            try {
+                const docSnap = await getDoc(doc(db, "students", id));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.sessionUID) await deleteStudentFiles(data.sessionUID);
+                    // خفض العداد
+                    try {
+                        const today = new Date().toISOString().split('T')[0];
+                        await runTransaction(db, async (tx) => {
+                            const s = await tx.get(statsRef);
+                            if (s.exists()) {
+                                const sd = s.data();
+                                const gradeKey = (data.grade || 'غير_محدد').replace(/\s+/g, '_');
+                                const gd = sd.gradeDistribution || {};
+                                tx.update(statsRef, {
+                                    total: increment(-1),
+                                    male: increment(data.gender === 'ذكر' ? -1 : 0),
+                                    female: increment(data.gender === 'أنثى' ? -1 : 0),
+                                    todayCount: sd.lastReset === today ? increment(-1) : sd.todayCount,
+                                    [`gradeDistribution.${gradeKey}`]: increment(-1)
+                                });
+                            }
+                        });
+                    } catch (ce) { console.warn("⚠️ فشل تحديث العداد:", ce); }
+                }
+                await deleteDoc(doc(db, "students", id));
+                selectedStudentIds.delete(id);
+                document.getElementById('deleteModal').classList.remove('show');
+                showToast('✅ تم حذف الطالب والصور المرفقة.', 'success');
+                loadStudents(true);
+            } catch (e) {
+                showToast('❌ فشل الحذف: ' + e.message, 'error');
+            }
+        });
+
+        // ===== حذف جماعي مع خفض العداد =====
+        document.getElementById('bulkDeleteBtn').addEventListener('click', async function() {
+            const count = selectedStudentIds.size;
+            if (count === 0) {
+                showToast('❌ لم يتم تحديد أي طالب للحذف.', 'error');
+                return;
+            }
+
+            const hasPermission = await checkAdminPermission();
+            if (!hasPermission) return;
+
+            if (!confirm(`⚠️ تحذير: هل أنت متأكد من حذف (${count}) طالب نهائياً؟`)) return;
+
+            try {
+                showToast(`⏳ جاري حذف ${count} طالب...`, 'info');
+                const batch = writeBatch(db);
+                let maleDel = 0, femaleDel = 0;
+                const gradeDels = {};
+
+                for (const id of selectedStudentIds) {
+                    const docSnap = await getDoc(doc(db, "students", id));
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.sessionUID) await deleteStudentFiles(data.sessionUID);
+                        if (data.gender === 'ذكر') maleDel++;
+                        else if (data.gender === 'أنثى') femaleDel++;
+                        const gk = (data.grade || 'غير_محدد').replace(/\s+/g, '_');
+                        gradeDels[gk] = (gradeDels[gk] || 0) + 1;
+                    }
+                    batch.delete(doc(db, "students", id));
+                }
+
+                await batch.commit();
+
+                // خفض العداد بشكل ذري
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    await runTransaction(db, async (tx) => {
+                        const s = await tx.get(statsRef);
+                        if (s.exists()) {
+                            const sd = s.data();
+                            const gd = { ...(sd.gradeDistribution || {}) };
+                            Object.keys(gradeDels).forEach(k => {
+                                gd[k] = (gd[k] || 0) - gradeDels[k];
+                                if (gd[k] <= 0) delete gd[k];
+                            });
+                            tx.update(statsRef, {
+                                total: increment(-count),
+                                male: increment(-maleDel),
+                                female: increment(-femaleDel),
+                                todayCount: sd.lastReset === today ? increment(-count) : sd.todayCount,
+                                gradeDistribution: gd
+                            });
+                        }
+                    });
+                } catch (ce) { console.warn("⚠️ فشل تحديث العداد:", ce); }
+
+                selectedStudentIds.clear();
+                updateBulkActionsBar();
+                showToast(`✅ تم حذف ${count} طالب وملفاتهم بنجاح.`, 'success');
+                loadStudents(true);
+            } catch (e) {
+                showToast('❌ فشل الحذف الجماعي: ' + e.message, 'error');
+            }
+        });
+
+        // ===== تصدير الصفحة الحالية فقط (محسّن) =====
+        exportPageBtn.addEventListener('click', async function() {
+            try {
+                const hasPermission = await checkAdminPermission();
+                if (!hasPermission) return;
+
+                const pageDocs = pageSnapshots[currentPage]?.docs || [];
+                if (pageDocs.length === 0) {
+                    showToast('لا توجد بيانات في الصفحة الحالية للتصدير.', 'error');
+                    return;
+                }
+
+                showToast(`⏳ جاري تصدير ${pageDocs.length} طالب من الصفحة ${currentPage+1}...`, 'info');
+                const headers = ['الاسم الكامل', 'تاريخ الميلاد', 'الجنس', 'الصف', 'ولي الأمر', 'جهة العمل', 'الجوال', 'العنوان', 'الملاحظات', 'تاريخ التسجيل'];
+                let csv = headers.join(',') + '\n';
+                pageDocs.forEach(doc => {
+                    const s = doc.data();
+                    const row = headers.map((h, i) => {
+                        const keys = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'parentJob', 'phone', 'address', 'notes', 'registeredAt'];
+                        let val = s[keys[i]] || '';
+                        if (keys[i] === 'registeredAt' && val) {
+                            const d = val.toDate ? val.toDate() : new Date(val);
+                            val = d.toLocaleString('ar-EG');
+                        }
+                        return `"${val}"`;
+                    });
+                    csv += row.join(',') + '\n';
+                });
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `طلاب_الارتقاء_الصفحة${currentPage+1}_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast(`✅ تم تصدير ${pageDocs.length} طالب من الصفحة ${currentPage+1} بنجاح.`, 'success');
+            } catch (e) {
+                showToast('❌ فشل التصدير: ' + e.message, 'error');
+            }
+        });
+
+        // ===== تصدير جميع الطلاب باستخدام Pagination =====
+        exportAllBtn.addEventListener('click', async function() {
+            try {
+                const hasPermission = await checkAdminPermission();
+                if (!hasPermission) return;
+
+                showToast('⏳ جاري تجهيز ملف التصدير الكامل... قد يستغرق بعض الوقت.', 'info');
+
+                // ✅ جلب جميع الطلاب باستخدام Pagination
+                let allDocs = [];
+                let lastDoc = null;
+                let hasMore = true;
+                const BATCH_SIZE = 100;
+
+                while (hasMore) {
+                    let q = query(
+                        collection(db, "students"),
+                        orderBy("registeredAt", "desc"),
+                        limit(BATCH_SIZE)
+                    );
+                    if (lastDoc) q = query(q, startAfter(lastDoc));
+
+                    const snapshot = await getDocs(q);
+                    const docs = snapshot.docs;
+
+                    if (docs.length === 0) {
+                        hasMore = false;
+                        break;
+                    }
+
+                    allDocs = allDocs.concat(docs);
+                    lastDoc = docs[docs.length - 1];
+
+                    if (docs.length < BATCH_SIZE) {
+                        hasMore = false;
+                    }
+                }
+
+                if (allDocs.length === 0) {
+                    showToast('لا توجد بيانات للتصدير.', 'error');
+                    return;
+                }
+
+                showToast(`⏳ جاري إنشاء ملف CSV لـ ${allDocs.length} طالب...`, 'info');
+
+                const headers = ['الاسم الكامل', 'تاريخ الميلاد', 'الجنس', 'الصف', 'ولي الأمر', 'جهة العمل', 'الجوال', 'العنوان', 'الملاحظات', 'تاريخ التسجيل'];
+                let csv = headers.join(',') + '\n';
+
+                allDocs.forEach(doc => {
+                    const s = doc.data();
+                    const row = headers.map((h, i) => {
+                        const keys = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'parentJob', 'phone', 'address', 'notes', 'registeredAt'];
+                        let val = s[keys[i]] || '';
+                        if (keys[i] === 'registeredAt' && val) {
+                            const d = val.toDate ? val.toDate() : new Date(val);
+                            val = d.toLocaleString('ar-EG');
+                        }
+                        return `"${val}"`;
+                    });
+                    csv += row.join(',') + '\n';
+                });
+
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `طلاب_الارتقاء_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast(`✅ تم تصدير ${allDocs.length} طالب بنجاح.`, 'success');
+            } catch (e) {
+                showToast('❌ فشل التصدير: ' + e.message, 'error');
+            }
+        });
+
+        // ===== تصدير المحددين فقط (محسّن باستخدام Promise.all) =====
+        document.getElementById('bulkExportBtn').addEventListener('click', async function() {
+            const count = selectedStudentIds.size;
+            if (count === 0) {
+                showToast('❌ لم يتم تحديد أي طالب للتصدير.', 'error');
+                return;
+            }
+
+            const hasPermission = await checkAdminPermission();
+            if (!hasPermission) return;
+
+            try {
+                showToast(`⏳ جاري تصدير ${count} طالب محدد...`, 'info');
+
+                // ✅ استخدام Promise.all لجلب المستندات بالتوازي
+                const docPromises = Array.from(selectedStudentIds).map(id => getDoc(doc(db, "students", id)));
+                const docSnaps = await Promise.all(docPromises);
+                const docs = docSnaps.filter(snap => snap.exists()).map(snap => ({ id: snap.id, ...snap.data() }));
+
+                if (docs.length === 0) {
+                    showToast('لا توجد بيانات للتصدير.', 'error');
+                    return;
+                }
+
+                const headers = ['الاسم الكامل', 'تاريخ الميلاد', 'الجنس', 'الصف', 'ولي الأمر', 'جهة العمل', 'الجوال', 'العنوان', 'الملاحظات', 'تاريخ التسجيل'];
+                let csv = headers.join(',') + '\n';
+                docs.forEach(s => {
+                    const row = headers.map((h, i) => {
+                        const keys = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'parentJob', 'phone', 'address', 'notes', 'registeredAt'];
+                        let val = s[keys[i]] || '';
+                        if (keys[i] === 'registeredAt' && val) {
+                            const d = val.toDate ? val.toDate() : new Date(val);
+                            val = d.toLocaleString('ar-EG');
+                        }
+                        return `"${val}"`;
+                    });
+                    csv += row.join(',') + '\n';
+                });
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `طلاب_الارتقاء_المحددين_${new Date().toISOString().slice(0,10)}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast(`✅ تم تصدير ${docs.length} طالب محدد بنجاح.`, 'success');
+            } catch (e) {
+                showToast('❌ فشل التصدير: ' + e.message, 'error');
+            }
+        });
+
+        console.log("🚀 لوحة التحكم النهائية (عداد + بث مباشر + بحث محلي + رسوم بيانية) جاهزة!");
+    </script>
+</body>
+</html>
