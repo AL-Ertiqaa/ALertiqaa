@@ -1,0 +1,25 @@
+# Firebase
+firebase-debug.log
+.firebase/
+database-debug.log
+
+# Dependencies
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Firebase cache
+.firebase/
+
+# Env
+.firebaserc.local

@@ -21,6 +21,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
+        /* ===== متغيرات التصميم ===== */
+        :root {
+            --primary-dark: #084c43;
+            --primary: #0f7264;
+            --primary-light: #38a169;
+            --accent: #b49554;
+            --accent-light: #e5dcb7;
+            --danger: #e53e3e;
+            --info: #3182ce;
+            --bg: #f2f7f6;
+            --bg-card: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --text-muted: #a0aec0;
+            --border: #e2e8f0;
+            --border-light: #edf2f7;
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 25px rgba(0,0,0,0.08);
+            --shadow-lg: 0 25px 70px rgba(15,114,100,0.12);
+            --font: 'Cairo', sans-serif;
+            --transition: 0.25s ease;
+        }
+
         /* ===== إعادة الضبط والتصميم الأساسي ===== */
         * {
             margin: 0;
@@ -31,8 +57,8 @@
             scroll-behavior: smooth;
         }
         body {
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(145deg, #f2f7f6, #dce8e6);
+            font-family: var(--font);
+            background: linear-gradient(145deg, var(--bg), #dce8e6);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -259,14 +285,20 @@
             display: block;
         }
         @keyframes fadeStep {
-            0% {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-200px) rotate(720deg); opacity: 0; }
+        }
+        @keyframes pulse-success {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(56, 161, 105, 0); }
+        }
+        .confetti-piece {
+            position: absolute; width: 10px; height: 10px;
+            border-radius: 2px; animation: confetti 1.5s ease-out forwards;
         }
 
         .step-title {
@@ -372,160 +404,6 @@
             background: #f0fff4;
         }
 
-        /* ===== المرفقات ===== */
-        .upload-section {
-            background: #fcfdfd;
-            border-radius: 24px;
-            padding: 22px 20px 12px;
-            margin: 10px 0 15px;
-            border: 2px dashed #b49554;
-            transition: 0.3s ease;
-        }
-        .upload-section:hover {
-            background: #f9faf8;
-        }
-        .upload-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .upload-item {
-            flex: 1 1 calc(33% - 15px);
-            min-width: 150px;
-            background: #fff;
-            border-radius: 18px;
-            padding: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .02);
-            border: 1px solid #edf2f7;
-            text-align: center;
-            transition: 0.2s ease;
-        }
-        .upload-item:hover {
-            border-color: #b49554;
-            box-shadow: 0 4px 15px rgba(180, 149, 84, .1);
-        }
-        .upload-item label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .upload-item .file-input-wrapper {
-            position: relative;
-            width: 100%;
-        }
-        .upload-item .file-input-wrapper input[type="file"] {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            top: 0;
-            right: 0;
-        }
-        .upload-item .upload-box {
-            border: 2px dashed #e2e8f0;
-            border-radius: 14px;
-            padding: 15px 5px;
-            background: #f7fafc;
-            transition: 0.25s ease;
-            min-height: 90px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .upload-item .upload-box:hover {
-            border-color: #b49554;
-            background: #fffbf5;
-        }
-        .upload-item .upload-box i {
-            font-size: 32px;
-            color: #a0aec0;
-            margin-bottom: 4px;
-        }
-        .upload-item .upload-box span {
-            font-size: 12px;
-            color: #718096;
-        }
-        .upload-item .file-info {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 4px;
-            display: none;
-        }
-        .upload-item .file-info.show {
-            display: block;
-        }
-        .upload-item .preview-img {
-            width: 75px;
-            height: 75px;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 2px solid #e2e8f0;
-            margin-top: 6px;
-            display: none;
-            background: #fff;
-            aspect-ratio: 1 / 1;
-        }
-        .upload-item .preview-img.show {
-            display: block;
-            margin: 6px auto 0;
-        }
-        .upload-item .remove-file {
-            display: none;
-            background: #e53e3e;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-top: 4px;
-        }
-        .upload-item .remove-file:hover {
-            background: #c53030;
-        }
-        .upload-item .remove-file.show {
-            display: inline-block;
-        }
-
-        /* ===== شريط تقدم رفع الملفات ===== */
-        .upload-progress {
-            display: none;
-            margin: 15px 0;
-            padding: 10px;
-            background: #edf2f7;
-            border-radius: 12px;
-        }
-        .upload-progress.show {
-            display: block;
-        }
-        .upload-progress .progress-bar-bg {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .upload-progress .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: #0f7264;
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-        .upload-progress .progress-text {
-            font-size: 13px;
-            color: #4a5568;
-            margin-top: 5px;
-            text-align: center;
-            font-weight: 600;
-        }
-
         /* ===== أزرار التنقل ===== */
         .step-buttons {
             display: flex;
@@ -592,14 +470,27 @@
             text-align: center;
             color: #22543d;
             animation: fadeStep 0.6s ease;
+            position: relative;
+            overflow: hidden;
         }
         .success-message.show {
             display: block;
+            animation: pulse-success 2s ease-in-out 1;
         }
-        .success-message i {
-            font-size: 55px;
+        .success-message .success-icon {
+            font-size: 60px;
             color: #38a169;
             margin-bottom: 10px;
+            display: inline-block;
+        }
+        .success-message .check-circle {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: #c6f6d5; display: flex; align-items: center;
+            justify-content: center; margin: 0 auto 15px;
+            animation: pulse-success 2s ease-in-out infinite;
+        }
+        .success-message .check-circle i {
+            font-size: 40px; color: #38a169;
         }
         .success-message h3 {
             font-size: 24px;
@@ -649,31 +540,6 @@
         }
         .btn-sibling:hover {
             background: #967e41;
-            transform: scale(1.03);
-        }
-
-        .btn-emergency {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: #e53e3e;
-            color: #fff;
-            text-decoration: none;
-            padding: 14px 30px;
-            border-radius: 35px;
-            font-weight: 700;
-            margin-top: 10px;
-            font-size: 16px;
-            font-family: 'Cairo', sans-serif;
-            box-shadow: 0 8px 20px rgba(229, 62, 62, 0.3);
-            transition: 0.2s ease;
-        }
-        .btn-emergency.show {
-            display: inline-flex;
-        }
-        .btn-emergency:hover {
-            background: #c53030;
             transform: scale(1.03);
         }
 
@@ -751,9 +617,6 @@
             .form-body {
                 padding: 15px;
             }
-            .upload-item {
-                flex: 1 1 100%;
-            }
             .footer {
                 padding: 20px 15px;
             }
@@ -826,7 +689,7 @@
                     </div>
                     <div class="progress-step" data-step="3">
                         <div class="circle">3</div>
-                        <span class="step-label">المستندات</span>
+                        <span class="step-label">الملاحظات والإرسال</span>
                     </div>
                     <div class="progress-line">
                         <div class="progress-line-fill" id="progressFill"></div>
@@ -921,93 +784,12 @@
                         </div>
                     </div>
 
-                    <!-- ===== الخطوة 3: المستندات والملاحظات ===== -->
+                    <!-- ===== الخطوة 3: الملاحظات والإرسال ===== -->
                     <div class="step-section" data-step="3">
                         <div class="step-title">
-                            <i class="fas fa-paperclip"></i> المستندات والملاحظات
+                            <i class="fas fa-sticky-note"></i> الملاحظات والإرسال
                             <span class="step-counter">(الخطوة 3 من 3)</span>
                         </div>
-                        <div class="upload-section">
-                            <div class="upload-grid">
-                                <div class="upload-item">
-                                    <label for="studentPhoto">الصورة الشخصية <span style="color:#b49554;">(خلفية بيضاء)</span></label>
-                                    <div class="file-input-wrapper">
-                                        <div class="upload-box" id="box-studentPhoto">
-                                            <i class="fas fa-camera"></i>
-                                            <span>اختر الصورة</span>
-                                            <img class="preview-img" id="preview-studentPhoto" src="#" alt="معاينة" width="71" height="71">
-                                        </div>
-                                        <input type="file" id="studentPhoto" accept="image/*">
-                                    </div>
-                                    <div class="file-info" id="info-studentPhoto"></div>
-                                    <button class="remove-file" id="remove-studentPhoto" aria-label="إزالة الصورة"><i class="fas fa-times"></i></button>
-                                </div>
-                                <div class="upload-item">
-                                    <label for="studentIdDoc">بطاقة الطالب الوطنية</label>
-                                    <div class="file-input-wrapper">
-                                        <div class="upload-box" id="box-studentId">
-                                            <i class="fas fa-id-card"></i>
-                                            <span>اختر الصورة</span>
-                                            <img class="preview-img" id="preview-studentId" src="#" alt="معاينة" width="71" height="71">
-                                        </div>
-                                        <input type="file" id="studentIdDoc" accept="image/*">
-                                    </div>
-                                    <div class="file-info" id="info-studentIdDoc"></div>
-                                    <button class="remove-file" id="remove-studentIdDoc" aria-label="إزالة الصورة"><i class="fas fa-times"></i></button>
-                                </div>
-                                <div class="upload-item">
-                                    <label for="fatherId">بطاقة ولي الأمر (الأب)</label>
-                                    <div class="file-input-wrapper">
-                                        <div class="upload-box" id="box-fatherId">
-                                            <i class="fas fa-id-card"></i>
-                                            <span>اختر الصورة</span>
-                                            <img class="preview-img" id="preview-fatherId" src="#" alt="معاينة" width="71" height="71">
-                                        </div>
-                                        <input type="file" id="fatherId" accept="image/*">
-                                    </div>
-                                    <div class="file-info" id="info-fatherId"></div>
-                                    <button class="remove-file" id="remove-fatherId" aria-label="إزالة الصورة"><i class="fas fa-times"></i></button>
-                                </div>
-                                <div class="upload-item">
-                                    <label for="motherId">بطاقة الأم (إن وجدت)</label>
-                                    <div class="file-input-wrapper">
-                                        <div class="upload-box" id="box-motherId">
-                                            <i class="fas fa-id-card"></i>
-                                            <span>اختر الصورة</span>
-                                            <img class="preview-img" id="preview-motherId" src="#" alt="معاينة" width="71" height="71">
-                                        </div>
-                                        <input type="file" id="motherId" accept="image/*">
-                                    </div>
-                                    <div class="file-info" id="info-motherId"></div>
-                                    <button class="remove-file" id="remove-motherId" aria-label="إزالة الصورة"><i class="fas fa-times"></i></button>
-                                </div>
-                                <div class="upload-item">
-                                    <label for="rentCard">بطاقة السكن / إيجار</label>
-                                    <div class="file-input-wrapper">
-                                        <div class="upload-box" id="box-rentCard">
-                                            <i class="fas fa-file-alt"></i>
-                                            <span>اختر الصورة</span>
-                                            <img class="preview-img" id="preview-rentCard" src="#" alt="معاينة" width="71" height="71">
-                                        </div>
-                                        <input type="file" id="rentCard" accept="image/*">
-                                    </div>
-                                    <div class="file-info" id="info-rentCard"></div>
-                                    <button class="remove-file" id="remove-rentCard" aria-label="إزالة الصورة"><i class="fas fa-times"></i></button>
-                                </div>
-                            </div>
-                            <p style="font-size:12px;color:#718096;margin-top:12px;text-align:center;">
-                                <i class="fas fa-info-circle"></i> سيتم ضغط الصور تلقائياً لتوفير البيانات وتسريع الرفع.
-                            </p>
-                        </div>
-
-                        <!-- شريط تقدم رفع الملفات -->
-                        <div class="upload-progress" id="uploadProgress">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" id="uploadProgressFill"></div>
-                            </div>
-                            <div class="progress-text" id="uploadProgressText">جاري رفع الملفات...</div>
-                        </div>
-
                         <div class="form-row">
                             <div class="form-group full-width">
                                 <label for="notes"><i class="fas fa-sticky-note"></i> ملاحظات إضافية (حالة صحية، احتياجات خاصة، ...)</label>
@@ -1027,7 +809,7 @@
 
                 <!-- رسالة النجاح -->
                 <div class="success-message" id="successMessage">
-                    <i class="fas fa-check-circle"></i>
+                    <div class="check-circle"><i class="fas fa-check"></i></div>
                     <h3>✅ تم التسجيل سحابياً بنجاح!</h3>
                     <p>شكراً لتسجيلكم في مدارس الأرتقاء الأهلية. يرجى الضغط أدناه لتأكيد طلبكم عبر واتساب الإدارة فوراً.</p>
                     <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
@@ -1040,12 +822,7 @@
                     </div>
                 </div>
 
-                <!-- زر الطوارئ -->
-                <div style="text-align: center;">
-                    <a id="emergencyBtn" href="#" target="_blank" class="btn-emergency">
-                        <i class="fab fa-whatsapp"></i> هل انقطع الإنترنت؟ أرسل البيانات يدوياً عبر واتساب الآن
-                    </a>
-                </div>
+
             </div>
         </div>
 
@@ -1079,12 +856,6 @@
     </div>
 
     <!-- ========================================= -->
-    <!-- تحميل مكتبة ضغط الصور بشكل متأخر (defer) -->
-    <!-- ========================================= -->
-    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.4.0/dist/browser-image-compression.js" defer>
-    </script>
-
-    <!-- ========================================= -->
     <!-- Firebase SDK + منطق النموذج الكامل -->
     <!-- ========================================= -->
     <script type="importmap">
@@ -1092,7 +863,6 @@
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js",
                 "firebase/firestore": "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js",
-                "firebase/storage": "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js",
                 "firebase/app-check": "https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js"
             }
         }
@@ -1102,7 +872,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
         import { initializeFirestore, doc, setDoc, getDoc, collection, addDoc, persistentLocalCache, serverTimestamp, increment, updateDoc, runTransaction, onSnapshot } from
             "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-storage.js";
+
         // import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app-check.js";
 
         // ===== إعدادات Firebase =====
@@ -1110,7 +880,6 @@
             apiKey: "AIzaSyBPk7T-rD_DffpMP13ra7Q_gkOBy8Nqi5s",
             authDomain: "alertiqaa.firebaseapp.com",
             projectId: "alertiqaa",
-            storageBucket: "alertiqaa.firebasestorage.app",
             messagingSenderId: "118590328758",
             appId: "1:118590328758:web:2ac3aa05f9c364eb78fb17",
             measurementId: "G-G9L6CT2XYS"
@@ -1126,7 +895,7 @@
             });
         } catch (e) { console.warn("⚠️ App Check:", e); } */
 
-        const storage = getStorage(app);
+
         const db = initializeFirestore(app, { localCache: persistentLocalCache() });
         const statsRef = doc(db, "config", "stats");
 
@@ -1168,29 +937,16 @@
         const form = document.getElementById('registrationForm');
         const successMsg = document.getElementById('successMessage');
         const submitBtn = document.getElementById('submitBtn');
-        const emergencyBtn = document.getElementById('emergencyBtn');
+
         const regSiblingBtn = document.getElementById('regSiblingBtn');
         const yearBadgeLabel = document.getElementById('yearBadgeLabel');
         const progressFill = document.getElementById('progressFill');
         const progressSteps = document.querySelectorAll('.progress-step');
-        const uploadProgress = document.getElementById('uploadProgress');
-        const uploadProgressFill = document.getElementById('uploadProgressFill');
-        const uploadProgressText = document.getElementById('uploadProgressText');
-
-        // ===== كشف حالة الإنترنت =====
-        if (!navigator.onLine) {
-            alert('⚠️ يبدو أنك غير متصل بالإنترنت. سيتم حفظ البيانات محلياً مؤقتاً.');
-            emergencyBtn.classList.add('show');
-        }
-        window.addEventListener('online', () => {
-            emergencyBtn.classList.remove('show');
-        });
 
         // ===== زمن بدء تعبئة النموذج (Honeypot + Time Detection) =====
         const startTime = Date.now();
 
         // ===== متغيرات الحالة =====
-        const compressedFiles = {};
         let activeAcademicYear = "2026-2027";
         let currentStep = 1;
         const totalSteps = 3;
@@ -1423,98 +1179,6 @@
             });
         }
 
-        // ===== المرفقات المحسنة (مع تحرير الذاكرة) =====
-        const fileMappings = [
-            { id: 'studentPhoto', previewId: 'preview-studentPhoto', infoId: 'info-studentPhoto', removeId: 'remove-studentPhoto',
-                boxId: 'box-studentPhoto' },
-            { id: 'studentIdDoc', previewId: 'preview-studentId', infoId: 'info-studentIdDoc', removeId: 'remove-studentIdDoc',
-                boxId: 'box-studentId' },
-            { id: 'fatherId', previewId: 'preview-fatherId', infoId: 'info-fatherId', removeId: 'remove-fatherId',
-                boxId: 'box-fatherId' },
-            { id: 'motherId', previewId: 'preview-motherId', infoId: 'info-motherId', removeId: 'remove-motherId',
-                boxId: 'box-motherId' },
-            { id: 'rentCard', previewId: 'preview-rentCard', infoId: 'info-rentCard', removeId: 'remove-rentCard',
-                boxId: 'box-rentCard' }
-        ];
-
-        fileMappings.forEach(item => {
-            const input = document.getElementById(item.id);
-            const preview = document.getElementById(item.previewId);
-            const info = document.getElementById(item.infoId);
-            const removeBtn = document.getElementById(item.removeId);
-
-            if (input && preview) {
-                let oldBlobUrl = null;
-
-                input.addEventListener('change', async function() {
-                    const file = this.files[0];
-                    if (file) {
-                        if (file.size > 5 * 1024 * 1024) {
-                            alert("⚠️ حجم الملف كبير جداً (أكثر من 5 ميجابايت). يرجى اختيار صورة أصغر.");
-                            this.value = '';
-                            return;
-                        }
-                        if (!file.type.startsWith('image/')) {
-                            alert("⚠️ يرجى اختيار ملف صورة صحيح.");
-                            this.value = '';
-                            return;
-                        }
-
-                        // تحرير الرابط القديم لتجنب تسريب الذاكرة
-                        if (oldBlobUrl) {
-                            URL.revokeObjectURL(oldBlobUrl);
-                            oldBlobUrl = null;
-                        }
-
-                        try {
-                            const blob = await imageCompression(file, {
-                                maxSizeMB: 0.5,
-                                maxWidthOrHeight: 1200,
-                                useWebWorker: true,
-                                fileType: 'image/jpeg'
-                            });
-                            compressedFiles[item.id] = blob;
-                            oldBlobUrl = URL.createObjectURL(blob);
-                            preview.src = oldBlobUrl;
-                            preview.classList.add('show');
-                            if (info) {
-                                info.textContent = `📎 ${(blob.size / 1024).toFixed(1)} KB`;
-                                info.classList.add('show');
-                            }
-                            if (removeBtn) removeBtn.classList.add('show');
-                        } catch (err) {
-                            console.error('فشل ضغط الصورة:', err);
-                            // استخدام الملف الأصلي كبديل
-                            compressedFiles[item.id] = file;
-                            oldBlobUrl = URL.createObjectURL(file);
-                            preview.src = oldBlobUrl;
-                            preview.classList.add('show');
-                            if (info) {
-                                info.textContent = `📎 ${(file.size / 1024).toFixed(1)} KB`;
-                                info.classList.add('show');
-                            }
-                            if (removeBtn) removeBtn.classList.add('show');
-                        }
-                    }
-                });
-
-                if (removeBtn) {
-                    removeBtn.addEventListener('click', function() {
-                        input.value = '';
-                        preview.classList.remove('show');
-                        if (oldBlobUrl) {
-                            URL.revokeObjectURL(oldBlobUrl);
-                            oldBlobUrl = null;
-                        }
-                        preview.src = '#';
-                        if (info) info.classList.remove('show');
-                        removeBtn.classList.remove('show');
-                        delete compressedFiles[item.id];
-                    });
-                }
-            }
-        });
-
         // ===== إرسال النموذج =====
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1528,18 +1192,18 @@
             const timeTaken = (Date.now() - startTime) / 1000;
             if (timeTaken < 5) {
                 console.warn("⚠️ محاولة إرسال سريعة جداً (ربما بوت)");
-                alert('⚠️ يبدو أن هناك محاولة إرسال غير طبيعية. يرجى المحاولة مرة أخرى بتمعن.');
+                showToast('⚠️ يبدو أن هناك محاولة إرسال غير طبيعية. يرجى المحاولة مرة أخرى بتمعن.', 'warning');
                 return;
             }
 
             if (!navigator.onLine) {
-                alert('⚠️ أنت غير متصل بالإنترنت. يرجى الاتصال بالشبكة والمحاولة مرة أخرى.');
+                showToast('⚠️ أنت غير متصل بالإنترنت. يرجى الاتصال بالشبكة والمحاولة مرة أخرى.', 'warning');
                 return;
             }
 
             const isOpen = !closedMsg.classList.contains('show');
             if (!isOpen) {
-                alert('⛔ عذراً، التسجيل مغلق حالياً.');
+                showToast('⛔ عذراً، التسجيل مغلق حالياً.', 'error');
                 return;
             }
 
@@ -1554,7 +1218,7 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
 
             const sName = document.getElementById('fullName').value.trim();
             const sGrade = document.getElementById('grade').value;
@@ -1563,59 +1227,7 @@
             if (cleanPhone.startsWith('964')) cleanPhone = '0' + cleanPhone.substring(3);
             const waNumber = "9647850009133";
 
-            // تنقية النصوص قبل عرضها
-            const safeName = escapeHTML(sName);
-            const safeGrade = escapeHTML(sGrade);
-            const safePhone = escapeHTML(cleanPhone);
-            const safeParent = escapeHTML(document.getElementById('parentName').value.trim());
-
-            const emergencyText = encodeURIComponent(
-                `بيانات تسجيل عاجلة:\nالاسم: ${safeName}\nالصف: ${safeGrade}\nالهاتف: ${safePhone}\nالميلاد: ${escapeHTML(document.getElementById('dob').value)}\nولي الأمر: ${safeParent}`
-            );
-            emergencyBtn.href = `https://wa.me/${waNumber}?text=${emergencyText}`;
-
-            // إظهار شريط تقدم الرفع
-            uploadProgress.classList.add('show');
-            uploadProgressFill.style.width = '0%';
-            uploadProgressText.textContent = 'جاري تجهيز الملفات...';
-
-            const uploadedFileRefs = [];
-            let uploadCount = 0;
-            const fileFields = [
-                { id: 'studentPhoto', dbKey: 'studentPhotoURL' },
-                { id: 'studentIdDoc', dbKey: 'studentIdDocURL' },
-                { id: 'fatherId', dbKey: 'fatherIdURL' },
-                { id: 'motherId', dbKey: 'motherIdURL' },
-                { id: 'rentCard', dbKey: 'rentCardURL' }
-            ];
-            const totalFiles = fileFields.filter(item => compressedFiles[item.id]).length;
-
             try {
-                const sessionUID = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                const urls = {};
-
-                const uploadPromises = fileFields.map(async (item) => {
-                    if (compressedFiles[item.id]) {
-                        const blob = compressedFiles[item.id];
-                        const fileRef = ref(storage, `students/${sessionUID}/${item.id}.jpg`);
-                        uploadedFileRefs.push(fileRef);
-                        const result = await uploadBytes(fileRef, blob);
-                        const url = await getDownloadURL(result.ref);
-                        urls[item.dbKey] = url;
-                        uploadCount++;
-                        const progress = totalFiles > 0 ? (uploadCount / totalFiles) * 100 : 100;
-                        uploadProgressFill.style.width = progress + '%';
-                        uploadProgressText.textContent = `جاري رفع الملف ${uploadCount} من ${totalFiles}...`;
-                    } else {
-                        urls[item.dbKey] = "";
-                    }
-                });
-
-                await Promise.all(uploadPromises);
-
-                uploadProgressText.textContent = 'جاري حفظ البيانات...';
-                uploadProgressFill.style.width = '100%';
-
                 const now = serverTimestamp();
                 const studentData = {
                     fullName: sName,
@@ -1624,15 +1236,13 @@
                     gender: document.getElementById('gender').value,
                     grade: sGrade,
                     academicYear: activeAcademicYear,
-                    sessionUID: sessionUID,
                     parentName: document.getElementById('parentName').value.trim(),
                     parentJob: document.getElementById('parentJob').value.trim() || 'غير مذكور',
                     phone: cleanPhone,
                     address: document.getElementById('address').value.trim() || 'غير مذكور',
                     notes: document.getElementById('notes').value.trim() || 'لا يوجد',
                     registeredAt: now,
-                    modifiedAt: now,
-                    ...urls
+                    modifiedAt: now
                 };
 
                 await addDoc(collection(db, "students"), studentData);
@@ -1673,22 +1283,23 @@
                 document.getElementById('whatsappLink').href = `https://wa.me/${waNumber}?text=${waText}`;
 
                 successMsg.classList.add('show');
-                emergencyBtn.classList.remove('show');
+                // تأثير احتفالي بسيط
+                const colors = ['#38a169','#b49554','#0f7264','#e53e3e','#3182ce','#dd6b20'];
+                for (let i = 0; i < 20; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.left = (Math.random() * 90 + 5) + '%';
+                    piece.style.top = (Math.random() * 40 + 30) + '%';
+                    piece.style.animationDelay = (Math.random() * 0.5) + 's';
+                    piece.style.width = (Math.random() * 6 + 6) + 'px';
+                    piece.style.height = (Math.random() * 6 + 6) + 'px';
+                    successMsg.appendChild(piece);
+                    setTimeout(() => piece.remove(), 2000);
+                }
                 form.reset();
                 clearDraft();
-                document.querySelectorAll('.preview-img').forEach(img => {
-                    if (img.src && img.src.startsWith('blob:')) {
-                        URL.revokeObjectURL(img.src);
-                    }
-                    img.classList.remove('show');
-                    img.src = '#';
-                });
-                document.querySelectorAll('.file-info').forEach(el => el.classList.remove('show'));
-                document.querySelectorAll('.remove-file').forEach(el => el.classList.remove('show'));
-                Object.keys(compressedFiles).forEach(k => delete compressedFiles[k]);
                 document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
-
-                uploadProgress.classList.remove('show');
 
                 successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
@@ -1699,16 +1310,10 @@
 
             } catch (error) {
                 console.error(error);
-                uploadProgress.classList.remove('show');
                 if (error.code === 'permission-denied') {
-                    alert('⛔ تم إغلاق التسجيل من قِبل الإدارة.');
+                    showToast('⛔ تم إغلاق التسجيل من قِبل الإدارة.', 'error');
                 } else {
-                    try {
-                        await Promise.allSettled(uploadPromises);
-                        await Promise.all(uploadedFileRefs.map(f => deleteObject(f)));
-                    } catch (delErr) { /* تجاهل */ }
-                    alert('⚠️ مشكلة في الشبكة، تم تفعيل خيار واتساب.');
-                    emergencyBtn.classList.add('show');
+                    showToast('⚠️ حدث خطأ أثناء الحفظ. يرجى المحاولة مرة أخرى.', 'error');
                 }
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تسجيل الطالب';
@@ -1720,18 +1325,7 @@
             successMsg.classList.remove('show');
             clearDraft();
             form.reset();
-            document.querySelectorAll('.preview-img').forEach(img => {
-                if (img.src && img.src.startsWith('blob:')) {
-                    URL.revokeObjectURL(img.src);
-                }
-                img.classList.remove('show');
-                img.src = '#';
-            });
-            document.querySelectorAll('.file-info').forEach(el => el.classList.remove('show'));
-            document.querySelectorAll('.remove-file').forEach(el => el.classList.remove('show'));
             document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
-            Object.keys(compressedFiles).forEach(k => delete compressedFiles[k]);
-            uploadProgress.classList.remove('show');
             goToStep(1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
