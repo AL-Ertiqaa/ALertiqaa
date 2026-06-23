@@ -30,7 +30,6 @@
         .modal-box .detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #edf2f7;font-size:15px}.modal-box .detail-row .key{font-weight:600;color:#4a5568;min-width:35%}.modal-box .detail-row .value{color:#1a202c;font-weight:500;text-align:left;max-width:60%;word-break:break-word}.modal-box .image-row{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:12px 0;border-bottom:1px solid #edf2f7;width:100%}.modal-box .image-row .key{font-weight:700;color:#4a5568}.modal-box .image-row .image-wrapper{display:flex;flex-wrap:wrap;gap:10px;align-items:center;width:100%}.modal-box .image-row .image-wrapper img{max-width:120px;max-height:120px;border-radius:12px;border:1px solid #e2e8f0;object-fit:cover;aspect-ratio:1/1;cursor:pointer}.modal-box .image-row .image-actions{display:flex;gap:8px;flex-wrap:wrap}.modal-box .image-row .image-actions button{padding:6px 16px;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:'Cairo',sans-serif;font-size:13px;transition:.2s}.btn-img-view{background:#3182ce;color:#fff}.btn-img-view:hover{background:#2c5282}.btn-img-download{background:#38a169;color:#fff}.btn-img-download:hover{background:#2f855a}.btn-img-print{background:#dd6b20;color:#fff}.btn-img-print:hover{background:#c05621}
         .modal-actions-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}.btn-print-report,.btn-pdf-report{padding:8px 20px;color:#fff;border:none;border-radius:12px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;transition:.2s}.btn-print-report{background:#084c43}.btn-print-report:hover{background:#0f7264}.btn-pdf-report{background:#b49554}.btn-pdf-report:hover{background:#967e41}
         .delete-modal .modal-box{max-width:420px;text-align:center}.delete-modal .modal-box i{font-size:50px;color:#e53e3e;margin-bottom:10px}.delete-modal .modal-box .btn-danger{background:#e53e3e;color:#fff;border:none;padding:12px 30px;border-radius:16px;font-weight:700;font-size:16px;cursor:pointer;font-family:'Cairo',sans-serif;margin:5px}.delete-modal .modal-box .btn-danger:hover{background:#c53030}.delete-modal .modal-box .btn-cancel{background:#edf2f7;color:#2d3748;border:none;padding:12px 30px;border-radius:16px;font-weight:700;font-size:16px;cursor:pointer;font-family:'Cairo',sans-serif;margin:5px}.delete-modal .modal-box .btn-cancel:hover{background:#e2e8f0}
-        .toast{position:fixed;bottom:20px;right:20px;padding:14px 28px;border-radius:14px;font-weight:700;font-family:'Cairo',sans-serif;box-shadow:0 8px 25px rgba(0,0,0,0.2);z-index:9999;animation:fadeIn .3s ease;direction:rtl;max-width:90%}.toast.success{background:#38a169;color:#fff}.toast.error{background:#e53e3e;color:#fff}.toast.info{background:#3182ce;color:#fff}.toast.warning{background:#b49554;color:#fff}
         @keyframes fadeIn{0%{opacity:0;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
         /* ===== شريط التبويب ===== */
         .tab-bar{display:flex;gap:4px;background:#fff;padding:6px;border-radius:16px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);overflow-x:auto}.tab-btn{padding:10px 22px;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;font-size:14px;transition:.2s;background:transparent;color:#718096;white-space:nowrap;position:relative}.tab-btn:hover{background:#f2f7f6;color:#084c43}.tab-btn.active{background:#084c43;color:#fff;box-shadow:0 2px 10px rgba(8,76,67,0.2)}.tab-btn i{margin-left:8px}.tab-section{display:none}.tab-section.active{display:block;animation:fadeStep .3s ease}@keyframes fadeStep{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}.tab-badge{display:none;background:#e53e3e;color:#fff;font-size:11px;padding:1px 8px;border-radius:20px;margin-right:5px;animation:pulseBadge 1.5s ease-in-out infinite}@keyframes pulseBadge{0%,100%{opacity:1}50%{opacity:.6}}
@@ -619,6 +618,7 @@
             const gender = filterGender.value;
             const year = filterAcademicYear.value;
 
+            constraints.push(where("deleted", "==", false));
             if (year) constraints.push(where("academicYear", "==", year));
             if (grade) constraints.push(where("grade", "==", grade));
             if (gender) constraints.push(where("gender", "==", gender));
@@ -791,7 +791,7 @@
                 index++;
             });
             studentsBody.innerHTML = html;
-            resultCount.textContent = `(عرض ${docs.length} من ${totalDocs} طالب)`;
+            resultCount.textContent = `(عرض ${activeDocs.length} من ${totalDocs} طالب)`;
             lastUpdatedText.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}`;
 
             // ربط الأحداث
@@ -854,20 +854,8 @@
 
         function prevPage() {
             if (currentPage === 0) return;
-            const prev = currentPage - 1;
-            if (pageSnapshots[prev] && pageSnapshots[prev].docs) {
-                currentPage = prev;
-                lastVisible = pageSnapshots[prev].last;
-                firstVisible = pageSnapshots[prev].first;
-                renderTable(pageSnapshots[prev].docs);
-                updatePagination(pageSnapshots[prev].docs.length);
-                loadStudents(false);
-            } else {
-                currentPage = 0;
-                lastVisible = null;
-                firstVisible = null;
-                loadStudents(true);
-            }
+            currentPage--;
+            loadStudents(false);
         }
 
         prevPageBtn.addEventListener('click', prevPage);
@@ -1165,8 +1153,6 @@
 
         refreshBtn.addEventListener('click', () => {
             loadStudents(true);
-            updateStats(true);
-            loadConfigSettings();
             showToast('🔄 تم تحديث البيانات.', 'info');
         });
 
