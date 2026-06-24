@@ -68,6 +68,28 @@
             --shadow-md: 0 8px 25px rgba(0,0,0,0.3);
             --shadow-lg: 0 25px 60px rgba(0,0,0,0.4);
         }
+        /* ===== Auto-detect Dark Mode (when no explicit preference saved) ===== */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #1a202c;
+                --bg-card: #2d3748;
+                --bg-dark: #171923;
+                --text-primary: #e2e8f0;
+                --text-secondary: #a0aec0;
+                --text-muted: #718096;
+                --border: #4a5568;
+                --border-light: #2d3748;
+                --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+                --shadow-md: 0 8px 25px rgba(0,0,0,0.3);
+                --shadow-lg: 0 25px 60px rgba(0,0,0,0.4);
+            }
+            :root:not([data-theme="light"]) .btn-dark-toggle {
+                background: rgba(255,255,255,0.15);
+            }
+            :root:not([data-theme="light"]) .btn-dark-toggle i::before {
+                content: "\f185"; /* fa-sun */
+            }
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -1404,7 +1426,8 @@
                 pageSnapshots = [];
             }
             try {
-                studentsBody.innerHTML = Array(5).fill(0).map(() => `
+                // Skeleton ديناميكي حسب PAGE_SIZE
+                const skeletonRow = `
                     <tr>
                         <td><div class="skeleton" style="width:18px;height:18px;border-radius:4px;margin:auto;"></div></td>
                         <td><div class="skeleton skeleton-text" style="width:30px;margin:auto;"></div></td>
@@ -1416,7 +1439,8 @@
                         <td><div class="skeleton skeleton-text" style="width:80px;margin:auto;"></div></td>
                         <td><div class="skeleton" style="width:60px;height:28px;border-radius:10px;margin:auto;"></div></td>
                     </tr>
-                `).join('');
+                `;
+                studentsBody.innerHTML = Array(PAGE_SIZE).fill(0).map(() => skeletonRow).join('');
 
                 // ✅ البحث المحلي أولاً (0 قراءة من Firestore)
                 const searchResults = localSearch();
@@ -1581,82 +1605,6 @@
             resultCount.textContent = `(عرض ${activeDocs.length} من ${totalDocs} طالب)`;
             lastUpdatedText.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}`;
 
-            // ربط الأحداث
-            document.querySelectorAll('.btn-view').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const id = this.dataset.id;
-                    const docSnap = await getDoc(doc(db, "students", id));
-                    if (docSnap.exists()) showDetails({ id: docSnap.id, ...docSnap.data() });
-                });
-            });
-            document.querySelectorAll('.btn-edit').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const id = this.dataset.id;
-                    const docSnap = await getDoc(doc(db, "students", id));
-                    if (docSnap.exists()) showEditModal({ id: docSnap.id, ...docSnap.data() });
-                });
-            });
-            document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const id = this.dataset.id;
-                    const grade = this.dataset.grade || 'غير_محدد';
-                    const gender = this.dataset.gender || '';
-                    const hasPermission = await checkAdminPermission();
-                    if (!hasPermission) return;
-                    try {
-                        await runTransaction(db, async (tx) => {
-                            tx.update(doc(db, "students", id), { deleted: true, deletedAt: Timestamp.fromDate(new Date()) });
-                            const s = await tx.get(statsRef);
-                            if (s.exists()) {
-                                const gd = s.data().gradeDistribution || {};
-                                tx.update(statsRef, {
-                                    total: increment(-1),
-                                    male: increment(gender === 'ذكر' ? -1 : 0),
-                                    female: increment(gender === 'أنثى' ? -1 : 0),
-                                    deletedCount: increment(1),
-                                    todayCount: increment(0),
-                                    [`gradeDistribution.${grade.replace(/\s+/g, '_')}`]: increment(-1)
-                                });
-                            }
-                        });
-                        showToast('🗑️ تم نقل الطالب إلى سلة المحذوفات.', 'warning', 'تراجع', async () => {
-                            try {
-                                await runTransaction(db, async (tx) => {
-                                    tx.update(doc(db, "students", id), { deleted: false, deletedAt: null });
-                                    const s = await tx.get(statsRef);
-                                    if (s.exists()) {
-                                        tx.update(statsRef, {
-                                            total: increment(1),
-                                            male: increment(gender === 'ذكر' ? 1 : 0),
-                                            female: increment(gender === 'أنثى' ? 1 : 0),
-                                            deletedCount: increment(-1),
-                                            [`gradeDistribution.${grade.replace(/\s+/g, '_')}`]: increment(1)
-                                        });
-                                    }
-                                });
-                                showToast('✅ تم التراجع عن الحذف.', 'success');
-                                loadStudents(true);
-                            } catch (e) { showToast('❌ فشل التراجع.', 'error'); }
-                        });
-                        logAction('delete', `نقل طالب إلى سلة المحذوفات (${id})`);
-                        loadStudents(true);
-                    } catch (e) { showToast('❌ فشل الحذف: ' + e.message, 'error'); }
-                });
-            });
-
-            // ربط مربعات الاختيار الفردية
-            document.querySelectorAll('.student-check').forEach(chk => {
-                chk.addEventListener('change', function() {
-                    const id = this.dataset.id;
-                    if (this.checked) {
-                        selectedStudentIds.add(id);
-                    } else {
-                        selectedStudentIds.delete(id);
-                    }
-                    updateBulkActionsBar();
-                });
-            });
-
             // تحديث شريط التحكم الجماعي
             updateBulkActionsBar();
         }
@@ -1684,6 +1632,52 @@
         prevPageBtn.addEventListener('click', prevPage);
         nextPageBtn.addEventListener('click', nextPage);
 
+        // ===== Prefetch للصفحة التالية على hover =====
+        const prefetchCache = new Map();
+        let prefetchInProgress = false;
+        nextPageBtn.addEventListener('mouseenter', () => {
+            if (nextPageBtn.disabled || prefetchInProgress) return;
+            const nextPageNum = currentPage + 1;
+            if (prefetchCache.has(nextPageNum)) return;
+            prefetchInProgress = true;
+            (async () => {
+                try {
+                    let q = query(collection(db, "students"), where("deleted", "==", false), orderBy("registeredAt", "desc"), limit(PAGE_SIZE));
+                    if (lastVisible && pageSnapshots[currentPage]) {
+                        q = query(q, startAfter(pageSnapshots[currentPage].last));
+                    } else if (lastVisible) {
+                        q = query(q, startAfter(lastVisible));
+                    }
+                    const snapshot = await getDocs(q);
+                    if (snapshot.docs.length > 0) {
+                        prefetchCache.set(nextPageNum, { docs: snapshot.docs, first: snapshot.docs[0], last: snapshot.docs[snapshot.docs.length - 1] });
+                    }
+                } catch (e) { console.warn('Prefetch failed:', e); }
+                finally { prefetchInProgress = false; }
+            })();
+        });
+
+        // تحديث nextPage لاستخدام الكاش إن وجد
+        function nextPage() {
+            if (!lastVisible) return;
+            const nextPageNum = currentPage + 1;
+            if (prefetchCache.has(nextPageNum)) {
+                const cached = prefetchCache.get(nextPageNum);
+                currentPage++;
+                renderTable(cached.docs);
+                pageSnapshots[currentPage] = cached;
+                lastVisible = cached.last;
+                firstVisible = cached.first;
+                updatePagination(cached.docs.length);
+                prefetchCache.delete(nextPageNum);
+                // Prefetch الصفحة التي تليها
+                nextPageBtn.dispatchEvent(new Event('mouseenter'));
+            } else {
+                currentPage++;
+                loadStudents(false);
+            }
+        }
+
         // ===== تحديث الإحصائيات مع تخزين مؤقت (0 قراءات إضافية) =====
         function setupStatsCaching() {
             const cached = getLocalCache('alertiqaa_admin_stats', 60000);
@@ -1707,19 +1701,25 @@
             const labels = keys.map(k => k.replace(/_/g, ' '));
             const values = keys.map(k => distribution[k] || 0);
             const colors = ['#084c43','#0f7264','#38a169','#b49554','#3182ce','#4299e1','#667eea','#9f7aea','#d53f8c','#e53e3e'];
-            if (gradeChartInstance) { gradeChartInstance.destroy(); }
-            gradeChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: { labels, datasets: [{ label: 'عدد الطلاب', data: values, backgroundColor: colors.slice(0, values.length), borderRadius: 6, borderSkipped: false }] },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Cairo' } } },
-                        x: { ticks: { font: { family: 'Cairo', size: 11 } } }
+            if (gradeChartInstance) {
+                gradeChartInstance.data.labels = labels;
+                gradeChartInstance.data.datasets[0].data = values;
+                gradeChartInstance.data.datasets[0].backgroundColor = colors.slice(0, values.length);
+                gradeChartInstance.update();
+            } else {
+                gradeChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'عدد الطلاب', data: values, backgroundColor: colors.slice(0, values.length), borderRadius: 6, borderSkipped: false }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Cairo' } } },
+                            x: { ticks: { font: { family: 'Cairo', size: 11 } } }
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         // ===== Debounce للبحث المحلي (0 قراءة من Firestore) =====
@@ -1827,6 +1827,7 @@
             setupFilterDebounce();
             setupTabs();
             setupDarkMode();
+            setupTableEventDelegation();
             document.getElementById('clearLogsBtn').addEventListener('click', async function() {
                 try {
                     const snap = await getDocs(query(collection(db, "logs"), limit(500)));
@@ -1866,14 +1867,24 @@
             statusBadge.textContent = isOpen ? 'مفتوح ✅' : 'مغلق ❌';
         }
 
-        // ===== الوضع الليلي (Dark Mode) =====
+        // ===== الوضع الليلي (Dark Mode) مع Auto-detect =====
         function setupDarkMode() {
             const toggle = document.getElementById('darkModeToggle');
-            const saved = localStorage.getItem('darkMode') === 'true';
-            if (saved) { document.documentElement.setAttribute('data-theme', 'dark'); toggle.innerHTML = '<i class="fas fa-sun"></i>'; }
+            const saved = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = saved !== null ? saved === 'true' : prefersDark;
+            
+            if (isDark) { 
+                document.documentElement.setAttribute('data-theme', 'dark'); 
+                toggle.innerHTML = '<i class="fas fa-sun"></i>'; 
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                toggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+            
             toggle.addEventListener('click', () => {
-                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                if (isDark) {
+                const isCurrentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (isCurrentlyDark) {
                     document.documentElement.removeAttribute('data-theme');
                     localStorage.setItem('darkMode', 'false');
                     toggle.innerHTML = '<i class="fas fa-moon"></i>';
@@ -1883,6 +1894,113 @@
                     toggle.innerHTML = '<i class="fas fa-sun"></i>';
                 }
             });
+            
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (localStorage.getItem('darkMode') === null) {
+                    if (e.matches) {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        toggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    } else {
+                        document.documentElement.removeAttribute('data-theme');
+                        toggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    }
+                }
+            });
+        }
+
+        // ===== Event Delegation للجدول (أداء عالي) =====
+        function setupTableEventDelegation() {
+            if (studentsBody._delegated) return;
+            studentsBody._delegated = true;
+
+            studentsBody.addEventListener('click', async (e) => {
+                const btn = e.target.closest('button[data-id]');
+                if (!btn) return;
+
+                const id = btn.dataset.id;
+                if (btn.classList.contains('btn-view')) {
+                    const docSnap = await getDoc(doc(db, "students", id));
+                    if (docSnap.exists()) showDetails({ id: docSnap.id, ...docSnap.data() });
+                } else if (btn.classList.contains('btn-edit')) {
+                    const docSnap = await getDoc(doc(db, "students", id));
+                    if (docSnap.exists()) showEditModal({ id: docSnap.id, ...docSnap.data() });
+                } else if (btn.classList.contains('btn-delete')) {
+                    const grade = btn.dataset.grade || 'غير_محدد';
+                    const gender = btn.dataset.gender || '';
+                    const hasPermission = await checkAdminPermission();
+                    if (!hasPermission) return;
+                    try {
+                        await runTransaction(db, async (tx) => {
+                            tx.update(doc(db, "students", id), { deleted: true, deletedAt: Timestamp.fromDate(new Date()) });
+                            const s = await tx.get(statsRef);
+                            if (s.exists()) {
+                                tx.update(statsRef, {
+                                    total: increment(-1),
+                                    male: increment(gender === 'ذكر' ? -1 : 0),
+                                    female: increment(gender === 'أنثى' ? -1 : 0),
+                                    deletedCount: increment(1),
+                                    [`gradeDistribution.${grade.replace(/\s+/g, '_')}`]: increment(-1)
+                                });
+                            }
+                        });
+                        showToast('🗑️ تم نقل الطالب إلى سلة المحذوفات.', 'warning', 'تراجع', async () => {
+                            try {
+                                await runTransaction(db, async (tx) => {
+                                    tx.update(doc(db, "students", id), { deleted: false, deletedAt: null });
+                                    const s = await tx.get(statsRef);
+                                    if (s.exists()) {
+                                        tx.update(statsRef, {
+                                            total: increment(1),
+                                            male: increment(gender === 'ذكر' ? 1 : 0),
+                                            female: increment(gender === 'أنثى' ? 1 : 0),
+                                            deletedCount: increment(-1),
+                                            [`gradeDistribution.${grade.replace(/\s+/g, '_')}`]: increment(1)
+                                        });
+                                    }
+                                });
+                                showToast('✅ تم التراجع عن الحذف.', 'success');
+                                loadStudents(true);
+                            } catch (e) { showToast('❌ فشل التراجع.', 'error'); }
+                        });
+                        logAction('delete', `نقل طالب إلى سلة المحذوفات (${id})`);
+                        loadStudents(true);
+                    } catch (e) { showToast('❌ فشل الحذف: ' + e.message, 'error'); }
+                }
+            });
+
+            studentsBody.addEventListener('change', (e) => {
+                const chk = e.target.closest('.student-check');
+                if (!chk) return;
+                const id = chk.dataset.id;
+                if (chk.checked) {
+                    selectedStudentIds.add(id);
+                } else {
+                    selectedStudentIds.delete(id);
+                }
+                updateBulkActionsBar();
+            });
+
+            // Select all checkbox
+            const selectAllCheck = document.getElementById('selectAllCheck');
+            if (selectAllCheck && !selectAllCheck._delegated) {
+                selectAllCheck._delegated = true;
+                selectAllCheck.addEventListener('change', function() {
+                    const checks = document.querySelectorAll('.student-check');
+                    if (this.checked) {
+                        checks.forEach(chk => {
+                            chk.checked = true;
+                            selectedStudentIds.add(chk.dataset.id);
+                        });
+                    } else {
+                        checks.forEach(chk => {
+                            chk.checked = false;
+                            selectedStudentIds.delete(chk.dataset.id);
+                        });
+                    }
+                    updateBulkActionsBar();
+                });
+            }
         }
 
         // ===== طباعة تقرير الطالب =====
@@ -2273,15 +2391,22 @@
             }
         });
 
-        // ===== دالة مساعدة لجلب الطلاب بالكامل مع pagination =====
+        // ===== دالة مساعدة لجلب الطلاب بالكامل مع pagination (محسّنة) =====
         async function fetchAllStudents() {
+            // 1. احصل على العدد الكلي أولاً (0 قراءة للوثائق) - early exit
+            const countSnap = await getCountFromServer(query(
+                collection(db, "students"), where("deleted", "==", false)
+            ));
+            const total = countSnap.data().count;
+            if (total === 0) return [];
+
+            // 2. جلب تسلسلي محسّن
+            const BATCH_SIZE = 100;
             let allDocs = [];
             let lastDoc = null;
             let hasMore = true;
-            const BATCH_SIZE = 100;
-            let safety = 0;
-            while (hasMore && safety < 50) {
-                safety++;
+            
+            while (hasMore) {
                 let q = query(collection(db, "students"), where("deleted", "==", false), orderBy("registeredAt", "desc"), limit(BATCH_SIZE));
                 if (lastDoc) q = query(q, startAfter(lastDoc));
                 const snapshot = await getDocs(q);
