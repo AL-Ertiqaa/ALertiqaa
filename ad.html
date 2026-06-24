@@ -1419,8 +1419,6 @@
         });
 
         document.getElementById('loginForm').addEventListener('submit', (e) => { e.preventDefault(); login(); });
-        loginBtn.addEventListener('click', login);
-        adminPassInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') login(); });
         document.getElementById('passToggleBtn').addEventListener('click', function() {
             const input = adminPassInput;
             const icon = this.querySelector('i');
