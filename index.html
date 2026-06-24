@@ -137,12 +137,12 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ===== تأثيرات دخول محسّنة ===== */
+        /* ===== تأثيرات دخول ===== */
         @keyframes formAppear {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .form-body { animation: formAppear 0.6s ease; }
+        .form-body { animation: formAppear 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeScale {
             0% { opacity: 0; transform: scale(0.95); }
             100% { opacity: 1; transform: scale(1); }
@@ -159,6 +159,11 @@
             background: #f7fafc;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .consent-checkbox:has(input:focus) {
+            border-color: #0f7264;
+            box-shadow: 0 0 0 4px rgba(15, 114, 100, 0.08);
         }
         .consent-checkbox input[type="checkbox"] {
             width: 20px;
@@ -217,14 +222,18 @@
             justify-content: center;
             z-index: 10000;
             direction: rtl;
+            backdrop-filter: blur(4px);
         }
         .admin-login-modal.show { display: flex; }
         .admin-login-modal .modal-content {
-            background: white;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 30px;
             width: 320px;
             box-shadow: 0 25px 70px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.8);
+            animation: fadeScale 0.3s ease;
         }
         .admin-login-modal h3 { color: #084c43; margin-bottom: 15px; text-align: center; }
         .admin-login-modal input {
@@ -239,6 +248,7 @@
         .admin-login-modal input:focus {
             border-color: #0f7264;
             outline: none;
+            box-shadow: 0 0 0 4px rgba(15, 114, 100, 0.08);
         }
         .admin-login-modal .modal-actions {
             display: flex;
@@ -277,7 +287,9 @@
         }
         body {
             font-family: var(--font);
-            background: linear-gradient(145deg, var(--bg), #dce8e6);
+            background: linear-gradient(-45deg, #f2f7f6, #dce8e6, #e8f0ef, #c5dbd7);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -285,16 +297,25 @@
             padding: 15px;
             margin: 0;
         }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         .container {
             background: rgba(255, 255, 255, .88);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             max-width: 880px;
             width: 100%;
             border-radius: 40px;
             box-shadow: 0 25px 70px rgba(15, 114, 100, .12);
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, .6);
-            transition: all 0.3s ease;
+            transition: box-shadow 0.3s ease;
+        }
+        .container:hover {
+            box-shadow: 0 30px 80px rgba(15, 114, 100, .16);
         }
 
         /* ===== الهيدر ===== */
@@ -326,6 +347,10 @@
             overflow: hidden;
             box-shadow: 0 6px 20px rgba(180, 149, 84, .3);
             flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+        .header .logo-img:hover {
+            transform: rotate(-5deg) scale(1.02);
         }
         .header .logo-img img {
             width: 100%;
@@ -356,6 +381,11 @@
             font-size: 18px;
             margin-top: 8px;
             box-shadow: 0 2px 15px rgba(180, 149, 84, .4);
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 2px 15px rgba(180, 149, 84, .4); }
+            50% { box-shadow: 0 2px 25px rgba(180, 149, 84, .6); }
         }
 
         /* ===== الفوتر ===== */
@@ -379,6 +409,10 @@
             font-size: 15px;
             flex: 1 1 200px;
             min-width: 180px;
+            transition: transform 0.2s ease;
+        }
+        .footer .footer-item:hover {
+            transform: translateY(-2px);
         }
         .footer .footer-item i {
             color: #b49554;
@@ -416,7 +450,7 @@
             color: #b49554;
         }
 
-        /* ===== النموذج والخطوات ===== */
+        /* ===== النموذج ===== */
         .form-body {
             padding: 25px 30px 15px;
         }
@@ -425,144 +459,50 @@
             opacity: 0.15;
         }
 
-        /* ===== شريط التقدم ===== */
-        .progress-container {
+        /* ===== فواصل الأقسام ===== */
+        .section-divider {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            position: relative;
-            direction: rtl;
+            margin: 30px 0 22px;
+            gap: 15px;
         }
-        .progress-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
             flex: 1;
-            position: relative;
-            z-index: 2;
-            font-weight: 600;
-            font-size: 13px;
-            color: #a0aec0;
-            transition: color 0.3s ease;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(180, 149, 84, 0.5));
         }
-        .progress-step .circle {
-            width: 35px;
-            height: 35px;
+        .section-divider::after {
+            background: linear-gradient(270deg, transparent, rgba(180, 149, 84, 0.5));
+        }
+        .section-divider .divider-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(145deg, #084c43, #0f7264);
             border-radius: 50%;
-            background: #edf2f7;
-            border: 3px solid #e2e8f0;
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-weight: 700;
-            color: #718096;
-            transition: all 0.4s ease;
-            margin-bottom: 5px;
-        }
-        .progress-step.active .circle {
-            background: #0f7264;
-            border-color: #0f7264;
+            justify-content: center;
             color: #fff;
+            font-size: 20px;
+            flex-shrink: 0;
             box-shadow: 0 4px 15px rgba(15, 114, 100, 0.3);
+            animation: dividerPulse 2.5s ease-in-out infinite;
+            transition: transform 0.3s ease;
         }
-        .progress-step.done .circle {
-            background: #38a169;
-            border-color: #38a169;
-            color: #fff;
+        .section-divider .divider-icon:hover {
+            transform: scale(1.15) rotate(10deg);
         }
-        .progress-step.active {
-            color: #0f7264;
+        @keyframes dividerPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(15, 114, 100, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(15, 114, 100, 0.5); }
         }
-        .progress-step.done {
-            color: #38a169;
-        }
-        .progress-step .step-label {
-            font-size: 12px;
-            white-space: nowrap;
-        }
-        .progress-line {
-            position: absolute;
-            top: 17px;
-            right: 0;
-            left: 0;
-            height: 3px;
-            background: #e2e8f0;
-            z-index: 0;
-        }
-        .progress-line-fill {
-            height: 100%;
-            width: 0%;
-            background: #0f7264;
-            transition: width 0.4s ease;
-        }
-
-        /* ===== أقسام الخطوات ===== */
-        .step-section {
-            display: none;
-        }
-        .step-section.active {
-            display: block;
-        }
-        .step-section.slide-in-right {
-            animation: slideInRight 0.4s ease;
-        }
-        .step-section.slide-in-left {
-            animation: slideInLeft 0.4s ease;
-        }
-        @keyframes slideInRight {
-            0% { opacity: 0; transform: translateX(30px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideInLeft {
-            0% { opacity: 0; transform: translateX(-30px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes confetti {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-200px) rotate(720deg); opacity: 0; }
-        }
-        @keyframes pulse-success {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.4); }
-            50% { box-shadow: 0 0 0 20px rgba(56, 161, 105, 0); }
-        }
-        .confetti-piece {
-            position: absolute; width: 10px; height: 10px;
-            border-radius: 2px; animation: confetti 1.5s ease-out forwards;
-        }
-
-        /* ===== Micro-interactions ===== */
-        button:active { transform: scale(0.97); }
-        input, select, textarea {
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
-        }
-        input:focus, select:focus, textarea:focus {
-            transform: scale(1.005);
-        }
-        .btn-primary, .btn-secondary, .btn-success {
-            transition: transform 0.15s ease, box-shadow 0.3s ease;
-        }
-        .btn-primary:active, .btn-secondary:active, .btn-success:active {
-            transform: scale(0.97);
-        }
-
-        .step-title {
+        .section-divider .divider-text {
             font-weight: 700;
+            font-size: 16px;
             color: #084c43;
-            border-right: 4px solid #b49554;
-            padding-right: 14px;
-            margin: 0 0 18px 0;
-            font-size: 18px;
-        }
-        .step-title i {
-            color: #b49554;
-            margin-left: 8px;
-        }
-        .step-counter {
-            font-size: 14px;
-            color: #718096;
-            font-weight: 400;
-            margin-right: 10px;
+            white-space: nowrap;
         }
 
         .form-row {
@@ -573,7 +513,8 @@
         .form-group {
             flex: 1 1 calc(50% - 18px);
             min-width: 190px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            position: relative;
         }
         .form-group.full-width {
             flex: 1 1 100%;
@@ -586,6 +527,13 @@
             color: #1a202c;
             margin-bottom: 5px;
             cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .form-group:focus-within label {
+            color: #0f7264;
+        }
+        .form-group:focus-within label i {
+            color: #b49554;
         }
         label .required {
             color: #e53e3e;
@@ -595,6 +543,7 @@
             color: #b49554;
             margin-left: 8px;
             width: 20px;
+            transition: color 0.3s ease;
         }
 
         input,
@@ -607,18 +556,32 @@
             font-size: 16px;
             font-family: 'Cairo', sans-serif;
             background: #f9fbfd;
-            transition: 0.25s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease, background 0.3s ease;
             color: #1a202c;
             -webkit-appearance: none;
             appearance: none;
+        }
+        input::placeholder,
+        textarea::placeholder {
+            color: #a0aec0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        input:focus::placeholder,
+        textarea:focus::placeholder {
+            opacity: 0.3;
+            transform: translateX(-4px);
         }
         input:focus,
         select:focus,
         textarea:focus {
             outline: none;
             border-color: #0f7264;
-            box-shadow: 0 0 0 5px rgba(15, 114, 100, .08);
+            box-shadow: 0 0 0 5px rgba(15, 114, 100, .1), 0 4px 15px rgba(15, 114, 100, .06);
             background: #fff;
+            transform: scale(1.006);
+        }
+        select:focus {
+            transform: scale(1.004);
         }
         textarea {
             resize: vertical;
@@ -626,6 +589,13 @@
         }
 
         /* ===== التحقق الفوري ===== */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
         .field-error {
             color: #e53e3e;
             font-size: 13px;
@@ -642,6 +612,7 @@
         select.error {
             border-color: #e53e3e;
             background: #fff5f5;
+            animation: shake 0.4s ease;
         }
         input.valid,
         select.valid {
@@ -649,37 +620,9 @@
             background: #f0fff4;
         }
 
-        /* ===== أزرار التنقل ===== */
-        .step-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .btn-nav {
-            padding: 14px 35px;
-            border: none;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            font-family: 'Cairo', sans-serif;
-            transition: 0.2s ease;
-        }
-        .btn-prev {
-            background: #edf2f7;
-            color: #2d3748;
-        }
-        .btn-prev:hover {
-            background: #e2e8f0;
-        }
-        .btn-next {
-            background: #0f7264;
-            color: #fff;
-        }
-        .btn-next:hover {
-            background: #084c43;
-        }
+        /* ===== أزرار ===== */
+        button:active { transform: scale(0.97); }
+
         .btn-submit {
             background: linear-gradient(145deg, #084c43, #0f7264);
             color: #fff;
@@ -690,18 +633,38 @@
             font-weight: 700;
             cursor: pointer;
             font-family: 'Cairo', sans-serif;
-            transition: 0.2s ease;
-            box-shadow: 0 8px 20px rgba(15, 114, 100, 0.2);
-            flex: 1;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 20px rgba(15, 114, 100, 0.25);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(145deg, rgba(255,255,255,0.12), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .btn-submit:hover:not(:disabled)::before {
+            opacity: 1;
         }
         .btn-submit:hover:not(:disabled) {
-            transform: scale(1.02);
-            box-shadow: 0 12px 30px rgba(15, 114, 100, 0.3);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 14px 35px rgba(15, 114, 100, 0.35);
         }
         .btn-submit:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+        }
+        .btn-submit i {
+            margin-left: 8px;
+        }
+
+        .form-actions {
+            margin-top: 24px;
         }
 
         /* ===== رسائل النجاح والإغلاق ===== */
@@ -714,7 +677,7 @@
             margin-top: 30px;
             text-align: center;
             color: #22543d;
-            animation: fadeStep 0.6s ease;
+            animation: fadeScale 0.6s ease;
             position: relative;
             overflow: hidden;
         }
@@ -737,6 +700,10 @@
         .success-message .check-circle i {
             font-size: 40px; color: #38a169;
         }
+        @keyframes pulse-success {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(56, 161, 105, 0); }
+        }
         .success-message h3 {
             font-size: 24px;
             font-weight: 700;
@@ -758,11 +725,11 @@
             font-size: 16px;
             font-family: 'Cairo', sans-serif;
             box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
-            transition: 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
         }
         .btn-whatsapp:hover {
             background: #20ba5a;
-            transform: scale(1.03);
+            transform: scale(1.03) translateY(-1px);
         }
 
         .btn-sibling {
@@ -780,12 +747,12 @@
             font-size: 16px;
             font-family: 'Cairo', sans-serif;
             box-shadow: 0 8px 20px rgba(180, 149, 84, 0.3);
-            transition: 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
             cursor: pointer;
         }
         .btn-sibling:hover {
             background: #967e41;
-            transform: scale(1.03);
+            transform: scale(1.03) translateY(-1px);
         }
 
         .closed-message {
@@ -797,7 +764,7 @@
             margin: 20px 0;
             text-align: center;
             color: #742a2a;
-            animation: fadeStep 0.6s ease;
+            animation: fadeScale 0.6s ease;
         }
         .closed-message.show {
             display: block;
@@ -832,6 +799,16 @@
             overflow: hidden !important;
             opacity: 0 !important;
             pointer-events: none !important;
+        }
+
+        /* ===== تأثير الاحتفال ===== */
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-200px) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: absolute; width: 10px; height: 10px;
+            border-radius: 2px; animation: confetti 1.5s ease-out forwards;
         }
 
         /* ===== مساعدة الجوال ===== */
@@ -871,27 +848,20 @@
             .container {
                 border-radius: 28px;
             }
-            .step-buttons {
-                flex-direction: column;
+            .section-divider .divider-text {
+                font-size: 14px;
             }
-            .step-buttons .btn-nav,
-            .step-buttons .btn-submit {
-                width: 100%;
-                justify-content: center;
-            }
-            .progress-step .step-label {
-                font-size: 10px;
-            }
-            .progress-step .circle {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
-            .progress-line {
-                top: 14px;
+            .section-divider .divider-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
             }
             input, select, textarea, button {
                 min-height: 48px;
+            }
+            .btn-submit {
+                font-size: 17px;
+                padding: 14px 30px;
             }
         }
     </style>
@@ -925,25 +895,6 @@
             <!-- محتوى النموذج -->
             <div class="form-content" id="formContent">
 
-                <!-- شريط التقدم -->
-                <div class="progress-container">
-                    <div class="progress-step active" data-step="1">
-                        <div class="circle">1</div>
-                        <span class="step-label">بيانات الطالب</span>
-                    </div>
-                    <div class="progress-step" data-step="2">
-                        <div class="circle">2</div>
-                        <span class="step-label">ولي الأمر</span>
-                    </div>
-                    <div class="progress-step" data-step="3">
-                        <div class="circle">3</div>
-                        <span class="step-label">الملاحظات والإرسال</span>
-                    </div>
-                    <div class="progress-line">
-                        <div class="progress-line-fill" id="progressFill"></div>
-                    </div>
-                </div>
-
                 <form id="registrationForm" novalidate>
 
                     <!-- Honeypot محسن -->
@@ -952,111 +903,97 @@
                         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                     </div>
 
-                    <!-- ===== الخطوة 1: بيانات الطالب ===== -->
-                    <div class="step-section active" data-step="1">
-                        <div class="step-title">
-                            <i class="fas fa-user-graduate"></i> بيانات الطالب
-                            <span class="step-counter">(الخطوة 1 من 3)</span>
+                    <!-- ===== قسم بيانات الطالب ===== -->
+                    <div class="section-divider">
+                        <span class="divider-icon"><i class="fas fa-user-graduate"></i></span>
+                        <span class="divider-text">بيانات الطالب</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName"><i class="fas fa-user"></i> الاسم الكامل <span class="required">*</span></label>
+                            <input type="text" id="fullName" autocomplete="name" placeholder="مثال: أحمد محمد علي" required aria-required="true">
+                            <div class="field-error" id="fullNameError"><i class="fas fa-exclamation-circle"></i> الاسم يجب أن يكون 3 أحرف عربية على الأقل</div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="fullName"><i class="fas fa-user"></i> الاسم الكامل <span class="required">*</span></label>
-                                <input type="text" id="fullName" autocomplete="name" placeholder="مثال: أحمد محمد علي" required aria-required="true">
-                                <div class="field-error" id="fullNameError"><i class="fas fa-exclamation-circle"></i> الاسم يجب أن يكون 3 أحرف عربية على الأقل</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="dob"><i class="fas fa-calendar-alt"></i> تاريخ الميلاد <span class="required">*</span></label>
-                                <input type="date" id="dob" autocomplete="bday" required aria-required="true">
-                                <div class="field-error" id="dobError"><i class="fas fa-exclamation-circle"></i> تاريخ غير صحيح (يجب أن يكون بين 1 و 18 سنة)</div>
-                            </div>
+                        <div class="form-group">
+                            <label for="dob"><i class="fas fa-calendar-alt"></i> تاريخ الميلاد <span class="required">*</span></label>
+                            <input type="date" id="dob" autocomplete="bday" required aria-required="true">
+                            <div class="field-error" id="dobError"><i class="fas fa-exclamation-circle"></i> تاريخ غير صحيح (يجب أن يكون بين 1 و 18 سنة)</div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="gender"><i class="fas fa-venus-mars"></i> الجنس <span class="required">*</span></label>
-                                <select id="gender" required aria-required="true">
-                                    <option value="">-- اختر --</option>
-                                    <option value="ذكر">ذكر</option>
-                                    <option value="أنثى">أنثى</option>
-                                </select>
-                                <div class="field-error" id="genderError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="grade"><i class="fas fa-school"></i> الصف الدراسي <span class="required">*</span></label>
-                                <select id="grade" required aria-required="true">
-                                    <option value="">-- اختر --</option>
-                                    <option>الأول ابتدائي</option><option>الثاني ابتدائي</option>
-                                    <option>الثالث ابتدائي</option><option>الرابع ابتدائي</option>
-                                    <option>الخامس ابتدائي</option><option>السادس ابتدائي</option>
-                                    <option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option>
-                                </select>
-                                <div class="field-error" id="gradeError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
-                            </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gender"><i class="fas fa-venus-mars"></i> الجنس <span class="required">*</span></label>
+                            <select id="gender" required aria-required="true">
+                                <option value="">-- اختر --</option>
+                                <option value="ذكر">ذكر</option>
+                                <option value="أنثى">أنثى</option>
+                            </select>
+                            <div class="field-error" id="genderError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
                         </div>
-                        <div class="step-buttons">
-                            <span></span>
-                            <button type="button" class="btn-nav btn-next" data-next="2">التالي <i class="fas fa-arrow-left"></i></button>
+                        <div class="form-group">
+                            <label for="grade"><i class="fas fa-school"></i> الصف الدراسي <span class="required">*</span></label>
+                            <select id="grade" required aria-required="true">
+                                <option value="">-- اختر --</option>
+                                <option>الأول ابتدائي</option><option>الثاني ابتدائي</option>
+                                <option>الثالث ابتدائي</option><option>الرابع ابتدائي</option>
+                                <option>الخامس ابتدائي</option><option>السادس ابتدائي</option>
+                                <option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option>
+                            </select>
+                            <div class="field-error" id="gradeError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
                         </div>
                     </div>
 
-                    <!-- ===== الخطوة 2: بيانات ولي الأمر ===== -->
-                    <div class="step-section" data-step="2">
-                        <div class="step-title">
-                            <i class="fas fa-user-tie"></i> بيانات ولي الأمر
-                            <span class="step-counter">(الخطوة 2 من 3)</span>
+                    <!-- ===== قسم بيانات ولي الأمر ===== -->
+                    <div class="section-divider">
+                        <span class="divider-icon"><i class="fas fa-user-tie"></i></span>
+                        <span class="divider-text">بيانات ولي الأمر</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parentName"><i class="fas fa-user-tie"></i> اسم ولي الأمر <span class="required">*</span></label>
+                            <input type="text" id="parentName" placeholder="اسم الأب أو الوصي" required aria-required="true">
+                            <div class="field-error" id="parentNameError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="parentName"><i class="fas fa-user-tie"></i> اسم ولي الأمر <span class="required">*</span></label>
-                                <input type="text" id="parentName" placeholder="اسم الأب أو الوصي" required aria-required="true">
-                                <div class="field-error" id="parentNameError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="parentJob"><i class="fas fa-briefcase"></i> جهة العمل / الوظيفة</label>
-                                <input type="text" id="parentJob" placeholder="مثال: موظف حكومي - وزارة التربية">
-                            </div>
+                        <div class="form-group">
+                            <label for="parentJob"><i class="fas fa-briefcase"></i> جهة العمل / الوظيفة</label>
+                            <input type="text" id="parentJob" placeholder="مثال: موظف حكومي - وزارة التربية">
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="phone"><i class="fas fa-phone-alt"></i> رقم الجوال <span class="required">*</span></label>
-                                <input type="tel" id="phone" autocomplete="tel" placeholder="مثال: 07850009133" required aria-required="true">
-                                <div class="field-error" id="phoneError"><i class="fas fa-exclamation-circle"></i> أدخل رقم جوال عراقي صحيح (11 رقم، يبدأ بـ 07)</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="address"><i class="fas fa-home"></i> العنوان (المنزل)</label>
-                                <input type="text" id="address" placeholder="الحي / المدينة">
-                            </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone"><i class="fas fa-phone-alt"></i> رقم الجوال <span class="required">*</span></label>
+                            <input type="tel" id="phone" autocomplete="tel" placeholder="مثال: 07850009133" required aria-required="true">
+                            <div class="field-error" id="phoneError"><i class="fas fa-exclamation-circle"></i> أدخل رقم جوال عراقي صحيح (11 رقم، يبدأ بـ 07)</div>
                         </div>
-                        <div class="step-buttons">
-                            <button type="button" class="btn-nav btn-prev" data-prev="1"><i class="fas fa-arrow-right"></i> السابق</button>
-                            <button type="button" class="btn-nav btn-next" data-next="3">التالي <i class="fas fa-arrow-left"></i></button>
+                        <div class="form-group">
+                            <label for="address"><i class="fas fa-home"></i> العنوان (المنزل) <span class="required">*</span></label>
+                            <input type="text" id="address" placeholder="الحي / المدينة" required aria-required="true">
+                            <div class="field-error" id="addressError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
                         </div>
                     </div>
 
-                    <!-- ===== الخطوة 3: الملاحظات والإرسال ===== -->
-                    <div class="step-section" data-step="3">
-                        <div class="step-title">
-                            <i class="fas fa-sticky-note"></i> الملاحظات والإرسال
-                            <span class="step-counter">(الخطوة 3 من 3)</span>
+                    <!-- ===== قسم التأكيد والإرسال ===== -->
+                    <div class="section-divider">
+                        <span class="divider-icon"><i class="fas fa-check-double"></i></span>
+                        <span class="divider-text">التأكيد والإرسال</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="notes"><i class="fas fa-sticky-note"></i> ملاحظات إضافية (حالة صحية، احتياجات خاصة، ...)</label>
+                            <textarea id="notes" placeholder="أي معلومات أخرى تود إضافتها..."></textarea>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label for="notes"><i class="fas fa-sticky-note"></i> ملاحظات إضافية (حالة صحية، احتياجات خاصة، ...)</label>
-                                <textarea id="notes" placeholder="أي معلومات أخرى تود إضافتها..."></textarea>
-                            </div>
-                            <div class="consent-checkbox">
-                                <input type="checkbox" id="consentCheck" required>
-                                <label for="consentCheck">
-                                    أوافق على <a href="#" onclick="return false;">سياسة الخصوصية</a> ومعالجة بياناتي الشخصية بغرض التسجيل في مدارس الأرتقاء الأهلية <span class="required">*</span>
-                                </label>
-                            </div>
+                        <div class="consent-checkbox">
+                            <input type="checkbox" id="consentCheck" required>
+                            <label for="consentCheck">
+                                أوافق على <a href="#" onclick="return false;">سياسة الخصوصية</a> ومعالجة بياناتي الشخصية بغرض التسجيل في مدارس الأرتقاء الأهلية <span class="required">*</span>
+                            </label>
                         </div>
+                    </div>
 
-                        <div class="step-buttons">
-                            <button type="button" class="btn-nav btn-prev" data-prev="2"><i class="fas fa-arrow-right"></i> السابق</button>
-                            <button type="submit" class="btn-submit" id="submitBtn">
-                                <i class="fas fa-paper-plane"></i> تسجيل الطالب
-                            </button>
-                        </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i> تسجيل الطالب
+                        </button>
                     </div>
 
                 </form>
@@ -1079,7 +1016,6 @@
                         </button>
                     </div>
                 </div>
-
 
             </div>
         </div>
@@ -1241,72 +1177,18 @@
 
         const regSiblingBtn = document.getElementById('regSiblingBtn');
         const yearBadgeLabel = document.getElementById('yearBadgeLabel');
-        const progressFill = document.getElementById('progressFill');
-        const progressSteps = document.querySelectorAll('.progress-step');
 
         // ===== زمن بدء تعبئة النموذج (Honeypot + Time Detection) =====
         const startTime = Date.now();
 
         // ===== متغيرات الحالة =====
         let activeAcademicYear = "2026-2027";
-        let currentStep = 1;
-        const totalSteps = 3;
 
-        // ===== دالة التقدم =====
-        function updateProgress(step) {
-            currentStep = step;
-            const percent = ((step - 1) / (totalSteps - 1)) * 100;
-            progressFill.style.width = percent + '%';
-
-            progressSteps.forEach((el) => {
-                const s = parseInt(el.dataset.step);
-                el.classList.remove('active', 'done');
-                if (s === step) el.classList.add('active');
-                else if (s < step) el.classList.add('done');
-            });
-        }
-
-        // ===== التنقل بين الخطوات =====
-        function goToStep(step) {
-            const prevActive = document.querySelector('.step-section.active');
-            const prevStep = prevActive ? parseInt(prevActive.dataset.step) : step;
-            const direction = step > prevStep ? 'next' : 'prev';
-            document.querySelectorAll('.step-section').forEach(el => {
-                el.classList.remove('active', 'slide-in-right', 'slide-in-left');
-            });
-            const target = document.querySelector(`.step-section[data-step="${step}"]`);
-            target.classList.add('active', direction === 'next' ? 'slide-in-right' : 'slide-in-left');
-            updateProgress(step);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // ===== أزرار التنقل =====
-        document.querySelectorAll('[data-next]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const next = parseInt(this.dataset.next);
-                const current = next - 1;
-                if (validateStep(current)) {
-                    goToStep(next);
-                }
-            });
-        });
-        document.querySelectorAll('[data-prev]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const prev = parseInt(this.dataset.prev);
-                goToStep(prev);
-            });
-        });
-
-        // ===== التحقق من صحة الخطوة =====
-        function validateStep(step) {
+        // ===== التحقق من صحة جميع الحقول =====
+        function validateAll() {
             let valid = true;
-            const fields = {
-                1: ['fullName', 'dob', 'gender', 'grade'],
-                2: ['parentName', 'phone'],
-                3: []
-            };
-            const stepFields = fields[step] || [];
-            stepFields.forEach(id => {
+            const requiredFields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'phone', 'address'];
+            requiredFields.forEach(id => {
                 const input = document.getElementById(id);
                 const err = document.getElementById(id + 'Error');
                 if (input) {
@@ -1322,6 +1204,8 @@
                         const min = new Date(now);
                         min.setFullYear(min.getFullYear() - 18);
                         isValid = !isNaN(date) && date <= now && date >= min;
+                    } else if (id === 'gender' || id === 'grade') {
+                        isValid = val !== '';
                     } else {
                         isValid = val !== '';
                     }
@@ -1345,7 +1229,7 @@
 
         // ===== التحقق الفوري =====
         function setupInlineValidation() {
-            const fields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'phone'];
+            const fields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'phone', 'address'];
             fields.forEach(id => {
                 const input = document.getElementById(id);
                 const err = document.getElementById(id + 'Error');
@@ -1569,12 +1453,8 @@
                 return;
             }
 
-            // التحقق من جميع الخطوات
-            let allValid = true;
-            for (let step = 1; step <= 2; step++) {
-                if (!validateStep(step)) allValid = false;
-            }
-            if (!allValid) {
+            // التحقق من جميع الحقول
+            if (!validateAll()) {
                 showToast('⚠️ يرجى تصحيح جميع الأخطاء قبل الإرسال.', 'error');
                 return;
             }
@@ -1735,7 +1615,7 @@
                 retryBtn.innerHTML = '<i class="fas fa-redo"></i> إعادة المحاولة';
                 retryBtn.style.cssText = 'background:#e53e3e;display:inline-flex;align-items:center;gap:10px;color:#fff;border:none;padding:14px 30px;border-radius:35px;font-weight:700;margin-top:18px;font-size:16px;font-family:var(--font);box-shadow:0 8px 20px rgba(229,62,62,0.35);transition:0.2s ease;cursor:pointer;';
                 retryBtn.onclick = () => { retryBtn.remove(); submitBtn.click(); };
-                document.querySelector('.step-buttons').appendChild(retryBtn);
+                document.querySelector('.form-actions').appendChild(retryBtn);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تسجيل الطالب';
             }
@@ -1747,7 +1627,7 @@
             clearDraft();
             form.reset();
             document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
-            goToStep(1);
+            document.getElementById('fullName').focus();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
@@ -1839,20 +1719,13 @@
                             next.click();
                         }
                     } else {
-                        // إذا كان آخر حقل، حاول الإرسال
-                        if (currentStep === 3) {
-                            const nextBtn = document.querySelector('.btn-next');
-                            if (nextBtn) {
-                                nextBtn.click();
-                            }
-                        }
+                        if (!submitBtn.disabled) submitBtn.click();
                     }
                 }
             });
         });
 
         // ===== بدء النموذج =====
-        updateProgress(1);
         console.log("🚀 نموذج التسجيل المحسّن (نسخة متكاملة مع لوحة التحكم) جاهز!");
         // تسجيل تحليلات بسيطة
         console.log('📊 إحصائيات:', {
