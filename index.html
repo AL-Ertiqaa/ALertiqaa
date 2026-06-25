@@ -1288,7 +1288,7 @@
             let clean = String(phone).replace(/[\s\-\(\)\+]/g, '');
             clean = normalizeArabicNumerals(clean);
             if (clean.startsWith('964')) clean = '0' + clean.substring(3);
-            return /^07[3-9]\d{8}$/.test(clean);
+            return /^(05\d{8}|07[3-9]\d{8}|01\d{9})$/.test(clean);
         }
 
         // ===== فحص التكرار (هاتف + اسم متشابه) =====
@@ -1347,9 +1347,11 @@
                     } else if (id === 'dob') {
                         const date = new Date(val);
                         const now = new Date();
-                        const min = new Date(now);
-                        min.setFullYear(min.getFullYear() - 18);
-                        isValid = !isNaN(date) && date <= now && date >= min;
+                        const minAge = new Date(now);
+                        minAge.setFullYear(minAge.getFullYear() - 25);
+                        const maxAge = new Date(now);
+                        maxAge.setFullYear(maxAge.getFullYear() - 5);
+                        isValid = !isNaN(date) && date <= now && date <= minAge && date >= maxAge;
                     } else if (id === 'gender' || id === 'grade') {
                         isValid = val !== '';
                     } else {
@@ -1394,9 +1396,11 @@
                         } else if (id === 'dob') {
                             const date = new Date(val);
                             const now = new Date();
-                            const min = new Date(now);
-                            min.setFullYear(min.getFullYear() - 18);
-                            isValid = !isNaN(date) && date <= now && date >= min;
+                            const minAge = new Date(now);
+                            minAge.setFullYear(minAge.getFullYear() - 25);
+                            const maxAge = new Date(now);
+                            maxAge.setFullYear(maxAge.getFullYear() - 5);
+                            isValid = !isNaN(date) && date <= now && date <= minAge && date >= maxAge;
                         } else if (id === 'gender' || id === 'grade') {
                             isValid = val !== '';
                         } else {
