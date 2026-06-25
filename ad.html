@@ -537,6 +537,16 @@
 
         /* ===== سجل العمليات ===== */
         .log-list { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .export-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .export-select {
+            padding: 6px 10px; border: 2px solid var(--border); border-radius: 10px;
+            font-family: var(--font); font-size: 12px; background: var(--bg-card); color: var(--text-primary);
+            cursor: pointer; transition: var(--transition); min-width: 0;
+        }
+        .export-select:focus { border-color: var(--primary); outline: none; }
+        @media (max-width: 768px) {
+            .export-group select { font-size: 11px; padding: 4px 6px; }
+        }
         .log-item {
             display: flex; align-items: center; gap: 15px;
             padding: 14px 20px; border-bottom: 1px solid var(--border-light);
@@ -717,6 +727,9 @@
             width: 100%;
         }
         .advanced-filters.hidden { display: none; }
+        .filter-field { display: flex; flex-direction: column; gap: 4px; }
+        .filter-field label { font-size: 12px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.3px; }
+        .filter-date-range { min-width: 130px; }
 
         /* ===== Print Styles ===== */
         @media print {
@@ -782,9 +795,30 @@
                 </div>
                 <div class="actions">
                     <button class="btn-refresh" id="refreshBtn"><i class="fas fa-sync-alt"></i> تحديث</button>
-                    <button class="btn-export-page" id="exportPageBtn"><i class="fas fa-file-export"></i> تصدير الصفحة</button>
-                    <button class="btn-export-all" id="exportAllBtn"><i class="fas fa-file-csv"></i> تصدير الكل</button>
-                    <button class="btn-backup" id="backupJsonBtn"><i class="fas fa-database"></i> نسخ احتياطي JSON</button>
+                    <div class="export-group">
+                        <select id="exportFormat" class="export-select" title="صيغة التصدير">
+                            <option value="csv">CSV</option>
+                            <option value="excel">Excel</option>
+                            <option value="pdf">PDF</option>
+                            <option value="json">JSON</option>
+                        </select>
+                        <select id="exportScope" class="export-select" title="نطاق التصدير">
+                            <option value="all">كل الطلاب</option>
+                            <option value="page">الصفحة الحالية</option>
+                            <option value="selected">المحددون</option>
+                        </select>
+                        <select id="exportSortField" class="export-select" title="ترتيب حسب">
+                            <option value="registeredAt">تاريخ التسجيل</option>
+                            <option value="fullName">الاسم</option>
+                            <option value="grade">الصف</option>
+                            <option value="status">الحالة</option>
+                        </select>
+                        <select id="exportSortOrder" class="export-select" title="ترتيب">
+                            <option value="desc">الأحدث أولاً</option>
+                            <option value="asc">الأقدم أولاً</option>
+                        </select>
+                        <button class="btn-export-all" id="exportBtn"><i class="fas fa-download"></i> تصدير</button>
+                    </div>
                     <button class="btn-dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button>
                     <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</button>
                 </div>
@@ -837,12 +871,12 @@
                     <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث بالاسم الكامل للطالب (يبدأ بـ)..."></div>
                     <button class="filter-toggle-btn" id="filterToggleBtn" type="button"><i class="fas fa-chevron-down"></i> فلترة متقدمة</button>
                     <div class="advanced-filters hidden" id="advancedFilters">
-                        <select id="filterGrade"><option value="">جميع الصفوف</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option><option>الثالث ابتدائي</option><option>الرابع ابتدائي</option><option>الخامس ابتدائي</option><option>السادس ابتدائي</option><option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option></select>
-                        <select id="filterGender"><option value="">الجميع</option><option value="ذكر">ذكور</option><option value="أنثى">إناث</option></select>
-                        <select id="filterStatus"><option value="">جميع الحالات</option><option value="جديد">جديد</option><option value="تم الاتصال">تم الاتصال</option><option value="مؤكد">مؤكد</option><option value="منسحب">منسحب</option><option value="ملغي">ملغي</option></select>
-                        <input type="date" id="filterDateFrom" title="من تاريخ" style="padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text-primary);min-width:130px;">
-                        <input type="date" id="filterDateTo" title="إلى تاريخ" style="padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text-primary);min-width:130px;">
-                        <select id="filterAcademicYear"><option value="">كل السنوات</option><option value="2026-2027">2026-2027</option></select>
+                        <div class="filter-field"><label>الصف الدراسي</label><select id="filterGrade"><option value="">جميع الصفوف</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option><option>الثالث ابتدائي</option><option>الرابع ابتدائي</option><option>الخامس ابتدائي</option><option>السادس ابتدائي</option><option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option></select></div>
+                        <div class="filter-field"><label>الجنس</label><select id="filterGender"><option value="">الجميع</option><option value="ذكر">ذكور</option><option value="أنثى">إناث</option></select></div>
+                        <div class="filter-field"><label>الحالة</label><select id="filterStatus"><option value="">جميع الحالات</option><option value="جديد">جديد</option><option value="تم الاتصال">تم الاتصال</option><option value="مؤكد">مؤكد</option><option value="منسحب">منسحب</option><option value="ملغي">ملغي</option></select></div>
+                        <div class="filter-field"><label>السنة الدراسية</label><select id="filterAcademicYear"><option value="">كل السنوات</option><option value="2026-2027">2026-2027</option></select></div>
+                        <div class="filter-field filter-date-range"><label>من تاريخ</label><input type="date" id="filterDateFrom" style="padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text-primary);min-width:130px;"></div>
+                        <div class="filter-field filter-date-range"><label>إلى تاريخ</label><input type="date" id="filterDateTo" style="padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text-primary);min-width:130px;"></div>
                         <button class="clear-btn" id="clearFiltersBtn"><i class="fas fa-undo"></i> إعادة ضبط</button>
                     </div>
                 </div>
@@ -850,7 +884,7 @@
                 <div class="bulk-actions-wrapper" id="bulkActionsBar">
                     <span class="bulk-info" id="bulkSelectedCount">تم تحديد 0 طالب</span>
                     <div class="bulk-btns">
-                        <button class="btn-bulk-export" id="bulkExportBtn"><i class="fas fa-file-csv"></i> تصدير المحدد</button>
+                        <button class="btn-bulk-export" id="bulkExportBtn"><i class="fas fa-download"></i> تصدير المحدد</button>
                         <button class="btn-bulk-export" id="bulkStatusBtn" style="background:#b08f4a;color:#fff;"><i class="fas fa-tags"></i> تغيير الحالة</button>
                         <button class="btn-bulk-delete" id="bulkDeleteBtn"><i class="fas fa-trash"></i> حذف المحدد</button>
                     </div>
@@ -1275,8 +1309,11 @@
         const pageInfo = document.getElementById('pageInfo');
         const resultCount = document.getElementById('resultCount');
         const lastUpdatedText = document.getElementById('lastUpdated');
-        const exportPageBtn = document.getElementById('exportPageBtn');
-        const exportAllBtn = document.getElementById('exportAllBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const exportFormat = document.getElementById('exportFormat');
+        const exportScope = document.getElementById('exportScope');
+        const exportSortField = document.getElementById('exportSortField');
+        const exportSortOrder = document.getElementById('exportSortOrder');
 
         // ===== متغيرات الترقيم =====
         const PAGE_SIZE = 20;
@@ -2650,137 +2687,132 @@
             return allDocs;
         }
 
-        // ===== تصدير الصفحة الحالية فقط =====
-        exportPageBtn.addEventListener('click', async function() {
-            const hasPermission = await checkAdminPermission();
-            if (!hasPermission) return;
-            const pageDocs = pageSnapshots[currentPage]?.docs || [];
-            if (pageDocs.length === 0) { showToast('لا توجد بيانات للتصدير.', 'error'); return; }
-            const csv = generateCSV(pageDocs);
-            downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `طلاب_الارتقاء_ص${currentPage+1}_${new Date().toISOString().slice(0,10)}.csv`);
-            showToast(`✅ تم تصدير ${pageDocs.length} طالب من الصفحة ${currentPage+1}.`, 'success');
-            logAction('export', `تصدير ${pageDocs.length} طالب من الصفحة ${currentPage+1}`);
-        });
-
-        // ===== تصدير جميع الطلاب (مع فلترة تاريخ) =====
-        exportAllBtn.addEventListener('click', async function() {
-            const hasPermission = await checkAdminPermission();
-            if (!hasPermission) return;
-            try {
+        // ===== دالة مساعدة لجلب الطلاب للتصدير (حسب النطاق) =====
+        async function getExportDocs(scope) {
+            if (scope === 'page') {
+                return pageSnapshots[currentPage]?.docs || [];
+            } else if (scope === 'selected') {
+                const ids = Array.from(selectedStudentIds);
+                if (ids.length === 0) return [];
+                const docPromises = ids.map(id => getDoc(doc(db, "students", id)));
+                const docSnaps = await Promise.all(docPromises);
+                return docSnaps.filter(snap => snap.exists());
+            } else {
                 const dateFrom = filterDateFrom.value || null;
                 const dateTo = filterDateTo.value || null;
-                if (dateFrom || dateTo) showToast('⏳ جاري تصدير حسب النطاق التاريخي...', 'info');
-                else showToast('⏳ جاري تجهيز ملف التصدير الكامل...', 'info');
-                const allDocs = await fetchAllStudents(dateFrom, dateTo);
-                if (allDocs.length === 0) { showToast('لا توجد بيانات.', 'error'); return; }
-                const csv = generateCSV(allDocs);
-                const suffix = dateFrom ? `_${dateFrom}_الى_${dateTo || 'now'}` : '';
-                downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `طلاب_الارتقاء${suffix}_${new Date().toISOString().slice(0,10)}.csv`);
-                showToast(`✅ تم تصدير ${allDocs.length} طالب بنجاح.`, 'success');
-                logAction('export', `تصدير ${allDocs.length} طالب${suffix.replace(/_/g,' ')}`);
-            } catch (e) { showToast('❌ فشل التصدير: ' + e.message, 'error'); }
-        });
-
-        // ===== تصدير المحددين فقط =====
-        document.getElementById('bulkExportBtn').addEventListener('click', async function() {
-            const count = selectedStudentIds.size;
-            if (count === 0) { showToast('❌ لم يتم تحديد أي طالب.', 'error'); return; }
-            const hasPermission = await checkAdminPermission();
-            if (!hasPermission) return;
-            try {
-                showToast(`⏳ جاري تصدير ${count} طالب...`, 'info');
-                const docPromises = Array.from(selectedStudentIds).map(id => getDoc(doc(db, "students", id)));
-                const docSnaps = await Promise.all(docPromises);
-                const docs = docSnaps.filter(snap => snap.exists());
-                if (docs.length === 0) { showToast('لا توجد بيانات.', 'error'); return; }
-                const csv = generateCSV(docs);
-                downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `طلاب_الارتقاء_محددون_${new Date().toISOString().slice(0,10)}.csv`);
-                showToast(`✅ تم تصدير ${docs.length} طالب محدد.`, 'success');
-                logAction('export', `تصدير ${docs.length} طالب محدد`);
-            } catch (e) { showToast('❌ فشل التصدير: ' + e.message, 'error'); }
-        });
-
-        // ===== نسخ احتياطي كامل بصيغة JSON =====
-        document.getElementById('backupJsonBtn').addEventListener('click', async function() {
-            const hasPermission = await checkAdminPermission();
-            if (!hasPermission) return;
-
-            try {
-                showToast('⏳ جاري تجهيز النسخة الاحتياطية الكاملة...', 'info');
-
-                let allDocs = [];
-                let lastDoc = null;
-                let hasMore = true;
-                const BATCH_SIZE = 100;
-
-                while (hasMore) {
-                    let q = query(collection(db, "students"), where("deleted", "==", false), orderBy("registeredAt", "desc"), limit(BATCH_SIZE));
-                    if (lastDoc) q = query(q, startAfter(lastDoc));
-                    const snapshot = await getDocs(q);
-                    const docs = snapshot.docs;
-                    if (docs.length === 0) { hasMore = false; break; }
-                    docs.forEach(d => allDocs.push({ id: d.id, ...d.data() }));
-                    lastDoc = docs[docs.length - 1];
-                    if (docs.length < BATCH_SIZE) hasMore = false;
-                }
-
-                if (allDocs.length === 0) {
-                    showToast('لا توجد بيانات للنسخ الاحتياطي.', 'error');
-                    return;
-                }
-
-                const backup = {
-                    exportDate: new Date().toISOString(),
-                    school: 'مدارس الأرتقاء الأهلية',
-                    totalStudents: allDocs.length,
-                    students: allDocs
-                };
-
-                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `نسخة_احتياطية_الارتقاء_${new Date().toISOString().slice(0,10)}.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast(`✅ تم تصدير النسخة الاحتياطية لـ ${allDocs.length} طالب بنجاح.`, 'success');
-            } catch (e) {
-                showToast('❌ فشل النسخ الاحتياطي: ' + e.message, 'error');
+                return await fetchAllStudents(dateFrom, dateTo);
             }
-        });
+        }
 
-        // ===== تصدير Excel مع تنسيق =====
-        window.exportToExcel = async function() {
+        // ===== دالة مساعدة لفرز البيانات =====
+        function sortDocs(docs, field, asc) {
+            return [...docs].sort((a, b) => {
+                const d = a.data ? a.data() : a;
+                const e = b.data ? b.data() : b;
+                let va = d[field], vb = e[field];
+                if (field === 'registeredAt') {
+                    va = va ? (va.toDate ? va.toDate().getTime() : new Date(va).getTime()) : 0;
+                    vb = vb ? (vb.toDate ? vb.toDate().getTime() : new Date(vb).getTime()) : 0;
+                } else {
+                    va = String(va || '').trim();
+                    vb = String(vb || '').trim();
+                }
+                return asc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+            });
+        }
+
+        // ===== دالة تصدير موحدة =====
+        async function exportData() {
+            const hasPermission = await checkAdminPermission();
+            if (!hasPermission) return;
             try {
-                const allDocs = await fetchAllStudents();
-                if (!allDocs.length) { showToast('لا توجد بيانات.', 'error'); return; }
-                showToast('⏳ جاري تجهيز ملف Excel...', 'info');
-                const data = allDocs.map(d => {
-                    const s = d.data();
-                    return {
-                        'رقم التسجيل': s.registrationId || '',
-                        'الاسم الكامل': s.fullName || '',
-                        'تاريخ الميلاد': s.dob || '',
-                        'الجنس': s.gender || '',
-                        'الصف': s.grade || '',
-                        'الحالة': s.status || 'جديد',
-                        'ولي الأمر': s.parentName || '',
-                        'جهة العمل': s.parentJob || '',
-                        'الجوال': s.phone || '',
-                        'العنوان': s.address || '',
-                        'الملاحظات': s.notes || '',
-                        'تاريخ التسجيل': s.registeredAt ? new Date(s.registeredAt.toDate ? s.registeredAt.toDate() : s.registeredAt).toLocaleDateString('ar-EG') : ''
-                    };
-                });
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
-                ws['!cols'] = Object.keys(data[0]).map(() => ({ wch: 18 }));
-                XLSX.writeFile(wb, `طلاب_الارتقاء_${new Date().toISOString().slice(0,10)}.xlsx`);
-                showToast(`✅ تم تصدير ${data.length} طالب إلى Excel.`, 'success');
-                logAction('export', `تصدير ${data.length} طالب إلى Excel`);
+                const format = exportFormat.value;
+                const scope = exportScope.value;
+                const sortField = exportSortField.value;
+                const sortAsc = exportSortOrder.value === 'asc';
+
+                let docs = await getExportDocs(scope);
+                if (docs.length === 0) { showToast('❌ لا توجد بيانات للتصدير.', 'error'); return; }
+                docs = sortDocs(docs, sortField, sortAsc);
+
+                const dateStr = new Date().toISOString().slice(0,10);
+                const scopeLabel = scope === 'page' ? `ص${currentPage+1}` : scope === 'selected' ? 'محددون' : 'الكل';
+                const filenameBase = `طلاب_الارتقاء_${scopeLabel}_${dateStr}`;
+
+                if (format === 'csv') {
+                    const csv = generateCSV(docs);
+                    downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), `${filenameBase}.csv`);
+                } else if (format === 'excel') {
+                    showToast('⏳ جاري تجهيز Excel...', 'info');
+                    const data = docs.map(d => {
+                        const s = d.data ? d.data() : d;
+                        return {
+                            'رقم التسجيل': s.registrationId || '',
+                            'الاسم الكامل': s.fullName || '',
+                            'تاريخ الميلاد': s.dob || '',
+                            'الجنس': s.gender || '',
+                            'الصف': s.grade || '',
+                            'الحالة': s.status || 'جديد',
+                            'ولي الأمر': s.parentName || '',
+                            'جهة العمل': s.parentJob || '',
+                            'الجوال': s.phone || '',
+                            'العنوان': s.address || '',
+                            'الملاحظات': s.notes || '',
+                            'تاريخ التسجيل': s.registeredAt ? new Date(s.registeredAt.toDate ? s.registeredAt.toDate() : s.registeredAt).toLocaleDateString('ar-EG') : ''
+                        };
+                    });
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
+                    ws['!cols'] = Object.keys(data[0]).map(() => ({ wch: 18 }));
+                    XLSX.writeFile(wb, `${filenameBase}.xlsx`);
+                } else if (format === 'pdf') {
+                    showToast('⏳ جاري تجهيز PDF...', 'info');
+                    if (window.exportAllToPDF) {
+                        await window.exportAllToPDF();
+                    } else {
+                        const { default: jsPDF } = await import('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                        const { default: html2canvas } = await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+                        const container = document.createElement('div');
+                        container.style.cssText = 'padding:20px;font-family:Cairo;direction:rtl;background:#fff;color:#1a202c;width:800px;';
+                        let html = `<h2 style="color:#063a33;text-align:center;">مدارس الأرتقاء الأهلية</h2><h3 style="text-align:center;color:#b08f4a;">تقرير الطلاب</h3><table style="width:100%;border-collapse:collapse;margin-top:15px;font-size:11px;"><thead><tr style="background:#063a33;color:#fff;"><th style="padding:6px;border:1px solid #ddd;">#</th><th style="padding:6px;border:1px solid #ddd;">الاسم</th><th style="padding:6px;border:1px solid #ddd;">الصف</th><th style="padding:6px;border:1px solid #ddd;">الجوال</th><th style="padding:6px;border:1px solid #ddd;">الحالة</th></tr></thead><tbody>`;
+                        docs.forEach((d, i) => {
+                            const s = d.data ? d.data() : d;
+                            html += `<tr><td style="padding:5px;border:1px solid #ddd;text-align:center;">${i+1}</td><td style="padding:5px;border:1px solid #ddd;">${s.fullName || ''}</td><td style="padding:5px;border:1px solid #ddd;">${s.grade || ''}</td><td style="padding:5px;border:1px solid #ddd;">${s.phone || ''}</td><td style="padding:5px;border:1px solid #ddd;">${s.status || 'جديد'}</td></tr>`;
+                        });
+                        html += '</tbody></table>';
+                        container.innerHTML = html;
+                        document.body.appendChild(container);
+                        const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+                        document.body.removeChild(container);
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const pdfW = pdf.internal.pageSize.getWidth();
+                        const pdfH = (canvas.height * pdfW) / canvas.width;
+                        pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+                        pdf.save(`${filenameBase}.pdf`);
+                    }
+                } else if (format === 'json') {
+                    showToast('⏳ جاري تجهيز JSON...', 'info');
+                    const allData = docs.map(d => {
+                        const s = d.data ? d.data() : d;
+                        return { id: d.id || '', ...s };
+                    });
+                    const backup = { exportDate: new Date().toISOString(), school: 'مدارس الأرتقاء الأهلية', totalStudents: allData.length, students: allData };
+                    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8;' });
+                    downloadBlob(blob, `${filenameBase}.json`);
+                }
+
+                showToast(`✅ تم تصدير ${docs.length} طالب بنجاح.`, 'success');
+                logAction('export', `تصدير ${docs.length} طالب (${format.toUpperCase()}) - ${scopeLabel}`);
             } catch (e) { showToast('❌ فشل التصدير: ' + e.message, 'error'); }
-        };
+        }
+
+        exportBtn.addEventListener('click', exportData);
+        document.getElementById('bulkExportBtn').addEventListener('click', function() {
+            exportScope.value = 'selected';
+            exportBtn.click();
+        });
 
         // ===== تغيير حالة جماعي =====
         document.getElementById('bulkStatusBtn').addEventListener('click', function() {
@@ -2870,28 +2902,6 @@
 
         // ===== ربط الأزرار الجديدة =====
         setTimeout(() => {
-            if (typeof XLSX !== 'undefined') {
-                const exportActions = document.querySelector('.actions');
-                if (exportActions) {
-                    const excelBtn = document.createElement('button');
-                    excelBtn.className = 'btn-print-report';
-                    excelBtn.innerHTML = '<i class="fas fa-file-excel"></i> Excel';
-                    excelBtn.onclick = window.exportToExcel;
-                    exportActions.appendChild(excelBtn);
-                    const yearBtn = document.createElement('button');
-                    yearBtn.className = 'btn-pdf-report';
-                    yearBtn.innerHTML = '<i class="fas fa-chart-pie"></i> تقرير سنوي';
-                    yearBtn.onclick = window.generateYearlyReport;
-                    exportActions.appendChild(yearBtn);
-                    // PDF Export All Button
-                    const pdfAllBtn = document.createElement('button');
-                    pdfAllBtn.className = 'btn-pdf-report';
-                    pdfAllBtn.style.background = '#dc3545';
-                    pdfAllBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF الجميع';
-                    pdfAllBtn.onclick = window.exportAllToPDF;
-                    exportActions.appendChild(pdfAllBtn);
-                }
-            }
             // ربط شريط التنقل السفلي
             document.querySelectorAll('.bottom-nav button').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -3225,9 +3235,9 @@
                 // Ctrl/Cmd + E لتصدير Excel
                 if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
                     e.preventDefault();
-                    if (document.getElementById('exportExcelBtn')) {
-                        document.getElementById('exportExcelBtn').click();
-                    }
+                    exportFormat.value = 'excel';
+                    exportScope.value = 'all';
+                    exportBtn.click();
                 }
 
                 // Ctrl/Cmd + P للبحث
@@ -3251,14 +3261,14 @@
                     goToAddStudent();
                     break;
                 case 'export-excel':
-                    if (document.getElementById('exportExcelBtn')) {
-                        document.getElementById('exportExcelBtn').click();
-                    }
+                    exportFormat.value = 'excel';
+                    exportScope.value = 'all';
+                    exportBtn.click();
                     break;
                 case 'export-pdf':
-                    if (document.getElementById('pdfReportBtn')) {
-                        document.getElementById('pdfReportBtn').click();
-                    }
+                    exportFormat.value = 'pdf';
+                    exportScope.value = 'all';
+                    exportBtn.click();
                     break;
                 case 'reports':
                     if (document.getElementById('reports-tab')) {
@@ -3266,9 +3276,9 @@
                     }
                     break;
                 case 'backup':
-                    if (document.getElementById('backupJsonBtn')) {
-                        document.getElementById('backupJsonBtn').click();
-                    }
+                    exportFormat.value = 'json';
+                    exportScope.value = 'all';
+                    exportBtn.click();
                     break;
             }
         }
