@@ -177,6 +177,12 @@
         .table-toolbar .export-group {
             display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
         }
+        .table-toolbar .filter-wrapper {
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .table-toolbar .filter-wrapper label {
+            font-size: 11px; font-weight: 700; color: var(--text-secondary); padding-right: 4px;
+        }
         .table-toolbar .export-select {
             padding: 7px 12px; border: 2px solid var(--border); border-radius: 10px;
             font-family: var(--font); font-size: 12px; background: var(--bg-card); color: var(--text-primary);
@@ -821,27 +827,27 @@
 
                 <div class="table-toolbar">
                     <div class="export-group">
-                        <select id="exportFormat" class="export-select" title="صيغة التصدير">
+                        <div class="filter-wrapper"><label>الصيغة</label><select id="exportFormat" class="export-select">
                             <option value="csv">CSV</option>
                             <option value="excel">Excel</option>
                             <option value="pdf">PDF</option>
                             <option value="json">JSON</option>
-                        </select>
-                        <select id="exportScope" class="export-select" title="نطاق التصدير">
+                        </select></div>
+                        <div class="filter-wrapper"><label>النطاق</label><select id="exportScope" class="export-select">
                             <option value="all">كل الطلاب</option>
                             <option value="page">الصفحة الحالية</option>
                             <option value="selected">المحددون</option>
-                        </select>
-                        <select id="exportSortField" class="export-select" title="ترتيب حسب">
+                        </select></div>
+                        <div class="filter-wrapper"><label>ترتيب حسب</label><select id="exportSortField" class="export-select">
                             <option value="registeredAt">تاريخ التسجيل</option>
                             <option value="fullName">الاسم</option>
                             <option value="grade">الصف</option>
                             <option value="status">الحالة</option>
-                        </select>
-                        <select id="exportSortOrder" class="export-select" title="ترتيب">
+                        </select></div>
+                        <div class="filter-wrapper"><label>الترتيب</label><select id="exportSortOrder" class="export-select">
                             <option value="desc">الأحدث أولاً</option>
                             <option value="asc">الأقدم أولاً</option>
-                        </select>
+                        </select></div>
                         <button class="btn-export-all" id="exportBtn"><i class="fas fa-download"></i> تصدير</button>
                     </div>
                     <button class="btn-add-student" id="addStudentBtn"><i class="fas fa-user-plus"></i> إضافة طالب</button>
