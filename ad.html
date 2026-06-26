@@ -1267,8 +1267,8 @@
                 const grade = data.grade || 'غير_محدد';
                 const gender = data.gender || '';
                 await runTransaction(db, async (tx) => {
-                    tx.update(doc(db, "students", id), { deleted: false, deletedAt: null, restoredAt: Timestamp.fromDate(new Date()) });
                     const s = await tx.get(statsRef);
+                    tx.update(doc(db, "students", id), { deleted: false, deletedAt: null, restoredAt: Timestamp.fromDate(new Date()) });
                     if (s.exists()) {
                         tx.update(statsRef, {
                             total: increment(1),
@@ -2341,8 +2341,8 @@
                     if (!hasPermission) return;
                     try {
                         await runTransaction(db, async (tx) => {
-                            tx.update(doc(db, "students", id), { deleted: true, deletedAt: Timestamp.fromDate(new Date()) });
                             const s = await tx.get(statsRef);
+                            tx.update(doc(db, "students", id), { deleted: true, deletedAt: Timestamp.fromDate(new Date()) });
                             if (s.exists()) {
                                 tx.update(statsRef, {
                                     total: increment(-1),
@@ -2356,8 +2356,8 @@
                         showToast('🗑️ تم نقل الطالب إلى سلة المحذوفات.', 'warning', 'تراجع', async () => {
                             try {
                                 await runTransaction(db, async (tx) => {
-                                    tx.update(doc(db, "students", id), { deleted: false, deletedAt: null });
                                     const s = await tx.get(statsRef);
+                                    tx.update(doc(db, "students", id), { deleted: false, deletedAt: null });
                                     if (s.exists()) {
                                         tx.update(statsRef, {
                                             total: increment(1),
