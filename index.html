@@ -1584,6 +1584,17 @@
             submitProgressBar.style.background = 'linear-gradient(90deg, #0f7264, #38a169)';
         }
 
+        // ===== حساب العمر من تاريخ الميلاد =====
+        function calcAge(dob) {
+            if (!dob) return 0;
+            const birth = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+            return age;
+        }
+
         // ===== إرسال النموذج =====
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1670,12 +1681,16 @@
 
             try {
                 const now = serverTimestamp();
+                const dobVal = document.getElementById('dob').value;
+                const age = calcAge(dobVal);
                 const studentData = {
+                    name: sName,
                     fullName: sName,
+                    age: age,
                     searchName: normalizeArabicName(sName),
                     registrationId: registrationId,
                     status: 'جديد',
-                    dob: document.getElementById('dob').value,
+                    dob: dobVal,
                     gender: document.getElementById('gender').value,
                     grade: sGrade,
                     academicYear: activeAcademicYear,
