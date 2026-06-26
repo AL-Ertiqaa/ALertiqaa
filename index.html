@@ -1861,7 +1861,7 @@
                 await delay(300);
                 successMsg.classList.add('show');
                 // إخفاء النموذج بعد التسجيل الناجح
-                formContent.style.display = 'none';
+                form.style.display = 'none';
                 // تأثير احتفالي بسيط
                 const colors = ['#38a169','#b08f4a','#0d6b5c','#dc3545','#2563eb','#d97706'];
                 for (let i = 0; i < 20; i++) {
@@ -1910,7 +1910,7 @@
         // ===== زر تسجيل شقيق =====
         regSiblingBtn.addEventListener('click', function() {
             successMsg.classList.remove('show');
-            formContent.style.display = '';
+            form.style.display = '';
             clearDraft();
             form.reset();
             document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
