@@ -542,6 +542,10 @@
             color: #e53e3e;
             margin-right: 3px;
         }
+        .dob-select { padding: 14px 10px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 15px; font-family: 'Cairo', sans-serif; background: #f9fbfd; transition: border-color 0.3s var(--spring-soft), box-shadow 0.3s var(--spring-soft), background 0.3s ease; color: var(--text-primary); -webkit-appearance: none; appearance: none; cursor: pointer; }
+        .dob-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); background: #fff; }
+        .dob-select.error { border-color: #dc3545; background: #fef2f2; animation: shake 0.45s var(--spring-soft); }
+        .dob-select.valid { border-color: var(--success); background: #f0fdf4; }
         label i {
             color: var(--accent);
             margin-left: 8px;
@@ -1048,10 +1052,25 @@
                             <div class="field-error" id="fullNameError"><i class="fas fa-exclamation-circle"></i> الاسم يجب أن يكون 3 أحرف عربية على الأقل</div>
                         </div>
                         <div class="form-group">
-                            <label for="dob"><i class="fas fa-calendar-alt"></i> تاريخ الميلاد <span class="required">*</span></label>
-                            <input type="date" id="dob" autocomplete="bday" required aria-required="true">
+                            <label for="dobDay"><i class="fas fa-calendar-alt"></i> تاريخ الميلاد <span class="required">*</span></label>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <select id="dobDay" class="dob-select" style="flex:1;min-width:70px;" required aria-required="true">
+                                    <option value="">اليوم</option>
+                                </select>
+                                <select id="dobMonth" class="dob-select" style="flex:1;min-width:80px;" required aria-required="true">
+                                    <option value="">الشهر</option>
+                                    <option value="01">يناير</option><option value="02">فبراير</option><option value="03">مارس</option>
+                                    <option value="04">أبريل</option><option value="05">مايو</option><option value="06">يونيو</option>
+                                    <option value="07">يوليو</option><option value="08">أغسطس</option><option value="09">سبتمبر</option>
+                                    <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+                                </select>
+                                <select id="dobYear" class="dob-select" style="flex:1;min-width:80px;" required aria-required="true">
+                                    <option value="">السنة</option>
+                                </select>
+                            </div>
+                            <input type="hidden" id="dob" value="">
                             <span class="valid-icon"><i class="fas fa-check-circle"></i></span>
-                            <div class="field-error" id="dobError"><i class="fas fa-exclamation-circle"></i> تاريخ غير صحيح (يجب أن يكون العمر بين 5 و 25 سنة)</div>
+                            <div class="field-error" id="dobError"><i class="fas fa-exclamation-circle"></i> العمر يجب أن يكون بين 5 و 18 سنة</div>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1069,7 +1088,7 @@
                             <label for="grade"><i class="fas fa-school"></i> الصف الدراسي <span class="required">*</span></label>
                             <select id="grade" required aria-required="true">
                                 <option value="">-- اختر --</option>
-                                <option>الأول ابتدائي</option><option>الثاني ابتدائي</option>
+                                <option>الصف التمهيدي</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option>
                                 <option>الثالث ابتدائي</option><option>الرابع ابتدائي</option>
                                 <option>الخامس ابتدائي</option><option>السادس ابتدائي</option>
                                 <option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option>
@@ -1092,16 +1111,18 @@
                             <div class="field-error" id="parentNameError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
                         </div>
                         <div class="form-group">
-                            <label for="parentJob"><i class="fas fa-briefcase"></i> جهة العمل / الوظيفة</label>
-                            <input type="text" id="parentJob" placeholder="مثال: موظف حكومي - وزارة التربية">
+                            <label for="parentJob"><i class="fas fa-briefcase"></i> جهة العمل / الوظيفة <span class="required">*</span></label>
+                            <input type="text" id="parentJob" placeholder="مثال: موظف حكومي - وزارة التربية" required aria-required="true">
+                            <span class="valid-icon"><i class="fas fa-check-circle"></i></span>
+                            <div class="field-error" id="parentJobError"><i class="fas fa-exclamation-circle"></i> مطلوب</div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="phone"><i class="fas fa-phone-alt"></i> رقم الجوال <span class="required">*</span></label>
-                            <input type="tel" id="phone" autocomplete="tel" placeholder="مثال: 07850009133" required aria-required="true">
+                            <input type="tel" id="phone" autocomplete="tel" placeholder="مثال: 07850009133" required aria-required="true" dir="ltr">
                             <span class="valid-icon"><i class="fas fa-check-circle"></i></span>
-                            <div class="field-error" id="phoneError"><i class="fas fa-exclamation-circle"></i> أدخل رقم جوال صحيح (مثال: 07850009133 أو 0551234567)</div>
+                            <div class="field-error" id="phoneError"><i class="fas fa-exclamation-circle"></i> أدخل رقم هاتف عراقي صحيح مكون من 11 رقماً (مثال: 07850009133)</div>
                         </div>
                         <div class="form-group">
                             <label for="address"><i class="fas fa-home"></i> العنوان (المنزل) <span class="required">*</span></label>
@@ -1162,7 +1183,7 @@
             <div class="footer-grid">
                 <div class="footer-item">
                     <i class="fas fa-phone-alt"></i>
-                    <span>
+                    <span style="display:flex;flex-direction:column;gap:6px;">
                         <span class="label">هاتف:</span>
                         <span class="phone-numbers">07850009133</span>
                         <span class="phone-numbers">07750009133</span>
@@ -1262,8 +1283,7 @@
                 if (!snap.exists()) {
                     await setDoc(statsRef, {
                         total: 0, male: 0, female: 0, todayCount: 0,
-                        lastReset: new Date().toISOString().split('T')[0],
-                        gradeDistribution: {}
+                        lastReset: new Date().toISOString().split('T')[0]
                     });
                 }
                 const cSnap = await getDoc(counterRef);
@@ -1293,9 +1313,7 @@
             clean = normalizeArabicNumerals(clean);
             if (clean.startsWith('00964')) clean = '0' + clean.substring(5);
             else if (clean.startsWith('964')) clean = '0' + clean.substring(3);
-            else if (clean.startsWith('00966')) clean = '0' + clean.substring(5);
-            else if (clean.startsWith('966')) clean = '0' + clean.substring(3);
-            return /^(05\d{8}|07[3-9]\d{8}|01\d{9})$/.test(clean);
+            return /^07\d{9}$/.test(clean);
         }
 
         // ===== فحص التكرار (هاتف + اسم متشابه) =====
@@ -1340,7 +1358,7 @@
         // ===== التحقق من صحة جميع الحقول =====
         function validateAll() {
             let valid = true;
-            const requiredFields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'phone', 'address'];
+            const requiredFields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'parentJob', 'phone', 'address'];
             requiredFields.forEach(id => {
                 const input = document.getElementById(id);
                 const err = document.getElementById(id + 'Error');
@@ -1352,17 +1370,19 @@
                     } else if (id === 'fullName') {
                         isValid = val.length >= 3;
                     } else if (id === 'dob') {
-                        const date = new Date(val);
+                        const date = new Date(val + 'T00:00:00');
                         const now = new Date();
                         const oldest = new Date(now);
-                        oldest.setFullYear(oldest.getFullYear() - 25);
+                        oldest.setFullYear(oldest.getFullYear() - 18);
                         const youngest = new Date(now);
                         youngest.setFullYear(youngest.getFullYear() - 5);
-                        isValid = !isNaN(date) && date <= youngest && date >= oldest;
+                        isValid = !isNaN(date.getTime()) && date <= youngest && date >= oldest;
                     } else if (id === 'gender' || id === 'grade') {
                         isValid = val !== '';
                     } else if (id === 'parentName') {
                         isValid = val.length >= 3;
+                    } else if (id === 'parentJob') {
+                        isValid = val.length >= 2;
                     } else {
                         isValid = val !== '';
                     }
@@ -1373,11 +1393,23 @@
                         if (err) err.classList.add('show');
                         if (icon) icon.classList.remove('show');
                         valid = false;
+                        if (id === 'dob') {
+                            ['dobDay','dobMonth','dobYear'].forEach(sid => {
+                                const sel = document.getElementById(sid);
+                                if (sel) { sel.classList.add('error'); sel.classList.remove('valid'); }
+                            });
+                        }
                     } else {
                         input.classList.remove('error');
                         input.classList.add('valid');
                         if (err) err.classList.remove('show');
                         if (icon) icon.classList.add('show');
+                        if (id === 'dob') {
+                            ['dobDay','dobMonth','dobYear'].forEach(sid => {
+                                const sel = document.getElementById(sid);
+                                if (sel) { sel.classList.remove('error'); sel.classList.add('valid'); }
+                            });
+                        }
                     }
                 }
             });
@@ -1389,7 +1421,7 @@
 
         // ===== التحقق الفوري =====
         function setupInlineValidation() {
-            const fields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'phone', 'address'];
+            const fields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'parentJob', 'phone', 'address'];
             fields.forEach(id => {
                 const input = document.getElementById(id);
                 const err = document.getElementById(id + 'Error');
@@ -1403,17 +1435,19 @@
                         } else if (id === 'fullName') {
                             isValid = val.length >= 3;
                         } else if (id === 'dob') {
-                            const date = new Date(val);
+                            const date = new Date(val + 'T00:00:00');
                             const now = new Date();
                             const oldest = new Date(now);
-                            oldest.setFullYear(oldest.getFullYear() - 25);
+                            oldest.setFullYear(oldest.getFullYear() - 18);
                             const youngest = new Date(now);
                             youngest.setFullYear(youngest.getFullYear() - 5);
-                            isValid = !isNaN(date) && date <= youngest && date >= oldest;
+                            isValid = !isNaN(date.getTime()) && date <= youngest && date >= oldest;
                         } else if (id === 'gender' || id === 'grade') {
                             isValid = val !== '';
                         } else if (id === 'parentName') {
                             isValid = val.length >= 3;
+                        } else if (id === 'parentJob') {
+                            isValid = val.length >= 2;
                         } else {
                             isValid = val !== '';
                         }
@@ -1436,10 +1470,15 @@
 
         // ===== حفظ المسودة =====
         const draftFields = ['fullName', 'dob', 'gender', 'grade', 'parentName', 'parentJob', 'phone', 'address', 'notes'];
+        const dobSelectFields = ['dobDay', 'dobMonth', 'dobYear'];
 
         function saveDraft() {
             try {
                 draftFields.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) localStorage.setItem('draft_' + id, el.value);
+                });
+                dobSelectFields.forEach(id => {
                     const el = document.getElementById(id);
                     if (el) localStorage.setItem('draft_' + id, el.value);
                 });
@@ -1453,38 +1492,85 @@
                     const el = document.getElementById(id);
                     if (val && el) el.value = val;
                 });
+                dobSelectFields.forEach(id => {
+                    const val = localStorage.getItem('draft_' + id);
+                    const el = document.getElementById(id);
+                    if (val && el) {
+                        el.value = val;
+                        el.dispatchEvent(new Event('change'));
+                    }
+                });
             } catch (e) { /* تجاهل */ }
         }
 
         function clearDraft() {
             draftFields.forEach(id => localStorage.removeItem('draft_' + id));
+            dobSelectFields.forEach(id => localStorage.removeItem('draft_' + id));
         }
 
         draftFields.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', saveDraft);
         });
+        dobSelectFields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', saveDraft);
+        });
         restoreDraft();
 
-        // ===== تاريخ الميلاد (مدقق: 5–25 سنة) =====
-        function setupDateRange() {
-            const dobInput = document.getElementById('dob');
-            if (dobInput) {
-                const today = new Date();
-                const y = today.getFullYear();
-                const m = String(today.getMonth() + 1).padStart(2, '0');
-                const d = String(today.getDate()).padStart(2, '0');
-                // الحد الأعلى: 5 سنوات (أصغر طالب)
-                const youngest = new Date(today);
-                youngest.setFullYear(youngest.getFullYear() - 5);
-                dobInput.max = youngest.toISOString().split('T')[0];
-                // الحد الأدنى: 25 سنة (أكبر طالب)
-                const oldest = new Date(today);
-                oldest.setFullYear(oldest.getFullYear() - 25);
-                dobInput.min = oldest.toISOString().split('T')[0];
+        // ===== تاريخ الميلاد (قوائم منسدلة + مدقق: 5–18 سنة) =====
+        function setupDobSelects() {
+            const daySelect = document.getElementById('dobDay');
+            const yearSelect = document.getElementById('dobYear');
+            const monthSelect = document.getElementById('dobMonth');
+            const hiddenInput = document.getElementById('dob');
+            if (!daySelect || !yearSelect) return;
+
+            // أيام الشهر
+            for (let d = 1; d <= 31; d++) {
+                const opt = document.createElement('option');
+                opt.value = String(d).padStart(2, '0');
+                opt.textContent = d;
+                daySelect.appendChild(opt);
             }
+
+            // السنوات (5-18 سنة)
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const minYear = currentYear - 18;
+            const maxYear = currentYear - 5;
+            for (let y = maxYear; y >= minYear; y--) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            }
+
+            function combineDob() {
+                const day = daySelect.value;
+                const month = monthSelect.value;
+                const year = yearSelect.value;
+                if (day && month && year) {
+                    const dateStr = `${year}-${month}-${day}`;
+                    const date = new Date(dateStr + 'T00:00:00');
+                    // تحقق من صحة اليوم (مثال: 30 فبراير)
+                    if (!isNaN(date.getTime()) && date.getDate() === parseInt(day)) {
+                        hiddenInput.value = dateStr;
+                    } else {
+                        hiddenInput.value = '';
+                    }
+                } else {
+                    hiddenInput.value = '';
+                }
+                // حدث input لتفعيل التحقق الفوري
+                hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            daySelect.addEventListener('change', combineDob);
+            monthSelect.addEventListener('change', combineDob);
+            yearSelect.addEventListener('change', combineDob);
         }
-        setupDateRange();
+        setupDobSelects();
 
         // ===== حالة التسجيل مع تخزين مؤقت (0 قراءات إضافية) =====
         function getCachedSettings() {
@@ -1650,8 +1736,6 @@
             cleanPhone = normalizeArabicNumerals(cleanPhone.replace(/[\s\-\(\)\+]/g, ''));
             if (cleanPhone.startsWith('00964')) cleanPhone = '0' + cleanPhone.substring(5);
             else if (cleanPhone.startsWith('964')) cleanPhone = '0' + cleanPhone.substring(3);
-            else if (cleanPhone.startsWith('00966')) cleanPhone = '0' + cleanPhone.substring(5);
-            else if (cleanPhone.startsWith('966')) cleanPhone = '0' + cleanPhone.substring(3);
 
             // ===== فحص التكرار =====
             showSubmitProgress('الخطوة 2 من 4: فحص التكرار', 'جاري فحص البيانات...', 35);
@@ -1742,26 +1826,21 @@
                         const statsSnap = await tx.get(statsRef);
                         if (statsSnap.exists()) {
                             const data = statsSnap.data();
-                            const gradeKey = sGrade.replace(/\s+/g, '_');
-                            const gradeDist = data.gradeDistribution || {};
                             tx.update(statsRef, {
                                 total: increment(1),
                                 male: increment(studentData.gender === 'ذكر' ? 1 : 0),
                                 female: increment(studentData.gender === 'أنثى' ? 1 : 0),
                                 todayCount: data.lastReset === today ? increment(1) : 1,
                                 lastReset: today,
-                                [`gradeDistribution.${gradeKey}`]: increment(1),
                                 lastRegisteredName: studentData.fullName,
                                 lastRegisteredTimestamp: serverTimestamp()
                             });
                         } else {
-                            const gradeKey = sGrade.replace(/\s+/g, '_');
                             tx.set(statsRef, {
                                 total: 1,
                                 male: studentData.gender === 'ذكر' ? 1 : 0,
                                 female: studentData.gender === 'أنثى' ? 1 : 0,
                                 todayCount: 1, lastReset: today,
-                                gradeDistribution: { [gradeKey]: 1 },
                                 lastRegisteredName: studentData.fullName,
                                 lastRegisteredTimestamp: serverTimestamp()
                             });
@@ -1798,6 +1877,7 @@
                 form.reset();
                 clearDraft();
                 document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
+                document.querySelectorAll('.dob-select').forEach(el => { el.classList.remove('valid','error'); });
 
                 successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
@@ -1831,6 +1911,7 @@
             clearDraft();
             form.reset();
             document.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
+            document.querySelectorAll('.dob-select').forEach(el => { el.classList.remove('valid','error'); el.value = ''; });
             document.querySelectorAll('.valid-icon.show').forEach(el => el.classList.remove('show'));
             document.getElementById('fullName').focus();
             window.scrollTo({ top: 0, behavior: 'smooth' });
