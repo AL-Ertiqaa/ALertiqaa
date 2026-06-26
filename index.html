@@ -1282,7 +1282,7 @@
                 const snap = await getDoc(statsRef);
                 if (!snap.exists()) {
                     await setDoc(statsRef, {
-                        total: 0, male: 0, female: 0, todayCount: 0,
+                        total: 0, male: 0, female: 0, todayCount: 0, deletedCount: 0,
                         lastReset: new Date().toISOString().split('T')[0]
                     });
                 }

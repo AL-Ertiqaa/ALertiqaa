@@ -174,9 +174,6 @@
             box-shadow: var(--shadow-sm); margin-bottom: 0;
             border-bottom: 2px solid var(--border-light);
         }
-        .table-toolbar .export-group {
-            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-        }
         .table-toolbar .filter-wrapper {
             display: flex; flex-direction: column; gap: 2px;
         }
@@ -203,7 +200,7 @@
             font-weight: 700; font-family: var(--font); font-size: 13px; cursor: pointer;
             transition: var(--transition);
         }
-        .table-toolbar .btn-add-student:hover { background: var(--accent-dark); }
+        .table-toolbar .btn-add-student:hover { background: #967e41; }
         @media (max-width: 768px) {
             .table-toolbar { flex-direction: column; align-items: stretch; }
             .table-toolbar .toolbar-filters { justify-content: center; }
@@ -1495,6 +1492,8 @@
             const notes = document.getElementById('addNotes').value.trim() || 'لا يوجد';
 
             if (!name || name.length < 3) { showToast('❌ الاسم يجب أن يكون 3 أحرف على الأقل.', 'error'); return; }
+            if (!gender) { showToast('❌ يرجى اختيار الجنس.', 'error'); return; }
+            if (!grade) { showToast('❌ يرجى اختيار الصف الدراسي.', 'error'); return; }
             if (!parentName || parentName.length < 3) { showToast('❌ اسم ولي الأمر يجب أن يكون 3 أحرف على الأقل.', 'error'); return; }
             if (!phone) { showToast('❌ رقم الجوال مطلوب.', 'error'); return; }
             if (!/^07\d{9}$/.test(phone)) { showToast('❌ رقم الهاتف غير صحيح. يجب أن يكون رقماً عراقياً مكوناً من 11 رقماً (مثال: 07850009133).', 'error'); return; }
@@ -1622,7 +1621,7 @@
             if (year) constraints.push(where("academicYear", "==", year));
             if (grade) constraints.push(where("grade", "==", grade));
             if (gender) constraints.push(where("gender", "==", gender));
-            if (ageVal) constraints.push(where("age", "==", Number(ageVal)));
+            // age يُصفى لاحقاً client-side (تجنباً للـ composite index)
             const dateFrom = filterDateFrom.value;
             const dateTo = filterDateTo.value;
             if (dateFrom) constraints.push(where("registeredAt", ">=", new Date(dateFrom)));
@@ -1827,7 +1826,12 @@
             }
             let html = '';
             let index = (currentPage * PAGE_SIZE) + 1;
-            const activeDocs = docs.filter(d => !d.data().deleted);
+            let activeDocs = docs.filter(d => !d.data().deleted);
+            // تصفية العمر client-side
+            const ageFilter = document.getElementById('toolbarAge')?.value;
+            if (ageFilter) {
+                activeDocs = activeDocs.filter(d => d.data().age === Number(ageFilter));
+            }
             if (activeDocs.length === 0 && docs.length > 0) {
                 studentsBody.innerHTML = `<tr><td colspan="10" class="empty-msg"><i class="fas fa-inbox"></i> لا توجد سجلات نشطة مطابقة</td></tr>`;
                 resultCount.textContent = `(عرض 0 من ${totalDocs} طالب)`;
@@ -2318,6 +2322,7 @@
                 { key: 'رقم التسجيل', value: escapeHTML(student.registrationId) || '-', isHighlight: true },
                 { key: 'الاسم الكامل', value: escapeHTML(student.fullName) || '-' },
                 { key: 'تاريخ الميلاد', value: escapeHTML(student.dob) || '-' },
+                { key: 'العمر', value: student.age ? `${student.age} سنة` : '-' },
                 { key: 'الجنس', value: escapeHTML(student.gender) || '-' },
                 { key: 'الصف الدراسي', value: escapeHTML(student.grade) || '-' },
                 { key: 'الحالة', value: escapeHTML(student.status || 'جديد') },
