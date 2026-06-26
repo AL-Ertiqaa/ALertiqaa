@@ -183,12 +183,15 @@
         .table-toolbar .filter-wrapper label {
             font-size: 11px; font-weight: 700; color: var(--text-secondary); padding-right: 4px;
         }
-        .table-toolbar .export-select {
+        .table-toolbar .toolbar-filters {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .table-toolbar .toolbar-select {
             padding: 7px 12px; border: 2px solid var(--border); border-radius: 10px;
             font-family: var(--font); font-size: 12px; background: var(--bg-card); color: var(--text-primary);
             cursor: pointer; transition: var(--transition); min-width: 0;
         }
-        .table-toolbar .export-select:focus { border-color: var(--primary); outline: none; }
+        .table-toolbar .toolbar-select:focus { border-color: var(--primary); outline: none; }
         .table-toolbar .btn-export-all {
             padding: 8px 18px; background: #2b6cb0; color: #fff; border: none; border-radius: 10px;
             font-weight: 700; font-family: var(--font); font-size: 13px; cursor: pointer;
@@ -203,8 +206,8 @@
         .table-toolbar .btn-add-student:hover { background: var(--accent-dark); }
         @media (max-width: 768px) {
             .table-toolbar { flex-direction: column; align-items: stretch; }
-            .table-toolbar .export-group { justify-content: center; }
-            .table-toolbar .export-select { font-size: 11px; padding: 6px 8px; }
+            .table-toolbar .toolbar-filters { justify-content: center; }
+            .table-toolbar .toolbar-select { font-size: 11px; padding: 6px 8px; }
         }
         /* ===== الإحصائيات ===== */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -826,27 +829,35 @@
                 </div>
 
                 <div class="table-toolbar">
-                    <div class="export-group">
-                        <div class="filter-wrapper"><label>الصيغة</label><select id="exportFormat" class="export-select">
-                            <option value="csv">CSV</option>
-                            <option value="excel">Excel</option>
-                            <option value="pdf">PDF</option>
-                            <option value="json">JSON</option>
+                    <div class="toolbar-filters">
+                        <div class="filter-wrapper"><label>الصف</label><select id="toolbarGrade" class="toolbar-select">
+                            <option value="">الكل</option>
+                            <option>الصف التمهيدي</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option>
+                            <option>الثالث ابتدائي</option><option>الرابع ابتدائي</option>
+                            <option>الخامس ابتدائي</option><option>السادس ابتدائي</option>
+                            <option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option>
                         </select></div>
-                        <div class="filter-wrapper"><label>النطاق</label><select id="exportScope" class="export-select">
-                            <option value="all">كل الطلاب</option>
-                            <option value="page">الصفحة الحالية</option>
-                            <option value="selected">المحددون</option>
+                        <div class="filter-wrapper"><label>الجنس</label><select id="toolbarGender" class="toolbar-select">
+                            <option value="">الكل</option>
+                            <option value="ذكر">ذكر</option>
+                            <option value="أنثى">أنثى</option>
                         </select></div>
-                        <div class="filter-wrapper"><label>ترتيب حسب</label><select id="exportSortField" class="export-select">
-                            <option value="registeredAt">تاريخ التسجيل</option>
-                            <option value="fullName">الاسم</option>
-                            <option value="grade">الصف</option>
-                            <option value="status">الحالة</option>
-                        </select></div>
-                        <div class="filter-wrapper"><label>الترتيب</label><select id="exportSortOrder" class="export-select">
-                            <option value="desc">الأحدث أولاً</option>
-                            <option value="asc">الأقدم أولاً</option>
+                        <div class="filter-wrapper"><label>العمر</label><select id="toolbarAge" class="toolbar-select">
+                            <option value="">الكل</option>
+                            <option value="5">5 سنوات</option>
+                            <option value="6">6 سنوات</option>
+                            <option value="7">7 سنوات</option>
+                            <option value="8">8 سنوات</option>
+                            <option value="9">9 سنوات</option>
+                            <option value="10">10 سنوات</option>
+                            <option value="11">11 سنوات</option>
+                            <option value="12">12 سنوات</option>
+                            <option value="13">13 سنوات</option>
+                            <option value="14">14 سنوات</option>
+                            <option value="15">15 سنوات</option>
+                            <option value="16">16 سنوات</option>
+                            <option value="17">17 سنوات</option>
+                            <option value="18">18 سنوات</option>
                         </select></div>
                         <button class="btn-export-all" id="exportBtn"><i class="fas fa-download"></i> تصدير</button>
                     </div>
@@ -1606,13 +1617,15 @@
         // ===== بناء قيود الاستعلام (محسّن بدون select) =====
         function buildConstraints(isLocalSearch = false) {
             const constraints = [];
-            const grade = filterGrade.value;
-            const gender = filterGender.value;
+            const grade = filterGrade.value || document.getElementById('toolbarGrade')?.value;
+            const gender = filterGender.value || document.getElementById('toolbarGender')?.value;
+            const ageVal = document.getElementById('toolbarAge')?.value;
             const year = filterAcademicYear.value;
 
             if (year) constraints.push(where("academicYear", "==", year));
             if (grade) constraints.push(where("grade", "==", grade));
             if (gender) constraints.push(where("gender", "==", gender));
+            if (ageVal) constraints.push(where("age", "==", Number(ageVal)));
             const dateFrom = filterDateFrom.value;
             const dateTo = filterDateTo.value;
             if (dateFrom) constraints.push(where("registeredAt", ">=", new Date(dateFrom)));
@@ -1948,6 +1961,24 @@
             });
         }
 
+        // ===== فلاتر شريط الأدوات (الصف، الجنس، العمر) =====
+        function setupToolbarFilters() {
+            ['toolbarGrade', 'toolbarGender', 'toolbarAge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', () => {
+                        // مزامنة مع الفلاتر المتقدمة
+                        const gradeEl = document.getElementById('toolbarGrade');
+                        const genderEl = document.getElementById('toolbarGender');
+                        if (gradeEl && filterGrade) filterGrade.value = gradeEl.value;
+                        if (genderEl && filterGender) filterGender.value = genderEl.value;
+                        currentPage = 0; lastVisible = null;
+                        loadStudents(true);
+                    });
+                }
+            });
+        }
+
         // ===== شريط التحكم الجماعي =====
         function updateBulkActionsBar() {
             const count = selectedStudentIds.size;
@@ -2032,6 +2063,7 @@
             if (!_statsRecalculated) recalcStatsOnce();
             setupSearchDebounce();
             setupFilterDebounce();
+            setupToolbarFilters();
             setupTabs();
             setupTableEventDelegation();
             setupVirtualScroll();
@@ -2532,6 +2564,9 @@
             filterStatus.value = '';
             filterDateFrom.value = '';
             filterDateTo.value = '';
+            document.getElementById('toolbarGrade').value = '';
+            document.getElementById('toolbarGender').value = '';
+            document.getElementById('toolbarAge').value = '';
             currentPage = 0;
             lastVisible = null;
             loadStudents(true);
@@ -2700,14 +2735,14 @@
         }
 
         // ===== دالة تصدير موحدة =====
-        async function exportData() {
+        async function exportData(fmt, scp) {
             const hasPermission = await checkAdminPermission();
             if (!hasPermission) return;
             try {
-                const format = exportFormat.value;
-                const scope = exportScope.value;
-                const sortField = exportSortField.value;
-                const sortAsc = exportSortOrder.value === 'asc';
+                const format = fmt || 'csv';
+                const scope = scp || 'all';
+                const sortField = 'registeredAt';
+                const sortAsc = false;
 
                 let docs = await getExportDocs(scope);
                 if (docs.length === 0) { showToast('❌ لا توجد بيانات للتصدير.', 'error'); return; }
@@ -2787,8 +2822,8 @@
 
         exportBtn.addEventListener('click', exportData);
         document.getElementById('bulkExportBtn').addEventListener('click', function() {
-            exportScope.value = 'selected';
-            exportBtn.click();
+            // التصدير الافتراضي: CSV لكل الطلاب
+            exportData();
         });
 
         // ===== تغيير حالة جماعي =====
@@ -3212,9 +3247,7 @@
                 // Ctrl/Cmd + E لتصدير Excel
                 if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
                     e.preventDefault();
-                    exportFormat.value = 'excel';
-                    exportScope.value = 'all';
-                    exportBtn.click();
+                    exportData('excel', 'all');
                 }
 
                 // Ctrl/Cmd + P للبحث
@@ -3236,23 +3269,17 @@
                     document.getElementById('addStudentBtn').click();
                     break;
                 case 'export-excel':
-                    exportFormat.value = 'excel';
-                    exportScope.value = 'all';
-                    exportBtn.click();
+                    exportData('excel', 'all');
                     break;
                 case 'export-pdf':
-                    exportFormat.value = 'pdf';
-                    exportScope.value = 'all';
-                    exportBtn.click();
+                    exportData('pdf', 'all');
                     break;
                 case 'reports':
                     document.querySelector('.stats-grid')?.scrollIntoView({ behavior: 'smooth' });
                     showToast('📊 الإحصائيات محدثة آنياً', 'info');
                     break;
                 case 'backup':
-                    exportFormat.value = 'json';
-                    exportScope.value = 'all';
-                    exportBtn.click();
+                    exportData('json', 'all');
                     break;
             }
         }
