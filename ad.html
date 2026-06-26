@@ -1291,10 +1291,6 @@
         const resultCount = document.getElementById('resultCount');
         const lastUpdatedText = document.getElementById('lastUpdated');
         const exportBtn = document.getElementById('exportBtn');
-        const exportFormat = document.getElementById('exportFormat');
-        const exportScope = document.getElementById('exportScope');
-        const exportSortField = document.getElementById('exportSortField');
-        const exportSortOrder = document.getElementById('exportSortOrder');
 
         // ===== متغيرات الترقيم =====
         const PAGE_SIZE = 20;
@@ -1501,6 +1497,7 @@
             if (!name || name.length < 3) { showToast('❌ الاسم يجب أن يكون 3 أحرف على الأقل.', 'error'); return; }
             if (!parentName || parentName.length < 3) { showToast('❌ اسم ولي الأمر يجب أن يكون 3 أحرف على الأقل.', 'error'); return; }
             if (!phone) { showToast('❌ رقم الجوال مطلوب.', 'error'); return; }
+            if (!/^07\d{9}$/.test(phone)) { showToast('❌ رقم الهاتف غير صحيح. يجب أن يكون رقماً عراقياً مكوناً من 11 رقماً (مثال: 07850009133).', 'error'); return; }
 
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
             try {
@@ -2522,9 +2519,11 @@
             if (!id) return;
             const hasPermission = await checkAdminPermission();
             if (!hasPermission) return;
+            const dob = document.getElementById('editDob').value;
             const data = {
                 fullName: document.getElementById('editFullName').value.trim(),
-                dob: document.getElementById('editDob').value,
+                dob: dob,
+                age: calcAge(dob),
                 gender: document.getElementById('editGender').value,
                 grade: document.getElementById('editGrade').value,
                 status: document.getElementById('editStatus').value,
@@ -2537,6 +2536,10 @@
             };
             if (!data.fullName || !data.gender || !data.grade) {
                 showToast('⚠️ يرجى ملء الحقول الأساسية (الاسم، الجنس، الصف).', 'error');
+                return;
+            }
+            if (data.phone && !/^07\d{9}$/.test(data.phone)) {
+                showToast('❌ رقم الهاتف غير صحيح. يجب أن يكون رقماً عراقياً مكوناً من 11 رقماً (مثال: 07850009133).', 'error');
                 return;
             }
             try {
