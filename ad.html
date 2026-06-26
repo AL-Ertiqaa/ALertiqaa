@@ -1566,7 +1566,6 @@
             const gender = filterGender.value;
             const year = filterAcademicYear.value;
 
-            constraints.push(where("deleted", "==", false));
             if (year) constraints.push(where("academicYear", "==", year));
             if (grade) constraints.push(where("grade", "==", grade));
             if (gender) constraints.push(where("gender", "==", gender));
@@ -1636,6 +1635,9 @@
                 const q = query(collection(db, "students"), ...constraints);
                 const snapshot = await getDocs(q);
                 let docs = snapshot.docs;
+
+                // ترشيح المحذوفين (client-side لأن deleted ليس في الاستعلام)
+                docs = docs.filter(d => d.data().deleted !== true);
 
                 // ترشيح حسب الحالة (client-side لتفادي index مركب)
                 const statusVal = filterStatus.value;

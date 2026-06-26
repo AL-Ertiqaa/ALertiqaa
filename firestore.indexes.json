@@ -4,9 +4,32 @@
       "collectionGroup": "students",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "deleted", "order": "ASCENDING" },
         { "fieldPath": "academicYear", "order": "ASCENDING" },
         { "fieldPath": "grade", "order": "ASCENDING" },
+        { "fieldPath": "gender", "order": "ASCENDING" },
+        { "fieldPath": "registeredAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "students",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "academicYear", "order": "ASCENDING" },
+        { "fieldPath": "registeredAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "students",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "grade", "order": "ASCENDING" },
+        { "fieldPath": "registeredAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "students",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "gender", "order": "ASCENDING" },
         { "fieldPath": "registeredAt", "order": "DESCENDING" }
       ]
