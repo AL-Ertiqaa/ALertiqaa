@@ -447,11 +447,6 @@
         .contact-history { border-top: 1px solid var(--border); margin-top: 10px; }
         .contact-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; position: relative; }
         .contact-item:last-child { border-bottom: none; }
-        .contact-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-        .contact-badge.اتصال { background: #dbeafe; color: #1e40af; }
-        .contact-badge.واتساب { background: #d1fae5; color: #065f46; }
-        .contact-badge.زيارة { background: #fef3c7; color: #92400e; }
-        .contact-badge.ملاحظة { background: #e2e8f0; color: #475569; }
         .contact-text { flex: 1; font-size: 15px; color: var(--text-primary); min-width: 100px; }
         .contact-time { font-size: 12px; color: var(--text-secondary); font-weight: 600; white-space: nowrap; }
         .contact-input-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
@@ -2381,23 +2376,17 @@
                 content.appendChild(div);
             });
 
-            // ===== سجل التواصل =====
+            // ===== الملاحظات =====
             const contactDiv = document.createElement('div');
             contactDiv.className = 'contact-history';
             contactDiv.innerHTML = `
-                <h4 style="margin:20px 0 10px;font-size:16px;color:var(--primary-dark);border-right:3px solid var(--accent);padding-right:12px;"><i class="fas fa-comments" style="color:var(--accent);margin-left:8px;"></i> سجل التواصل</h4>
+                <h4 style="margin:20px 0 10px;font-size:16px;color:var(--primary-dark);border-right:3px solid var(--accent);padding-right:12px;"><i class="fas fa-sticky-note" style="color:var(--accent);margin-left:8px;"></i> الملاحظات</h4>
                 <div class="contact-list" id="contactList">
                     ${renderContactHistory(student.contactHistory || [], student.id)}
                 </div>
                 <div class="contact-input-row">
-                    <input type="text" id="contactNoteInput" placeholder="أضف ملاحظة تواصل جديدة..." style="flex:1;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-family:var(--font);font-size:15px;font-weight:600;background:var(--bg-card);color:var(--text-primary);">
-                    <select id="contactTypeSelect" style="padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-family:var(--font);font-size:15px;font-weight:600;background:var(--bg-card);color:var(--text-primary);">
-                        <option value="اتصال">اتصال</option>
-                        <option value="واتساب">واتساب</option>
-                        <option value="زيارة">زيارة</option>
-                        <option value="ملاحظة">ملاحظة</option>
-                    </select>
-                    <button class="add-contact-btn" id="addContactBtn" data-student-id="${student.id}" title="إضافة ملاحظة تواصل جديدة"><i class="fas fa-plus"></i> إضافة ملاحظة</button>
+                    <input type="text" id="contactNoteInput" placeholder="أضف ملاحظة جديدة..." style="flex:1;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-family:var(--font);font-size:15px;font-weight:600;background:var(--bg-card);color:var(--text-primary);">
+                    <button class="add-contact-btn" id="addContactBtn" data-student-id="${student.id}" title="إضافة ملاحظة جديدة"><i class="fas fa-plus"></i> إضافة ملاحظة</button>
                 </div>
             `;
             content.appendChild(contactDiv);
@@ -2430,10 +2419,9 @@
         }
 
         function renderContactHistory(history, studentId) {
-            if (!history || history.length === 0) return '<p style="color:var(--text-secondary);font-size:15px;padding:12px 0;font-weight:600;"><i class="fas fa-info-circle"></i> لا توجد ملاحظات سابقة</p>';
+            if (!history || history.length === 0) return '<p style="color:var(--text-secondary);font-size:15px;padding:12px 0;font-weight:600;"><i class="fas fa-info-circle"></i> لا توجد ملاحظات</p>';
             return history.slice().reverse().map(h => `
                 <div class="contact-item">
-                    <span class="contact-badge ${h.type}">${h.type}</span>
                     <span class="contact-text">${escapeHTML(h.note)}</span>
                     <span class="contact-time">${new Date(h.at).toLocaleString('ar-EG')}</span>
                     <div class="contact-actions">
@@ -2444,7 +2432,7 @@
             `).join('');
         }
 
-        // ===== إدارة سجل التواصل (استماع على الـ modal) =====
+        // ===== إدارة الملاحظات (استماع على الـ modal) =====
         document.getElementById('detailModal').addEventListener('click', async function(e) {
             // ===== قوالب واتساب (تفويض) =====
             const waBtn = e.target.closest('.btn-wa-action');
@@ -2462,9 +2450,8 @@
                 return;
             }
             const input = document.getElementById('contactNoteInput');
-            const typeSel = document.getElementById('contactTypeSelect');
             const addBtn = document.getElementById('addContactBtn');
-            // ===== حذف ملاحظة اتصال =====
+            // ===== حذف ملاحظة =====
             const delBtn = e.target.closest('.del-contact-btn');
             if (delBtn) {
                 e.stopPropagation();
@@ -2485,7 +2472,7 @@
                 }
                 return;
             }
-            // ===== تعديل ملاحظة اتصال =====
+            // ===== تعديل ملاحظة =====
             const editBtn = e.target.closest('.edit-contact-btn');
             if (editBtn) {
                 e.stopPropagation();
@@ -2497,7 +2484,6 @@
                 const note = current.find(h => h.at === noteAt);
                 if (!note) { showToast('⚠️ الملاحظة غير موجودة', 'error'); return; }
                 input.value = note.note;
-                typeSel.value = note.type;
                 addBtn.textContent = 'تحديث الملاحظة';
                 addBtn.classList.add('editing');
                 addBtn.dataset.editAt = noteAt;
@@ -2505,7 +2491,7 @@
                 input.focus();
                 return;
             }
-            // ===== إضافة/تحديث ملاحظة اتصال =====
+            // ===== إضافة/تحديث ملاحظة =====
             const btn = e.target.closest('.add-contact-btn');
             if (!btn) return;
             const studentId = btn.dataset.studentId;
@@ -2520,14 +2506,13 @@
                     // تحديث ملاحظة موجودة
                     const idx = current.findIndex(h => h.at === editAt);
                     if (idx === -1) { showToast('⚠️ الملاحظة غير موجودة', 'error'); return; }
-                    current[idx] = { note, type: typeSel.value, at: editAt };
+                    current[idx] = { note, type: current[idx].type || 'ملاحظة', at: editAt };
                 } else {
                     // إضافة ملاحظة جديدة
-                    current.push({ note, type: typeSel.value, at: new Date().toISOString() });
+                    current.push({ note, type: 'ملاحظة', at: new Date().toISOString() });
                 }
                 await updateDoc(doc(db, 'students', studentId), { contactHistory: current, modifiedAt: serverTimestamp() });
                 input.value = '';
-                typeSel.value = 'اتصال';
                 addBtn.textContent = 'إضافة ملاحظة';
                 addBtn.classList.remove('editing');
                 delete addBtn.dataset.editAt;
