@@ -2236,6 +2236,7 @@
                     h2 { color: #063a33; border-bottom: 3px solid #b08f4a; padding-bottom: 8px; font-size: 20px; }
                     .report-header { text-align: center; margin-bottom: 25px; }
                     .report-header h1 { color: #063a33; font-size: 22px; margin: 0; }
+                    .contact-input-row { display: none !important; }
                     .report-header small { color: #718096; font-size: 13px; }
                     .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #edf2f7; font-size: 15px; }
                     .detail-row .key { font-weight: 600; color: #4a5568; min-width: 40%; }
@@ -2283,6 +2284,7 @@
                     <p style="text-align:center;color:#a0aec0;font-size:11px;">تم إنشاء التقرير في ${new Date().toLocaleString('ar-EG')}</p>
                 `;
                 document.body.appendChild(wrapper);
+                wrapper.querySelector('.contact-input-row')?.remove();
                 const canvas = await window.html2canvas(wrapper, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
                 document.body.removeChild(wrapper);
                 const imgData = canvas.toDataURL('image/png');
@@ -2380,7 +2382,7 @@
             const contactDiv = document.createElement('div');
             contactDiv.className = 'contact-history';
             contactDiv.innerHTML = `
-                <h4 style="margin:20px 0 10px;font-size:16px;color:var(--primary-dark);border-right:3px solid var(--accent);padding-right:12px;"><i class="fas fa-sticky-note" style="color:var(--accent);margin-left:8px;"></i> الملاحظات</h4>
+                <h4 style="margin:20px 0 10px;font-size:16px;color:var(--primary-dark);border-right:3px solid var(--accent);padding-right:12px;"><i class="fas fa-sticky-note" style="color:var(--accent);margin-left:8px;"></i> ملاحظات الإدارة</h4>
                 <div class="contact-list" id="contactList">
                     ${renderContactHistory(student.contactHistory || [], student.id)}
                 </div>
