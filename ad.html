@@ -216,8 +216,8 @@
         .btn-toolbar-status:hover { background: #967e41 !important; }
         .btn-toolbar-add { background: var(--accent); color: #fff; }
         .btn-toolbar-add:hover { background: #967e41 !important; }
-        .btn-toolbar-delete { background: #fed7d7; color: #9b2c2c; }
-        .btn-toolbar-delete:hover { background: #feb2b2 !important; }
+        .btn-toolbar-delete { background: #fecaca; color: #7f1d1d; }
+        .btn-toolbar-delete:hover { background: #fca5a5 !important; }
         @media (max-width: 768px) {
             .unified-toolbar .filters-row { flex-direction: column; align-items: stretch; }
             .unified-toolbar .actions-row { justify-content: center; }
@@ -225,8 +225,6 @@
             .unified-toolbar .toolbar-date { font-size: 11px; padding: 6px 8px; }
             .unified-toolbar .actions-row button { font-size: 11px; padding: 6px 10px; }
         }
-        /* ===== الإحصائيات (Bento Grid) ===== */
-
         /* ===== قسم التحكم ===== */
         .control-section {
             background: var(--bg-card); border-radius: var(--radius-lg);
@@ -281,7 +279,7 @@
             overflow: hidden; box-shadow: var(--shadow-sm);
             overflow-x: auto; margin-bottom: 20px;
         }
-        .table-wrapper table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 800px; line-height: 1.6; }
+        .table-wrapper table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 650px; line-height: 1.6; }
         .table-wrapper thead { background: var(--primary-dark); color: #fff; }
         .table-wrapper thead th { padding: 16px 12px; text-align: center; white-space: nowrap; font-weight: 800; font-size: 15px; border-bottom: 3px solid var(--accent); }
         .sortable { cursor: pointer; user-select: none; transition: background 0.2s ease; }
@@ -697,7 +695,10 @@
         }
 
         /* ===== حقل الفلترة (عنوان) ===== */
-        .filter-field { display: flex; flex-direction: column; gap: 4px; }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
 
         /* ===== Print Styles ===== */
         @media print {
@@ -712,6 +713,10 @@
         }
 
         /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .table-wrapper th:nth-child(5),
+            .table-wrapper td:nth-child(5) { display: none; }
+        }
         @media (max-width: 700px) {
             .admin-header { flex-direction: column; align-items: stretch; text-align: center; }
             .admin-header .actions { justify-content: center; gap: 8px; }
@@ -734,6 +739,22 @@
             .filter-section select, .filter-section .search-box input {
                 min-height: 44px;
             }
+            .table-wrapper th:nth-child(2),
+            .table-wrapper td:nth-child(2),
+            .table-wrapper th:nth-child(7),
+            .table-wrapper td:nth-child(7) { display: none; }
+        }
+        @media (max-width: 450px) {
+            .table-wrapper table { font-size: 13px; min-width: 0; }
+            .table-wrapper th, .table-wrapper td { padding: 10px 6px !important; }
+            .modal-box { padding: 20px 14px; }
+            .modal-actions-bar { gap: 6px; }
+            .modal-actions-bar button { font-size: 12px !important; padding: 8px 12px !important; min-width: 0; }
+            .unified-toolbar .toolbar-select { font-size: 11px; padding: 5px 6px; }
+            .unified-toolbar .actions-row button { font-size: 10px; padding: 5px 8px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .bottom-nav button { font-size: 10px; }
+            .bottom-nav button i { font-size: 16px; }
         }
     </style>
 </head>
@@ -902,7 +923,7 @@
         </div>
     </div>
 
-        <div class="modal-overlay" id="detailModal">
+        <div class="modal-overlay" id="detailModal" role="dialog" aria-modal="true" aria-label="بيانات الطالب">
             <div class="modal-box">
                 <button class="close-modal" data-close="detailModal"><i class="fas fa-times"></i></button>
                 <h2><i class="fas fa-user-graduate" style="color:#b08f4a;"></i> بيانات الطالب المرفقة</h2>
@@ -918,7 +939,7 @@
             </div>
         </div>
 
-        <div class="modal-overlay delete-modal" id="deleteModal">
+        <div class="modal-overlay delete-modal" id="deleteModal" role="dialog" aria-modal="true" aria-label="تأكيد الحذف">
             <div class="modal-box">
                 <button class="close-modal" data-close="deleteModal"><i class="fas fa-times"></i></button>
                 <i class="fas fa-skull-crossbones"></i>
@@ -929,7 +950,7 @@
             </div>
         </div>
 
-        <div class="modal-overlay" id="editModal">
+        <div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-label="تعديل بيانات الطالب">
             <div class="modal-box" style="max-width:700px;">
                 <button class="close-modal" data-close="editModal"><i class="fas fa-times"></i></button>
                 <h2><i class="fas fa-edit" style="color:#b08f4a;"></i> تعديل بيانات الطالب</h2>
@@ -942,7 +963,7 @@
             </div>
         </div>
 
-        <div class="modal-overlay" id="addStudentModal">
+        <div class="modal-overlay" id="addStudentModal" role="dialog" aria-modal="true" aria-label="إضافة طالب جديد">
             <div class="modal-box" style="max-width:700px;">
                 <button class="close-modal" data-close="addStudentModal"><i class="fas fa-times"></i></button>
                 <h2><i class="fas fa-user-plus" style="color:#b08f4a;"></i> إضافة طالب جديد</h2>
@@ -1068,6 +1089,7 @@
         function showToast(message, type = 'success', actionLabel = null, actionCallback = null) {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
+            toast.setAttribute('role', 'alert');
             const textSpan = document.createElement('span');
             textSpan.className = 'toast-text';
             textSpan.textContent = message;
@@ -2562,6 +2584,10 @@
             if (!id) return;
             const hasPermission = await checkAdminPermission();
             if (!hasPermission) return;
+            const btn = document.getElementById('saveEditBtn');
+            if (btn.disabled) return;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
             const dob = document.getElementById('editDob').value;
             const data = {
                 fullName: document.getElementById('editFullName').value.trim(),
@@ -2578,10 +2604,14 @@
                 modifiedAt: serverTimestamp()
             };
             if (!data.fullName || !data.gender || !data.grade) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> حفظ التغييرات';
                 showToast('⚠️ يرجى ملء الحقول الأساسية (الاسم، الجنس، الصف).', 'error');
                 return;
             }
             if (data.phone && !/^07\d{9}$/.test(data.phone)) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> حفظ التغييرات';
                 showToast('❌ رقم الهاتف غير صحيح. يجب أن يكون رقماً عراقياً مكوناً من 11 رقماً (مثال: 07850009133).', 'error');
                 return;
             }
@@ -2592,6 +2622,9 @@
                 loadStudents(true);
             } catch (e) {
                 showToast('❌ فشل حفظ التغييرات: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> حفظ التغييرات';
             }
         }
         document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
@@ -2675,7 +2708,7 @@
                 const deletedIds = new Set(ids);
                 selectedStudentIds.clear();
                 updateBulkActionsBar();
-                showToast(`✅ تم نقل ${count} طالب إلى سلة المحذوفات.`, 'warning', 'تراجع', async () => {
+                showToast(`✅ تم نقل ${ids.length} طالب إلى سلة المحذوفات.`, 'warning', 'تراجع', async () => {
                     try {
                         const undoSnaps = await Promise.all(Array.from(deletedIds).map(id => getDoc(doc(db, "students", id))));
                         let umale = 0, ufemale = 0;
@@ -3014,9 +3047,7 @@
                 selectedStudentIds.clear();
                 updateBulkActionsBar();
                 document.getElementById('bulkStatusModal').classList.remove('show');
-                showToast(`✅ تم تغيير حالة ${count} طالب إلى "${newStatus}".`, 'success', 'تراجع', async () => {
-                    showToast('⚠️ التراجع عن تغيير الحالة غير متاح للحالات الفردية. يرجى التعديل يدوياً.', 'warning');
-                });
+                showToast(`✅ تم تغيير حالة ${count} طالب إلى "${newStatus}".`, 'success');
                 refreshStatsFromFirestore();
                 loadStudents(true);
             } catch (e) { showToast('❌ فشل تغيير الحالة: ' + e.message, 'error'); }
