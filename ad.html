@@ -129,7 +129,7 @@
             outline: none; border-color: var(--primary);
             box-shadow: 0 0 0 5px rgba(15,114,100,0.08);
         }
-        #adminPassInput { padding-left: 40px !important; }
+        #adminPassInput { padding-inline-end: 40px !important; }
         #loginScreen button {
             padding: 14px 50px; background: var(--header-grad); color: #fff;
             border: none; border-radius: var(--radius-md); font-size: 18px;
@@ -138,9 +138,9 @@
         }
         #loginScreen button:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
         #loginScreen button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .login-error { color: var(--danger); font-weight: 600; display: none; margin-top: 5px; }
+        .login-error { color: var(--danger); font-weight: 600; display: none; margin-top: 5px; font-size: 14px; line-height: 1.6; background: rgba(220,53,69,0.06); padding: 8px 14px; border-radius: 10px; }
         .login-error.show { display: block; }
-        .login-error.warning { color: var(--accent); }
+        .login-error i { margin-left: 6px; }
         #dashboard { display: none; }
 
         /* ===== الهيدر ===== */
@@ -771,12 +771,11 @@
                 <input type="email" id="adminEmailInput" placeholder="البريد الإلكتروني" dir="ltr" autocomplete="email" required>
                 <div style="position:relative;width:100%">
                     <input type="password" id="adminPassInput" placeholder="كلمة المرور" dir="ltr" autocomplete="current-password" required>
-                    <button type="button" id="passToggleBtn" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px;" tabindex="-1" aria-label="إظهار/إخفاء كلمة المرور"><i class="fas fa-eye"></i></button>
+                    <button type="button" id="passToggleBtn" style="position:absolute;inset-inline-end:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;padding:4px;line-height:1;" tabindex="-1" aria-label="إظهار/إخفاء كلمة المرور"><i class="fas fa-eye"></i></button>
                 </div>
                 <button type="submit" id="loginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button>
             </form>
-            <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i> بيانات الدخول غير صحيحة</div>
-            <div class="login-error warning" id="loginBlockedError"><i class="fas fa-ban"></i> تم حظر الحساب مؤقتاً بسبب كثرة المحاولات. انتظر دقيقة.</div>
+            <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i></div>
         </div>
 
         <div id="dashboard">
@@ -1408,7 +1407,7 @@
         async function login() {
             const email = adminEmailInput.value.trim();
             const password = adminPassInput.value.trim();
-            if (!email || !password) { loginError.textContent = '❌ يرجى إدخال البريد الإلكتروني وكلمة المرور.';
+            if (!email || !password) { loginError.innerHTML = '<i class="fas fa-exclamation-circle"></i> يرجى إدخال البريد الإلكتروني وكلمة المرور.';
                 loginError.classList.add('show'); return; }
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
@@ -1417,17 +1416,30 @@
                 loginError.classList.remove('show');
                 showToast('✅ مرحباً بك في لوحة التحكم.', 'success');
             } catch (error) {
-                let msg = '❌ فشل تسجيل الدخول.';
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') msg = '❌ الحساب غير موجود أو كلمة المرور غير صحيحة.';
-                else if (error.code === 'auth/wrong-password') msg = '❌ كلمة المرور غير صحيحة.';
-                else if (error.code === 'auth/invalid-email') msg = '❌ البريد الإلكتروني غير صالح.';
-                else if (error.code === 'auth/too-many-requests') msg = '⛔ تم حظر الحساب مؤقتاً. انتظر دقيقة.';
-                else msg = '❌ حدث خطأ: ' + error.message;
-                loginError.textContent = msg;
+                let msg = '❌ فشل تسجيل الدخول.', icon = 'fa-exclamation-circle';
+                const code = error.code;
+                if (code === 'auth/invalid-credential' || code === 'auth/user-not-found' || code === 'auth/wrong-password') {
+                    msg = '❌ البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+                } else if (code === 'auth/invalid-email') {
+                    msg = '❌ البريد الإلكتروني غير صالح.';
+                } else if (code === 'auth/too-many-requests') {
+                    msg = '⛔ تم حظر الحساب مؤقتاً. انتظر دقيقة ثم حاول مجدداً.';
+                    icon = 'fa-ban';
+                } else if (code === 'auth/unauthorized-domain') {
+                    msg = '❌ النطاق غير مصرح به. يرجى إضافة ' + window.location.hostname + ' إلى Authorized Domains في Firebase Console.';
+                } else if (code === 'auth/network-request-failed') {
+                    msg = '❌ فشل الاتصال بالخادم. تحقق من اتصال الإنترنت.';
+                    icon = 'fa-wifi-slash';
+                } else if (code === 'auth/user-disabled') {
+                    msg = '❌ تم تعطيل هذا الحساب.';
+                } else {
+                    msg = '❌ ' + error.message.replace('Firebase: ', '').replace(/ \(auth\/.*\)/, '');
+                }
+                loginError.innerHTML = '<i class="fas ' + icon + '"></i> ' + msg;
                 loginError.classList.add('show');
             } finally {
                 loginBtn.disabled = false;
-                loginBtn.innerHTML = 'دخول';
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
             }
         }
 
