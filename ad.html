@@ -2960,7 +2960,7 @@
                 studentRows.push({ name, phone, raw: data.phone || '—' });
             }
 
-            // نافذة عرض قائمة المستلمين
+            // نافذة عرض قائمة المستلمين — مصممة للإرسال الجماعي عبر بث واتساب
             const rowsHtml = studentRows.map((s, i) => `
                 <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:14px;">
                     <span style="color:var(--text-muted);min-width:24px;">${i + 1}.</span>
@@ -2970,26 +2970,38 @@
             `).join('');
 
             const hasMissing = studentRows.some(s => !s.phone);
+            const broadcastHint = hasAnyPhone ? `
+                <div style="background:#eff6ff;padding:14px;border-radius:12px;margin-bottom:12px;border-right:4px solid #3b82f6;font-size:13px;line-height:1.8;color:#1e40af;">
+                    <strong><i class="fas fa-info-circle"></i> لإرسال الرسالة للجميع مرة واحدة:</strong>
+                    <ol style="margin:8px 0 0;padding-right:20px;">
+                        <li>اضغط <strong>"فتح واتساب"</strong> — ستفتح واتساب مع أول طالب والرسالة جاهزة</li>
+                        <li>في واتساب: اضغط القائمة <strong>(⋮)</strong> ← <strong>بث جديد</strong></li>
+                        <li>ألصق الأرقام المنسوخة في حقل البحث ← <strong>تحديد الكل</strong></li>
+                        <li>ألصق الرسالة ← اضغط <strong>إرسال</strong></li>
+                    </ol>
+                </div>` : '';
+
             const modalHtml = `
-                <div class="modal-overlay show" id="waRecipientsModal">
+                <div class="modal-overlay show" id="waRecipientsModal" role="dialog" aria-modal="true" aria-label="إرسال واتساب جماعي">
                     <div class="modal-box" style="max-width:580px;">
                         <button class="close-modal" data-close="waRecipientsModal"><i class="fas fa-times"></i></button>
-                        <h3 style="color:var(--primary-dark);margin-bottom:15px;">
+                        <h3 style="color:var(--primary-dark);margin-bottom:12px;">
                             <i class="fab fa-whatsapp" style="color:#25d366;margin-left:8px;"></i>
                             إرسال ${typeLabel} — ${studentRows.length} طالب
                         </h3>
                         <div style="background:#f0fdf4;padding:14px;border-radius:12px;margin-bottom:12px;border-right:4px solid #25d366;font-size:14px;line-height:1.7;white-space:pre-wrap;max-height:150px;overflow-y:auto;">${escapeHTML(message)}</div>
                         <p style="font-weight:700;color:var(--text-secondary);font-size:13px;margin-bottom:8px;"><i class="fas fa-users"></i> قائمة المستلمين:</p>
-                        <div style="max-height:240px;overflow-y:auto;border:1px solid var(--border-light);border-radius:12px;padding:0 12px;margin-bottom:12px;">${rowsHtml}</div>
+                        <div style="max-height:200px;overflow-y:auto;border:1px solid var(--border-light);border-radius:12px;padding:0 12px;margin-bottom:12px;">${rowsHtml}</div>
+                        ${broadcastHint}
                         ${hasMissing ? `
                         <div style="background:#fff7ed;border-radius:10px;padding:10px 14px;margin-bottom:12px;border-right:3px solid #f97316;font-size:13px;color:#92400e;">
                             <strong><i class="fas fa-phone"></i> الطلاب الذين بحاجة لاتصال هاتفي (بدون واتساب):</strong>
                             <ul style="margin:6px 0 0;padding-right:16px;">${studentRows.filter(s => !s.phone).map(s => `<li>${escapeHTML(s.name)}</li>`).join('')}</ul>
                         </div>` : ''}
                         <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:15px;">
-                            <button id="waCopyBtn" style="padding:10px 20px;background:#475569;color:#fff;border:none;border-radius:10px;font-weight:700;font-family:var(--font);font-size:14px;cursor:pointer;"><i class="fas fa-copy"></i> نسخ الرسالة</button>
-                            ${hasAnyPhone ? `<button id="waOpenFirstBtn" style="padding:10px 20px;background:#25d366;color:#fff;border:none;border-radius:10px;font-weight:700;font-family:var(--font);font-size:14px;cursor:pointer;"><i class="fab fa-whatsapp"></i> فتح واتساب</button>` : ''}
-                            <button class="btn-cancel" data-close="waRecipientsModal" style="padding:10px 20px;background:var(--border);color:var(--text-primary);border:none;border-radius:10px;font-weight:700;font-family:var(--font);font-size:14px;cursor:pointer;">إغلاق</button>
+                            <button id="waCopyAllBtn" style="padding:10px 18px;background:#475569;color:#fff;border:none;border-radius:10px;font-weight:700;font-family:var(--font);font-size:14px;cursor:pointer;"><i class="fas fa-copy"></i> نسخ الرسالة + الأرقام</button>
+                            ${hasAnyPhone ? `<button id="waSendAllBtn" style="padding:10px 18px;background:#25d366;color:#fff;border:none;border-radius:10px;font-weight:700;font-family:var(--font);font-size:14px;cursor:pointer;"><i class="fab fa-whatsapp"></i> فتح واتساب والإرسال للجميع</button>` : ''}
+                            <button class="btn-cancel" data-close="waRecipientsModal" style="padding:10px 18px;">إغلاق</button>
                         </div>
                     </div>
                 </div>
@@ -2999,23 +3011,24 @@
             document.body.appendChild(tempDiv);
 
             // ربط الأزرار
-            document.getElementById('waCopyBtn').addEventListener('click', async function() {
-                try {
-                    await navigator.clipboard.writeText(message);
-                    showToast('✅ تم نسخ الرسالة إلى الحافظة.', 'success');
-                } catch (e) { showToast('⚠️ تعذر النسخ', 'error'); }
-            });
-            const openBtn = document.getElementById('waOpenFirstBtn');
-            if (openBtn) {
-                openBtn.addEventListener('click', function() {
+            function copyAll() {
+                const phoneBlock = studentRows.filter(s => s.phone).map(s => `${s.name}: ${s.phone}`).join('\n');
+                const fullText = message + '\n\n---\n' + phoneBlock;
+                navigator.clipboard.writeText(fullText).then(() => {
+                    showToast('✅ تم نسخ الرسالة وجميع الأرقام.', 'success');
+                }).catch(() => showToast('⚠️ تعذر النسخ', 'error'));
+            }
+            document.getElementById('waCopyAllBtn').addEventListener('click', copyAll);
+            const sendBtn = document.getElementById('waSendAllBtn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', function() {
                     const first = studentRows.find(s => s.phone);
                     if (!first) return;
                     const cleanPhone = first.phone.replace(/^0+/, '');
                     const waNum = cleanPhone.startsWith('964') || cleanPhone.startsWith('+') ? cleanPhone : '964' + cleanPhone;
                     window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(message)}`, '_blank');
-                    // نسخ الرسالة تلقائياً
-                    navigator.clipboard.writeText(message).catch(() => {});
-                    showToast(`✅ تم فتح واتساب لـ ${first.name}. الرسالة منسوخة — أرسلها للباقي باللصق.`, 'success');
+                    copyAll();
+                    showToast('✅ تم فتح واتساب. الرسالة والأرقام منسوخة — اذهب لبث جديد في واتساب ← ألصق الأرقام ← ألصق الرسالة ← إرسال', 'success');
                 });
             }
             document.querySelector('[data-close="waRecipientsModal"]').addEventListener('click', function() {
