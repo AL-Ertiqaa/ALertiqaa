@@ -681,7 +681,6 @@
         }
         .stat-card.male::before { background: #2563eb; }
         .stat-card.female::before { background: #d53f8c; }
-        .stat-card.today::before { background: #4299e1; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
         .stat-card .stat-info h3 { font-size: 14px; color: #334155; margin: 0 0 4px; font-weight: 700; }
         .stat-card .stat-info p { font-size: 34px; font-weight: 800; color: var(--text-primary); margin: 0; line-height: 1.2; }
@@ -867,7 +866,6 @@
                     <div class="stat-card"><div class="stat-info"><h3><i class="fas fa-users" style="color:var(--accent);margin-left:6px;"></i> إجمالي الطلاب</h3><p id="totalCount">0</p></div><div class="stat-icon"><i class="fas fa-user-graduate"></i></div></div>
                     <div class="stat-card male"><div class="stat-info"><h3><i class="fas fa-mars" style="color:#2563eb;margin-left:6px;"></i> الذكور</h3><p id="maleCount">0</p></div><div class="stat-icon"><i class="fas fa-male"></i></div></div>
                     <div class="stat-card female"><div class="stat-info"><h3><i class="fas fa-venus" style="color:#d53f8c;margin-left:6px;"></i> الإناث</h3><p id="femaleCount">0</p></div><div class="stat-icon"><i class="fas fa-female"></i></div></div>
-                    <div class="stat-card today"><div class="stat-info"><h3><i class="fas fa-calendar-day" style="color:#4299e1;margin-left:6px;"></i> مسجل اليوم</h3><p id="todayCount">0</p></div><div class="stat-icon"><i class="fas fa-calendar-check"></i></div></div>
                 </div>
 
                 <div class="control-section">
@@ -1316,7 +1314,6 @@
         const totalCount = document.getElementById('totalCount');
         const maleCount = document.getElementById('maleCount');
         const femaleCount = document.getElementById('femaleCount');
-        const todayCount = document.getElementById('todayCount');
         const searchInput = document.getElementById('searchInput');
         const toolbarGrade = document.getElementById('toolbarGrade');
         const toolbarGender = document.getElementById('toolbarGender');
@@ -1402,20 +1399,11 @@
                 const male = maleR.data().count;
                 const female = femaleR.data().count;
                 const deletedCount = deletedR.data().count;
-                const today = new Date().toISOString().split('T')[0];
 
                 await setDoc(statsRef, {
                     total, male, female, deletedCount,
-                    todayCount: total, // سيُضبط بشكل صحيح أدناه
-                    lastReset: today,
                     lastUpdated: serverTimestamp()
                 }, { merge: true });
-
-                // حساب todayCount بشكل دقيق
-                const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-                const todayP = getCountFromServer(query(collection(db, "students"), where("deleted", "==", false), where("registeredAt", ">=", todayStart)));
-                const todayR = await todayP;
-                await setDoc(statsRef, { todayCount: todayR.data().count }, { merge: true });
 
                 const updatedSnap = await getDoc(statsRef);
                 if (updatedSnap.exists()) {
@@ -1439,7 +1427,6 @@
             totalCount.textContent = d.total ?? 0; totalCount.classList.remove('count-animate'); void totalCount.offsetWidth; totalCount.classList.add('count-animate');
             maleCount.textContent = d.male ?? 0; maleCount.classList.remove('count-animate'); void maleCount.offsetWidth; maleCount.classList.add('count-animate');
             femaleCount.textContent = d.female ?? 0; femaleCount.classList.remove('count-animate'); void femaleCount.offsetWidth; femaleCount.classList.add('count-animate');
-            todayCount.textContent = d.todayCount ?? 0; todayCount.classList.remove('count-animate'); void todayCount.offsetWidth; todayCount.classList.add('count-animate');
             cachedTotalFromStats = d.total ?? 0;
             const badge = document.getElementById('trashBadge');
             const dc = d.deletedCount || 0;
@@ -1619,10 +1606,7 @@
                             const d = s.data();
                             tx.update(statsRef, {
                                 total: increment(1), male: increment(gender === 'ذكر' ? 1 : 0),
-                                female: increment(gender === 'أنثى' ? 1 : 0),
-                                todayCount: d.lastReset === today ? increment(1) : 1,
-                                lastReset: today,
-                                lastRegisteredName: name, lastRegisteredTimestamp: serverTimestamp()
+                                female: increment(gender === 'أنثى' ? 1 : 0)
                             });
                         }
                     });
