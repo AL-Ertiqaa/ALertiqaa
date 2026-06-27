@@ -1084,7 +1084,6 @@
         const auth = getAuth(app);
         const db = initializeFirestore(app, { localCache: persistentLocalCache() });
         const statsRef = doc(db, "config", "stats");
-        const counterRef = doc(db, "config", "registrationCounter");
         let activeAcademicYear = "2026-2027";
 
         /* const appCheck = initializeAppCheck(app, {
@@ -1119,8 +1118,8 @@
 
         // ===== دالة CSV موحدة =====
         function generateCSV(docs) {
-            const headers = ['رقم التسجيل', 'الاسم الكامل', 'تاريخ الميلاد', 'الجنس', 'الصف', 'الحالة', 'ولي الأمر', 'جهة العمل', 'الجوال', 'العنوان', 'الملاحظات', 'تاريخ التسجيل'];
-            const keys = ['registrationId', 'fullName', 'dob', 'gender', 'grade', 'status', 'parentName', 'parentJob', 'phone', 'address', 'notes', 'registeredAt'];
+            const headers = ['الاسم الكامل', 'تاريخ الميلاد', 'الجنس', 'الصف', 'الحالة', 'ولي الأمر', 'جهة العمل', 'الجوال', 'العنوان', 'الملاحظات', 'تاريخ التسجيل'];
+            const keys = ['fullName', 'dob', 'gender', 'grade', 'status', 'parentName', 'parentJob', 'phone', 'address', 'notes', 'registeredAt'];
             let csv = headers.join(',') + '\n';
             docs.forEach(doc => {
                 const s = doc.data ? doc.data() : doc;
@@ -1519,22 +1518,12 @@
 
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
             try {
-                let regId = '';
-                try {
-                    regId = await runTransaction(db, async (tx) => {
-                        const snap = await tx.get(counterRef);
-                        const num = (snap.data()?.currentNumber || 0) + 1;
-                        tx.set(counterRef, { currentNumber: num }, { merge: true });
-                        return `ERT-${(activeAcademicYear || '2026-2027').split('-')[0]}-${String(num).padStart(4, '0')}`;
-                    });
-                } catch (e) { regId = `ERT-MANUAL-${Date.now()}`; }
-
                 const age = calcAge(dob);
                 const now = serverTimestamp();
                 const docRef = await addDoc(collection(db, "students"), {
                     name, fullName: name, age,
                     searchName: name.replace(/[أإآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي'),
-                    registrationId: regId, status: 'جديد',
+                    status: 'جديد',
                     dob, gender, grade, academicYear: activeAcademicYear || '2026-2027',
                     parentName, parentJob, phone, address, notes,
                     deleted: false,
@@ -1570,7 +1559,7 @@
                     });
                 } catch (e) {}
 
-                showToast(`✅ تم إضافة الطالب ${name} - رقم التسجيل: ${regId}`, 'success');
+                showToast(`✅ تم إضافة الطالب ${name}`, 'success');
                 document.getElementById('addStudentModal').classList.remove('show');
                 btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> حفظ الطالب';
                 // إعادة ضبط الحقول
@@ -1601,7 +1590,7 @@
         function buildFuseIndex() {
             if (!studentCache.length) return;
             fuseInstance = new Fuse(studentCache, {
-                keys: ['name', 'parentName', 'phone', 'registrationId'],
+                keys: ['name', 'parentName', 'phone'],
                 threshold: 0.3,
                 distance: 100,
                 ignoreLocation: true,
@@ -1621,7 +1610,6 @@
                     gender: r.item.gender,
                     parentName: r.item.parentName,
                     phone: r.item.phone,
-                    registrationId: r.item.registrationId || '',
                     status: r.item.status || 'جديد',
                     registeredAt: r.item.registeredAt ? { toDate: () => new Date(r.item.registeredAt) } : null,
                     deleted: false
@@ -1778,7 +1766,6 @@
                                 gender: dd.gender || '',
                                 parentName: dd.parentName || '',
                                 phone: dd.phone || '',
-                                registrationId: dd.registrationId || '',
                                 status: dd.status || 'جديد',
                                 registeredAt: dd.registeredAt ? dd.registeredAt.toMillis() : null,
                                 modifiedAt: dd.modifiedAt || null
@@ -1805,7 +1792,6 @@
                                 gender: dd.gender || '',
                                 parentName: dd.parentName || '',
                                 phone: dd.phone || '',
-                                registrationId: dd.registrationId || '',
                                 status: dd.status || 'جديد',
                                 registeredAt: dd.registeredAt ? dd.registeredAt.toMillis() : null,
                                 modifiedAt: dd.modifiedAt || null
@@ -2348,7 +2334,6 @@
             content.innerHTML = '';
 
             const rows = [
-                { key: 'رقم التسجيل', value: escapeHTML(student.registrationId) || '-', isHighlight: true },
                 { key: 'الاسم الكامل', value: escapeHTML(student.fullName) || '-' },
                 { key: 'تاريخ الميلاد', value: escapeHTML(student.dob) || '-' },
                 { key: 'العمر', value: student.age ? `${student.age} سنة` : '-' },
@@ -2399,7 +2384,7 @@
                 const cleanPhone = student.phone.replace(/^0+/, '');
                 const waNum = cleanPhone.startsWith('964') || cleanPhone.startsWith('+') ? cleanPhone : '964' + cleanPhone;
                 waBtn.onclick = () => {
-                    const waText = encodeURIComponent(`السلام عليكم، إدارة مدارس الأرتقاء: بخصوص الطالب (${escapeHTML(student.fullName)}) رقم تسجيل: ${student.registrationId || 'غير محدد'}.`);
+                    const waText = encodeURIComponent(`السلام عليكم، إدارة مدارس الأرتقاء: بخصوص الطالب (${escapeHTML(student.fullName)}).`);
                     window.open(`https://wa.me/${waNum}?text=${waText}`, '_blank');
                 };
                 waBtn.style.display = '';
@@ -2849,7 +2834,6 @@
                     const data = docs.map(d => {
                         const s = d.data ? d.data() : d;
                         return {
-                            'رقم التسجيل': s.registrationId || '',
                             'الاسم الكامل': s.fullName || '',
                             'تاريخ الميلاد': s.dob || '',
                             'الجنس': s.gender || '',
@@ -2867,7 +2851,6 @@
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
                     ws['!cols'] = [
-                        { wch: 10 },  // رقم التسجيل
                         { wch: 22 },  // الاسم الكامل
                         { wch: 14 },  // تاريخ الميلاد
                         { wch: 8 },   // الجنس

@@ -1160,10 +1160,6 @@
                     </div>
                     <h3>تم التسجيل بنجاح!</h3>
                     <p>شكراً لتسجيلكم في مدارس الأرتقاء الأهلية.</p>
-                    <div id="regIdDisplay" style="font-size:17px;margin:8px auto;background:linear-gradient(135deg,#e6fffa,#f0fdf4);padding:10px 20px;border-radius:14px;display:inline-flex;align-items:center;gap:8px;border:1px solid #86efac;">
-                        <i class="fas fa-hashtag" style="color:var(--primary);"></i>
-                        <strong style="color:var(--primary-dark);">رقم التسجيل: <span id="regIdValue">---</span></strong>
-                    </div>
                     <p>شكراً لتسجيلكم في مدارس الأرتقاء الأهلية. يرجى الضغط أدناه لتأكيد طلبكم عبر واتساب الإدارة فوراً.</p>
                     <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
                         <a id="whatsappLink" href="#" target="_blank" class="btn-whatsapp">
@@ -1273,7 +1269,6 @@
 
         const db = initializeFirestore(app, { localCache: persistentLocalCache() });
         const statsRef = doc(db, "config", "stats");
-        const counterRef = doc(db, "config", "registrationCounter");
         const settingsRef = doc(db, "config", "settings");
 
         // ===== تهيئة مستندات Firestore الأساسية =====
@@ -1285,10 +1280,6 @@
                         total: 0, male: 0, female: 0, todayCount: 0, deletedCount: 0,
                         lastReset: new Date().toISOString().split('T')[0]
                     });
-                }
-                const cSnap = await getDoc(counterRef);
-                if (!cSnap.exists()) {
-                    await setDoc(counterRef, { currentNumber: 0 });
                 }
                 const sSnap = await getDoc(settingsRef);
                 if (!sSnap.exists()) {
@@ -1759,22 +1750,8 @@
                 }
             }
 
-            // ===== توليد رقم تسجيل فريد =====
+            // ===== إعداد رابط واتساب =====
             showSubmitProgress('الخطوة 3 من 4: حفظ البيانات', 'جاري حفظ البيانات سحابياً...', 55);
-            let registrationId = '';
-            try {
-                const counterNum = await runTransaction(db, async (tx) => {
-                    const snap = await tx.get(counterRef);
-                    const num = (snap.data()?.currentNumber || 0) + 1;
-                    tx.set(counterRef, { currentNumber: num }, { merge: true });
-                    return num;
-                });
-                const yearPrefix = activeAcademicYear.split('-')[0];
-                registrationId = `ERT-${yearPrefix}-${String(counterNum).padStart(4, '0')}`;
-            } catch (e) {
-                registrationId = `ERT-${Date.now()}`;
-            }
-
             const waNumber = "9647850009133";
 
             try {
@@ -1787,7 +1764,6 @@
                     age: age,
                     deleted: false,
                     searchName: normalizeArabicName(sName),
-                    registrationId: registrationId,
                     status: 'جديد',
                     dob: dobVal,
                     gender: document.getElementById('gender').value,
@@ -1852,10 +1828,9 @@
                 await delay(200);
 
                 const waText = encodeURIComponent(
-                    `مرحباً إدارة مدارس الارتقاء، تم تسجيل الطالب (${escapeHTML(studentData.fullName)}) - رقم التسجيل: ${registrationId} للعام ${escapeHTML(activeAcademicYear)}.`
+                    `مرحباً إدارة مدارس الارتقاء، تم تسجيل الطالب (${escapeHTML(studentData.fullName)}) للعام ${escapeHTML(activeAcademicYear)}.`
                 );
                 document.getElementById('whatsappLink').href = `https://wa.me/${waNumber}?text=${waText}`;
-                document.getElementById('regIdValue').textContent = registrationId;
 
                 completeSubmitProgress(true);
                 await delay(300);

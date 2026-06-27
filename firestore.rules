@@ -42,11 +42,6 @@ service cloud.firestore {
       allow write: if true;
     }
 
-    match /config/registrationCounter {
-      allow read: if true;
-      allow write: if isAdmin();
-      allow create: if true;
-    }
 
     match /config/phoneRegistry/{phone} {
       allow read: if true;
