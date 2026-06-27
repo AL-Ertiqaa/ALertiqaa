@@ -1238,7 +1238,7 @@
             const tbody = document.getElementById('trashTableBody');
             tbody.innerHTML = Array(3).fill(0).map(() => '<tr><td><div class="skeleton" style="width:18px;height:18px;border-radius:4px;margin:auto;"></div></td><td><div class="skeleton skeleton-text" style="width:30px;margin:auto;"></div></td><td><div class="skeleton skeleton-text" style="width:120px;margin:auto;"></div></td><td><div class="skeleton skeleton-text" style="width:80px;margin:auto;"></div></td><td><div class="skeleton skeleton-text" style="width:40px;margin:auto;"></div></td><td><div class="skeleton skeleton-text" style="width:80px;margin:auto;"></div></td><td><div class="skeleton" style="width:80px;height:28px;border-radius:10px;margin:auto;"></div></td></tr>').join('');
             try {
-                const snap = await getDocs(query(collection(db, "students"), where("deleted", "==", true), limit(100)));
+                const snap = await getDocs(query(collection(db, "students"), where("deleted", "==", true), orderBy("deletedAt", "desc"), limit(100)));
                 let docs = snap.docs;
                 docs.sort((a, b) => {
                     const ta = a.data().deletedAt ? (a.data().deletedAt.toDate ? a.data().deletedAt.toDate().getTime() : new Date(a.data().deletedAt).getTime()) : 0;
@@ -1517,13 +1517,10 @@
                     lastUpdated: serverTimestamp()
                 }, { merge: true });
 
-                const updatedSnap = await getDoc(statsRef);
-                if (updatedSnap.exists()) {
-                    const d = updatedSnap.data();
-                    setLocalCache('alertiqaa_admin_stats', d);
-                    applyStatsToUI(d);
-                }
-                return { total, male, female, deletedCount };
+                const statsData = { total, male, female, deletedCount, lastUpdated: new Date() };
+                setLocalCache('alertiqaa_admin_stats', statsData);
+                applyStatsToUI(statsData);
+                return statsData;
             } catch (e) {
                 console.warn("⚠️ فشل إعادة حساب الإحصائيات:", e);
                 return null;
@@ -1606,6 +1603,10 @@
             if (statsRefreshInterval) { clearInterval(statsRefreshInterval); statsRefreshInterval = null; }
             if (configRefreshInterval) { clearInterval(configRefreshInterval); configRefreshInterval = null; }
             if (notificationInterval) { clearInterval(notificationInterval); notificationInterval = null; }
+            studentCache = [];
+            fuseInstance = null;
+            lastKnownName = '';
+            lastKnownTime = null;
             loginScreen.style.display = 'flex';
             dashboard.style.display = 'none';
             showToast('🔒 تم تسجيل الخروج.', 'info');
@@ -1842,7 +1843,7 @@
 
         // ===== بناء قيود الاستعلام (محسّن بدون select) =====
         function buildConstraints(isLocalSearch = false) {
-            const constraints = [];
+            const constraints = [where("deleted", "==", false)];
             const grade = toolbarGrade?.value || '';
             const gender = toolbarGender?.value || '';
             const ageVal = document.getElementById('toolbarAge')?.value;
@@ -1881,9 +1882,6 @@
                 const q = query(collection(db, "students"), ...constraints);
                 const snapshot = await getDocs(q);
                 let docs = snapshot.docs;
-
-                // ترشيح المحذوفين
-                docs = docs.filter(d => d.data().deleted !== true);
 
                 // ترشيح حسب الحالة
                 const statusVal = filterStatus.value;
@@ -1969,8 +1967,11 @@
         }
 
         function renderTable(docs) {
-            // بناء كاش البحث من نفس البيانات (تجنب قراءة مضاعفة)
-            if (docs.length > 0) {
+            // بناء كاش البحث فقط عند عدم وجود فلاتر نشطة (تجنب كسر الكاش)
+            const noFiltersActive = !toolbarGrade?.value && !toolbarGender?.value &&
+                !filterStatus?.value && !document.getElementById('toolbarAge')?.value &&
+                !document.getElementById('filterBirthDate')?.value && !filterAcademicYear?.value;
+            if (noFiltersActive && docs.length > 0) {
                 studentCache = docs.map(d => {
                     const dd = d.data();
                     return {
@@ -2082,7 +2083,8 @@
         }
 
         function setupFilterDebounce() {
-            const filters = [toolbarGrade, toolbarGender, filterAcademicYear, filterStatus];
+            const filters = [toolbarGrade, toolbarGender, filterAcademicYear, filterStatus,
+                document.getElementById('toolbarAge'), document.getElementById('filterBirthDate')];
             filters.forEach(filter => {
                 if (!filter) return;
                 filter.addEventListener('change', () => {
@@ -2094,17 +2096,6 @@
             });
         }
 
-        // ===== فلاتر شريط الأدوات (الصف، الجنس، العمر) =====
-        function setupToolbarFilters() {
-            ['toolbarGrade', 'toolbarGender', 'toolbarAge', 'filterBirthDate'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('change', () => {
-                        loadStudents();
-                    });
-                }
-            });
-        }
 
         // ===== شريط التحكم الجماعي =====
         function updateBulkActionsBar() {
@@ -2173,7 +2164,6 @@
             if (!_statsRecalculated) recalcStatsOnce();
             setupSearchDebounce();
             setupFilterDebounce();
-            setupToolbarFilters();
             setupTabs();
             setupTableEventDelegation();
         }
@@ -3132,10 +3122,12 @@
                     if (tabBtn) tabBtn.click();
                 });
             });
+        let _tabSyncDone = false;
+        // ... (inside setTimeout)
             // مزامنة التنقل السفلي مع tabs (مرة واحدة فقط)
-            if (!document.querySelector('.tab-btn._synced')) {
+            if (!_tabSyncDone) {
+                _tabSyncDone = true;
                 document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.classList.add('_synced');
                     btn.addEventListener('click', function() {
                         const tab = this.dataset.tab;
                         document.querySelectorAll('.bottom-nav button').forEach(b => {
@@ -3546,8 +3538,8 @@
                                 } catch (e) { /* تجاهل أخطاء الصوت */ }
                             }
                         });
+                        lastCheckedRegistration = Date.now();
                         if (snap.docs.length > 0) {
-                            lastCheckedRegistration = Date.now();
                             updateTitle();
                             localStorage.setItem('unreadRegistrations', unreadRegistrations.toString());
                         }
