@@ -222,8 +222,16 @@
         .btn-toolbar-reject:hover { background: #b91c1c !important; }
         .btn-toolbar-status { background: #b08f4a; color: #fff; }
         .btn-toolbar-status:hover { background: #967e41 !important; }
-        .btn-toolbar-add { background: var(--accent); color: #fff; }
-        .btn-toolbar-add:hover { background: #967e41 !important; }
+        .btn-toolbar-add {
+            background: linear-gradient(135deg, var(--primary-dark), #0d5c4a);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(6, 58, 51, 0.35);
+            margin-inline-end: auto;
+            font-size: 14px;
+            padding: 8px 20px;
+            border: 2px solid var(--accent);
+        }
+        .btn-toolbar-add:hover { background: linear-gradient(135deg, #0d5c4a, var(--primary-dark)) !important; transform: translateY(-2px) !important; box-shadow: 0 5px 16px rgba(6, 58, 51, 0.45); }
         .btn-toolbar-delete { background: #fecaca; color: #7f1d1d; }
         .btn-toolbar-delete:hover { background: #fca5a5 !important; }
         @media (max-width: 768px) {
@@ -836,9 +844,7 @@
                             <option value="14">14</option><option value="15">15</option><option value="16">16</option>
                             <option value="17">17</option><option value="18">18</option>
                         </select></div>
-                        <div class="filter-wrapper"><label>سنة الميلاد</label><select id="filterBirthYear" class="toolbar-select">
-                            <option value="">الكل</option>
-                        </select></div>
+                        <div class="filter-wrapper"><label>تاريخ الميلاد</label><input type="date" id="filterBirthDate" class="toolbar-select" title="اختر تاريخ ميلاد محدد"></div>
                         <div class="filter-wrapper"><label>الحالة</label><select id="filterStatus" class="toolbar-select">
                             <option value="">الكل</option><option value="جديد">جديد</option>
                             <option value="تم الاتصال">تم الاتصال</option><option value="مؤكد">مؤكد</option>
@@ -851,6 +857,7 @@
                         <button class="clear-btn" id="clearFiltersBtn" title="إعادة ضبط جميع الفلاتر"><i class="fas fa-undo"></i></button>
                     </div>
                     <div class="toolbar-row actions-row">
+                        <button class="btn-toolbar-add" id="addStudentBtn" title="إضافة طالب جديد إلى الجدول"><i class="fas fa-user-plus"></i> إضافة طالب</button>
                         <span class="bulk-info" id="bulkSelectedCount"><i class="fas fa-check-square"></i> 0</span>
                         <div class="export-dropdown" id="exportDropdown">
                             <button class="export-dropdown-btn" id="exportBtn"><i class="fas fa-download"></i> تصدير <i class="fas fa-chevron-down"></i></button>
@@ -866,7 +873,6 @@
                         <button class="btn-toolbar-interview" data-wa-bulk="interview" title="إرسال دعوة مقابلة"><i class="fas fa-handshake"></i> مقابلة</button>
                         <button class="btn-toolbar-reject" data-wa-bulk="reject" title="إرسال اعتذار"><i class="fas fa-times-circle"></i> اعتذار</button>
                         <button class="btn-toolbar-status" id="bulkStatusBtn" title="تغيير حالة المحدد"><i class="fas fa-tags"></i> حالة</button>
-                        <button class="btn-toolbar-add" id="addStudentBtn" title="إضافة طالب"><i class="fas fa-user-plus"></i> إضافة</button>
                         <button class="btn-toolbar-delete" id="bulkDeleteBtn" title="حذف المحدد"><i class="fas fa-trash"></i> حذف</button>
                     </div>
                 </div>
@@ -1821,10 +1827,10 @@
             if (ageFilter) {
                 activeDocs = activeDocs.filter(d => d.data().age === Number(ageFilter));
             }
-            // تصفية سنة الميلاد client-side
-            const birthYearFilter = document.getElementById('filterBirthYear')?.value;
-            if (birthYearFilter) {
-                activeDocs = activeDocs.filter(d => d.data().dob && d.data().dob.startsWith(birthYearFilter));
+            // تصفية تاريخ الميلاد client-side
+            const birthDateFilter = document.getElementById('filterBirthDate')?.value;
+            if (birthDateFilter) {
+                activeDocs = activeDocs.filter(d => d.data().dob === birthDateFilter);
             }
             // تتبع المعرفات الظاهرة (للأزرار الجماعية)
             visibleStudentIds = activeDocs.map(d => d.id);
@@ -1960,7 +1966,7 @@
 
         // ===== فلاتر شريط الأدوات (الصف، الجنس، العمر) =====
         function setupToolbarFilters() {
-            ['toolbarGrade', 'toolbarGender', 'toolbarAge', 'filterBirthYear'].forEach(id => {
+            ['toolbarGrade', 'toolbarGender', 'toolbarAge', 'filterBirthDate'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('change', () => {
@@ -2041,18 +2047,6 @@
                 const updatedSnap = await getDoc(statsRef);
                 if (updatedSnap.exists()) applyStatsToUI(updatedSnap.data());
             } catch (e) { console.warn("⚠️ فشل التصحيح الأولي للإحصائيات:", e); }
-        }
-        function populateBirthYearFilter() {
-            const sel = document.getElementById('filterBirthYear');
-            if (!sel) return;
-            const currentYear = new Date().getFullYear();
-            for (let y = currentYear - 5; y >= currentYear - 25; y--) {
-                const opt = document.createElement('option');
-                opt.value = String(y);
-                opt.textContent = String(y);
-                sel.appendChild(opt);
-            }
-        }
         function loadDashboardData() {
             if ('Notification' in window && Notification.permission === 'default') {
                 Notification.requestPermission();
@@ -2060,7 +2054,6 @@
             loadStudentNameCache();
             setupStatsCaching();
             setupConfigCaching();
-            populateBirthYearFilter();
             loadStudents(true);
             if (!_statsRecalculated) recalcStatsOnce();
             setupSearchDebounce();
@@ -2645,7 +2638,7 @@
             toolbarGrade.value = '';
             toolbarGender.value = '';
             document.getElementById('toolbarAge').value = '';
-            document.getElementById('filterBirthYear').value = '';
+            document.getElementById('filterBirthDate').value = '';
             filterAcademicYear.value = '';
             filterStatus.value = '';
             currentPage = 0;
