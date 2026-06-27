@@ -2896,45 +2896,7 @@
                     XLSX.writeFile(wb, `${filenameBase}.xlsx`);
                 } else if (format === 'pdf') {
                     showToast('⏳ جاري تجهيز PDF...', 'info');
-                    if (window.exportAllToPDF) {
-                        await window.exportAllToPDF(pdfTitle || '');
-                    } else {
-                        const { default: jsPDF } = await import('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-                        const { default: html2canvas } = await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-                        const container = document.createElement('div');
-                        container.style.cssText = 'padding:30px 35px;font-family:Cairo;direction:rtl;background:#fff;color:#1a202c;width:600px;font-size:13px;line-height:1.7;';
-                        let html = `
-                            <div style="text-align:center;margin-bottom:20px;">
-                                <img src="logo.jpg" alt="شعار المدرسة" style="width:65px;height:auto;display:block;margin:0 auto 8px;">
-                                <h1 style="color:#063a33;font-size:20px;margin:0;">مدارس الأرتقاء الأهلية</h1>
-                                <small style="color:#718096;font-size:12px;">Al-Ertiqaa Private Schools</small>
-                                <hr style="border:none;border-top:2px solid #b08f4a;margin:10px 0;">
-                            </div>
-                            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                                <thead><tr style="background:#063a33;color:#fff;">
-                                    <th style="padding:6px 8px;border:1px solid #ddd;">#</th>
-                                    <th style="padding:6px 8px;border:1px solid #ddd;">الاسم</th>
-                                    <th style="padding:6px 8px;border:1px solid #ddd;">الصف</th>
-                                    <th style="padding:6px 8px;border:1px solid #ddd;">الجوال</th>
-                                    <th style="padding:6px 8px;border:1px solid #ddd;">الحالة</th>
-                                </tr></thead><tbody>`;
-                        docs.forEach((d, i) => {
-                            const s = d.data ? d.data() : d;
-                            html += `<tr><td style="padding:5px 8px;border:1px solid #ddd;text-align:center;">${i+1}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.fullName || '')}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.grade || '')}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.phone || '')}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.status || 'جديد')}</td></tr>`;
-                        });
-                        html += '</tbody></table>';
-                        html += `<p style="text-align:center;color:#a0aec0;font-size:10px;margin-top:20px;">تم إنشاء التقرير في ${new Date().toLocaleString('ar-EG')}</p>`;
-                        container.innerHTML = html;
-                        document.body.appendChild(container);
-                        const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-                        document.body.removeChild(container);
-                        const imgData = canvas.toDataURL('image/png');
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        const pdfW = pdf.internal.pageSize.getWidth() - 20;
-                        const pdfH = (canvas.height * pdfW) / canvas.width;
-                        pdf.addImage(imgData, 'PNG', 10, 10, pdfW, pdfH);
-                        pdf.save(`${filenameBase}.pdf`);
-                    }
+                    await window.exportAllToPDF(pdfTitle || '', docs);
                 } else if (format === 'json') {
                     showToast('⏳ جاري تجهيز JSON...', 'info');
                     const allData = docs.map(d => {
@@ -3006,8 +2968,8 @@
             document.body.appendChild(modal);
 
             document.getElementById('confirmPdfBtn').addEventListener('click', async function() {
-                modal.remove();
                 const title = document.getElementById('pdfPreviewTitle').value.trim() || 'تقرير الطلاب';
+                modal.remove();
                 await exportData('pdf', 'selected', title);
             });
         }
@@ -3245,9 +3207,9 @@
 
         // ===== الدوال المفقودة =====
         // دالة تصدير جميع الطلاب إلى PDF
-        window.exportAllToPDF = async function(customTitle) {
+        window.exportAllToPDF = async function(customTitle, docs) {
             try {
-                const allDocs = await fetchAllStudents();
+                const allDocs = docs || await fetchAllStudents();
                 if (!allDocs.length) {
                     showToast('لا توجد بيانات.', 'error');
                     return;
@@ -3303,11 +3265,11 @@
                             <div>إجمالي الطلاب</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="font-size: 36px; font-weight: bold; color: #0d6b5c;">${allDocs.filter(d => d.data().gender === 'ذكر').length}</div>
+                            <div style="font-size: 36px; font-weight: bold; color: #0d6b5c;">${allDocs.filter(d => d.data ? d.data().gender === 'ذكر' : d.gender === 'ذكر').length}</div>
                             <div>الذكور</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="font-size: 36px; font-weight: bold; color: #b08f4a;">${allDocs.filter(d => d.data().gender === 'أنثى').length}</div>
+                            <div style="font-size: 36px; font-weight: bold; color: #b08f4a;">${allDocs.filter(d => d.data ? d.data().gender === 'أنثى' : d.gender === 'أنثى').length}</div>
                             <div>الإناث</div>
                         </div>
                     </div>
@@ -3338,7 +3300,7 @@
                 // الجسم
                 const tbody = document.createElement('tbody');
                 allDocs.forEach(doc => {
-                    const data = doc.data();
+                    const data = doc.data ? doc.data() : doc;
                     const row = document.createElement('tr');
                     const regDate = data.registeredAt ? data.registeredAt.toDate ? data.registeredAt.toDate() : new Date(data.registeredAt) : null;
                     row.innerHTML = `
