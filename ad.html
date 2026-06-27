@@ -394,11 +394,9 @@
         .btn-edit { background: #fefcbf; color: #744210; }
         .btn-edit:hover { background: #f6e05e; }
 
-        /* ===== Virtual Scrolling ===== */
+        /* ===== جدول الطلاب ===== */
         .virtual-table-container {
             position: relative;
-            height: 500px;
-            overflow-y: auto;
             overflow-x: auto;
         }
         .virtual-table-container table {
@@ -428,10 +426,6 @@
             vertical-align: middle;
         }
         .virtual-table-container tbody tr:hover { background: var(--bg); }
-        .virtual-spacer {
-            width: 100%;
-            pointer-events: none;
-        }
         .virtual-scroll-info {
             background: var(--bg);
             border-top: 1px solid var(--border);
@@ -967,7 +961,6 @@
                                 <tr><td colspan="10" class="empty-msg"><i class="fas fa-spinner fa-spin"></i> جاري جلب السجلات...</td></tr>
                             </tbody>
                         </table>
-                        <div class="virtual-spacer" id="virtualSpacer" style="height: 0;"></div>
                     </div>
                     <div class="pagination" id="paginationContainer">
                         <div class="controls">
@@ -976,7 +969,6 @@
                         </div>
                         <span class="info" id="pageInfo">الصفحة 1</span>
                     </div>
-                    <div class="virtual-scroll-info" id="virtualScrollInfo" style="display: none; padding: 10px; text-align: center; color: var(--text-muted); font-size: 13px;"></div>
                 </div>
             </div>
 
@@ -1269,7 +1261,7 @@
                 });
                 showToast('✅ تم استعادة الطالب بنجاح.', 'success');
                 loadTrash();
-                loadStudents(true);
+                loadStudents();
             } catch (e) { showToast('❌ فشل الاستعادة: ' + e.message, 'error'); }
         };
 
@@ -1304,7 +1296,7 @@
                 await deleteDoc(doc(db, "students", id));
                 showToast('✅ تم الحذف النهائي.', 'success');
                 loadTrash();
-                loadStudents(true);
+                loadStudents();
             } catch (e) { showToast('❌ فشل الحذف النهائي: ' + e.message, 'error'); }
         };
 
@@ -1369,13 +1361,8 @@
         const lastUpdatedText = document.getElementById('lastUpdated');
         const exportBtn = document.getElementById('exportBtn');
 
-        // ===== متغيرات الترقيم =====
-        const PAGE_SIZE = 20;
-        let currentPage = 0;
-        let lastVisible = null;
-        let firstVisible = null;
+        // ===== متغيرات عامة =====
         let totalDocs = 0;
-        let pageSnapshots = [];
         let searchTimeout = null;
         let filterTimeout = null;
 
@@ -1640,7 +1627,7 @@
                 btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> حفظ الطالب';
                 // إعادة ضبط الحقول
                 document.querySelectorAll('#addStudentModal input, #addStudentModal textarea').forEach(el => el.value = '');
-                loadStudents(true);
+                loadStudents();
                 refreshStatsFromFirestore();
             } catch (e) {
                 console.error(e);
@@ -1712,37 +1699,15 @@
             return constraints;
         }
 
-        // ===== تحميل الطلاب مع الترقيم + دعم البحث المحلي =====
-        async function loadStudents(resetPage = true) {
-            if (resetPage) {
-                currentPage = 0;
-                lastVisible = null;
-                firstVisible = null;
-                pageSnapshots = [];
-            }
+        // ===== تحميل جميع الطلاب (بدون pagination) =====
+        async function loadStudents() {
             try {
-                // Skeleton ديناميكي حسب PAGE_SIZE
-                const skeletonRow = `
-                    <tr>
-                        <td><div class="skeleton" style="width:18px;height:18px;border-radius:4px;margin:auto;"></div></td>
-                        <td><div class="skeleton skeleton-text" style="width:30px;margin:auto;"></div></td>
-                        <td><div class="skeleton skeleton-text" style="width:120px;margin:auto;"></div></td>
-                        <td><div class="skeleton skeleton-text" style="width:80px;margin:auto;"></div></td>
-                        <td><div class="skeleton skeleton-text" style="width:40px;margin:auto;"></div></td>
-                        <td><div class="skeleton skeleton-text" style="width:100px;margin:auto;"></div></td>
-                        <td><div class="skeleton skeleton-text" style="width:90px;margin:auto;"></div></td>
-                        <td><div class="skeleton skeleton-text" style="width:80px;margin:auto;"></div></td>
-                        <td><div class="skeleton" style="width:60px;height:28px;border-radius:10px;margin:auto;"></div></td>
-                    </tr>
-                `;
-                studentsBody.innerHTML = Array(PAGE_SIZE).fill(0).map(() => skeletonRow).join('');
+                studentsBody.innerHTML = `<tr><td colspan="10" class="empty-msg"><i class="fas fa-spinner fa-spin"></i> جاري جلب السجلات...</td></tr>`;
 
-                // ✅ البحث المحلي أولاً (0 قراءة من Firestore)
                 const searchResults = localSearch();
                 const isLocalSearch = searchResults !== null;
 
                 if (isLocalSearch) {
-                    // بحث محلي: عرض مباشر من الكاش بدون أي getDoc
                     totalDocs = searchResults.length;
                     renderTable(searchResults);
                     prevPageBtn.disabled = true;
@@ -1751,58 +1716,26 @@
                     return;
                 }
 
-                // ✅ استعلام عادي مع pagination (بدون select)
                 const constraints = buildConstraints();
-                constraints.push(limit(PAGE_SIZE));
-                if (lastVisible && pageSnapshots[currentPage - 1]) {
-                    constraints.push(startAfter(pageSnapshots[currentPage - 1].last));
-                } else if (lastVisible && currentPage > 0) {
-                    constraints.push(startAfter(lastVisible));
-                }
-
+                // جلب الكل بدون حد
                 const q = query(collection(db, "students"), ...constraints);
                 const snapshot = await getDocs(q);
                 let docs = snapshot.docs;
 
-                // ترشيح المحذوفين (client-side لأن deleted ليس في الاستعلام)
+                // ترشيح المحذوفين
                 docs = docs.filter(d => d.data().deleted !== true);
 
-                // ترشيح حسب الحالة (client-side لتفادي index مركب)
+                // ترشيح حسب الحالة
                 const statusVal = filterStatus.value;
                 if (statusVal) {
                     docs = docs.filter(d => (d.data().status || 'جديد') === statusVal);
                 }
 
-                if (resetPage) {
-                    try {
-                        const cntConstraints = buildConstraints(true);
-                        const allSnap = await getCountFromServer(query(collection(db, "students"), ...cntConstraints));
-                        const delSnap = await getCountFromServer(query(collection(db, "students"), where("deleted", "==", true), ...cntConstraints));
-                        totalDocs = allSnap.data().count - delSnap.data().count;
-                    } catch (e) {
-                        totalDocs = cachedTotalFromStats || 0;
-                    }
-                }
-
-                // استخدام آخر مستند من snapshot الأصلي للـ cursor (وليس من docs المفلتر)
-                // لتجنب مشكلة pagination مع الفلترة
-                const lastRaw = snapshot.docs[snapshot.docs.length - 1];
-                const firstRaw = snapshot.docs[0];
-                if (docs.length > 0) {
-                    lastVisible = lastRaw;
-                    firstVisible = firstRaw;
-                    pageSnapshots[currentPage] = { first: firstRaw, last: lastRaw, docs: docs };
-                } else {
-                    lastVisible = null;
-                    firstVisible = null;
-                }
+                totalDocs = docs.length;
                 renderTable(docs);
                 updatePagination(docs.length);
 
-                // ✅ تحديث كاش أسماء الطلاب في الخلفية
-                if (resetPage && !isLocalSearch) {
-                    refreshNameCache();
-                }
+                refreshNameCache();
             } catch (error) {
                 console.error(error);
                 studentsBody.innerHTML = `<tr><td colspan="10" class="empty-msg"><i class="fas fa-exclamation-triangle"></i> خطأ في التحميل: ${error.message}</td></tr>`;
@@ -1898,7 +1831,7 @@
                 return;
             }
             let html = '';
-            let index = (currentPage * PAGE_SIZE) + 1;
+            let index = 1;
             let activeDocs = docs.filter(d => !d.data().deleted);
             // تصفية العمر client-side
             const ageFilter = document.getElementById('toolbarAge')?.value;
@@ -1944,67 +1877,12 @@
         }
 
         function updatePagination(currentCount) {
-            const totalPages = Math.ceil(totalDocs / PAGE_SIZE) || 1;
-            pageInfo.textContent = `الصفحة ${currentPage + 1} من ${totalPages}`;
-            prevPageBtn.disabled = currentPage === 0;
-            nextPageBtn.disabled = currentCount < PAGE_SIZE || currentPage >= totalPages - 1;
-            renderPageNumbers();
+            pageInfo.textContent = `إجمالي ${totalDocs} طالب`;
+            prevPageBtn.style.display = 'none';
+            nextPageBtn.style.display = 'none';
         }
 
-        function nextPage() {
-            if (!lastVisible) return;
-            const nextPageNum = currentPage + 1;
-            if (prefetchCache && prefetchCache.has(nextPageNum)) {
-                const cached = prefetchCache.get(nextPageNum);
-                currentPage++;
-                renderTable(cached.docs);
-                pageSnapshots[currentPage] = cached;
-                lastVisible = cached.last;
-                firstVisible = cached.first;
-                updatePagination(cached.docs.length);
-                prefetchCache.delete(nextPageNum);
-                nextPageBtn.dispatchEvent(new Event('mouseenter'));
-            } else {
-                currentPage++;
-                loadStudents(false);
-            }
-        }
-
-        function prevPage() {
-            if (currentPage === 0) return;
-            currentPage--;
-            loadStudents(false);
-        }
-
-        prevPageBtn.addEventListener('click', prevPage);
-        nextPageBtn.addEventListener('click', nextPage);
-
-        // ===== Prefetch للصفحة التالية على hover =====
-        const prefetchCache = new Map();
-        let prefetchInProgress = false;
-        nextPageBtn.addEventListener('mouseenter', () => {
-            if (nextPageBtn.disabled || prefetchInProgress) return;
-            const nextPageNum = currentPage + 1;
-            if (prefetchCache.has(nextPageNum)) return;
-            prefetchInProgress = true;
-            (async () => {
-                try {
-                    const prefetchConstraints = buildConstraints();
-                    prefetchConstraints.push(limit(PAGE_SIZE));
-                    if (lastVisible && pageSnapshots[currentPage]) {
-                        prefetchConstraints.push(startAfter(pageSnapshots[currentPage].last));
-                    } else if (lastVisible) {
-                        prefetchConstraints.push(startAfter(lastVisible));
-                    }
-                    let q = query(collection(db, "students"), ...prefetchConstraints);
-                    const snapshot = await getDocs(q);
-                    if (snapshot.docs.length > 0) {
-                        prefetchCache.set(nextPageNum, { docs: snapshot.docs, first: snapshot.docs[0], last: snapshot.docs[snapshot.docs.length - 1] });
-                    }
-                } catch (e) { console.warn('Prefetch failed:', e); }
-                finally { prefetchInProgress = false; }
-            })();
-        });
+        // إزالة دوال التنقل بين الصفحات (لم نعد بحاجة لها)
 
         // ===== تحديث الإحصائيات مع تخزين مؤقت (0 قراءات إضافية) =====
         function setupStatsCaching() {
@@ -2020,9 +1898,7 @@
             searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    currentPage = 0;
-                    lastVisible = null;
-                    loadStudents(true);
+                    loadStudents();
                 }, 250);
             });
         }
@@ -2034,9 +1910,7 @@
                 filter.addEventListener('change', () => {
                     clearTimeout(filterTimeout);
                     filterTimeout = setTimeout(() => {
-                        currentPage = 0;
-                        lastVisible = null;
-                        loadStudents(true);
+                        loadStudents();
                     }, 300);
                 });
             });
@@ -2048,8 +1922,7 @@
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('change', () => {
-                        currentPage = 0; lastVisible = null;
-                        loadStudents(true);
+                        loadStudents();
                     });
                 }
             });
@@ -2133,14 +2006,13 @@
             loadStudentNameCache();
             setupStatsCaching();
             setupConfigCaching();
-            loadStudents(true);
+            loadStudents();
             if (!_statsRecalculated) recalcStatsOnce();
             setupSearchDebounce();
             setupFilterDebounce();
             setupToolbarFilters();
             setupTabs();
             setupTableEventDelegation();
-            setupVirtualScroll();
         }
 
         function updateStatusBadge(isOpen) {
@@ -2149,43 +2021,6 @@
         }
 
         // ===== Virtual Scrolling Setup =====
-        let virtualScrollEnabled = false;
-        let virtualRowHeight = 52;
-        let virtualBuffer = 5;
-        let lastScrollTop = 0;
-
-        function setupVirtualScroll() {
-            const container = document.getElementById('virtualTableContainer');
-            const spacer = document.getElementById('virtualSpacer');
-            const scrollInfo = document.getElementById('virtualScrollInfo');
-            if (!container || !spacer) return;
-
-            virtualScrollEnabled = true;
-            
-            container.addEventListener('scroll', () => {
-                const scrollTop = container.scrollTop;
-                const clientHeight = container.clientHeight;
-                const scrollHeight = container.scrollHeight;
-                
-                // Calculate visible range
-                const startIndex = Math.max(0, Math.floor(scrollTop / virtualRowHeight) - virtualBuffer);
-                const endIndex = Math.min(
-                    totalDocs,
-                    Math.ceil((scrollTop + clientHeight) / virtualRowHeight) + virtualBuffer
-                );
-                
-                // Update spacer height
-                spacer.style.height = `${totalDocs * virtualRowHeight}px`;
-                
-                // Show scroll info
-                if (totalDocs > PAGE_SIZE) {
-                    scrollInfo.style.display = 'block';
-                    scrollInfo.textContent = `عرض ${startIndex + 1} - ${Math.min(endIndex, totalDocs)} من ${totalDocs} طالب`;
-                }
-                
-                lastScrollTop = scrollTop;
-            });
-        }
 
         // ===== Event Delegation للجدول (أداء عالي) =====
         function setupTableEventDelegation() {
@@ -2236,10 +2071,10 @@
                                     }
                                 });
                                 showToast('✅ تم التراجع عن الحذف.', 'success');
-                                loadStudents(true);
+                                loadStudents();
                             } catch (e) { showToast('❌ فشل التراجع.', 'error'); }
                         });
-                        loadStudents(true);
+                        loadStudents();
                     } catch (e) { showToast('❌ فشل الحذف: ' + e.message, 'error'); }
                 }
             });
@@ -2367,45 +2202,6 @@
         };
 
         // ===== أرقام الصفحات في الترقيم =====
-        function renderPageNumbers() {
-            const container = document.querySelector('.pagination .controls');
-            if (!container) return;
-            const totalPages = Math.ceil(totalDocs / PAGE_SIZE) || 1;
-            const existingNums = container.querySelector('.page-nums');
-            if (existingNums) existingNums.remove();
-            if (totalPages <= 1) return;
-            const numsDiv = document.createElement('div');
-            numsDiv.className = 'page-nums';
-            const start = Math.max(0, currentPage - 2);
-            const end = Math.min(totalPages - 1, currentPage + 2);
-            if (start > 0) {
-                const first = document.createElement('button');
-                first.className = 'page-num'; first.textContent = '1';
-                first.addEventListener('click', () => { currentPage = 0; lastVisible = null; loadStudents(true); });
-                numsDiv.appendChild(first);
-                if (start > 1) { const dots = document.createElement('span'); dots.textContent = '...'; dots.style.cssText = 'padding:0 4px;color:var(--text-muted)'; numsDiv.appendChild(dots); }
-            }
-            for (let i = start; i <= end; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'page-num' + (i === currentPage ? ' active' : '');
-                btn.textContent = i + 1;
-                btn.addEventListener('click', () => {
-                    if (i === currentPage) return;
-                    currentPage = i; lastVisible = null; pageSnapshots = [];
-                    loadStudents(true);
-                    renderPageNumbers();
-                });
-                numsDiv.appendChild(btn);
-            }
-            if (end < totalPages - 1) {
-                if (end < totalPages - 2) { const dots = document.createElement('span'); dots.textContent = '...'; dots.style.cssText = 'padding:0 4px;color:var(--text-muted)'; numsDiv.appendChild(dots); }
-                const last = document.createElement('button');
-                last.className = 'page-num'; last.textContent = totalPages;
-                last.addEventListener('click', () => { currentPage = totalPages - 1; lastVisible = null; pageSnapshots = []; loadStudents(true); renderPageNumbers(); });
-                numsDiv.appendChild(last);
-            }
-            container.appendChild(numsDiv);
-        }
 
         // ===== عرض التفاصيل =====
         function showDetails(student) {
@@ -2701,7 +2497,7 @@
                 await updateDoc(doc(db, "students", id), data);
                 showToast('✅ تم حفظ التغييرات بنجاح.', 'success');
                 document.getElementById('editModal').classList.remove('show');
-                loadStudents(true);
+                loadStudents();
             } catch (e) {
                 showToast('❌ فشل حفظ التغييرات: ' + e.message, 'error');
             } finally {
@@ -2720,9 +2516,7 @@
             document.getElementById('filterBirthDate').value = '';
             filterAcademicYear.value = '';
             filterStatus.value = '';
-            currentPage = 0;
-            lastVisible = null;
-            loadStudents(true);
+            loadStudents();
             showToast('🧹 تم إعادة ضبط الفلاتر.', 'info');
         });
 
@@ -2811,10 +2605,10 @@
                         }
                         await undoBatch.commit();
                         showToast('✅ تم التراجع عن الحذف الجماعي.', 'success');
-                        loadStudents(true);
+                        loadStudents();
                     } catch (e) { showToast('❌ فشل التراجع.', 'error'); }
                 });
-                loadStudents(true);
+                loadStudents();
             } catch (e) {
                 showToast('❌ فشل الحذف الجماعي: ' + e.message, 'error');
             }
@@ -2849,7 +2643,17 @@
         // ===== دالة مساعدة لجلب الطلاب للتصدير (حسب النطاق) =====
         async function getExportDocs(scope) {
             if (scope === 'page') {
-                return pageSnapshots[currentPage]?.docs || [];
+                // جميع الطلاب المعروضين (لا يوجد pagination)
+                const rows = studentsBody.querySelectorAll('tr');
+                const ids = [];
+                rows.forEach(row => {
+                    const viewBtn = row.querySelector('.btn-view');
+                    if (viewBtn) ids.push(viewBtn.dataset.id);
+                });
+                if (ids.length === 0) return [];
+                const docPromises = ids.map(id => getDoc(doc(db, "students", id)));
+                const docSnaps = await Promise.all(docPromises);
+                return docSnaps.filter(snap => snap.exists());
             } else if (scope === 'selected') {
                 const ids = getTargetIds();
                 if (ids.length === 0) return [];
@@ -2893,7 +2697,7 @@
                 docs = sortDocs(docs, sortField, sortAsc);
 
                 const dateStr = new Date().toISOString().slice(0,10);
-                const scopeLabel = scope === 'page' ? `ص${currentPage+1}` : scope === 'selected' ? 'محددون' : 'الكل';
+                const scopeLabel = scope === 'page' ? 'الكل' : scope === 'selected' ? 'محددون' : 'الكل';
                 const filenameBase = `طلاب_الارتقاء_${scopeLabel}_${dateStr}`;
 
                 if (format === 'csv') {
@@ -3143,7 +2947,7 @@
                 document.getElementById('bulkStatusModal').classList.remove('show');
                 showToast(`✅ تم تغيير حالة ${count} طالب إلى "${newStatus}".`, 'success');
                 refreshStatsFromFirestore();
-                loadStudents(true);
+                loadStudents();
             } catch (e) { showToast('❌ فشل تغيير الحالة: ' + e.message, 'error'); }
         });
 
@@ -3649,7 +3453,7 @@
                 document.querySelectorAll('.sort-icon').forEach(i => i.className = 'fas fa-sort sort-icon');
                 const icon = this.querySelector('.sort-icon');
                 if (icon) icon.className = `fas fa-sort-${sortAsc ? 'up' : 'down'} sort-icon ${sortAsc ? 'asc' : 'desc'}`;
-                loadStudents(true);
+                loadStudents();
             });
         });
 
