@@ -302,6 +302,28 @@
         .btn-bulk-delete:hover { background: #feb2b2; }
         .btn-bulk-export { background: #c6f6d5; color: #22543d; }
         .btn-bulk-export:hover { background: #9ae6b4; }
+        .btn-bulk-wa {
+            border: none; padding: 8px 16px; border-radius: 10px;
+            font-family: var(--font); font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: var(--transition); color: #fff;
+        }
+        .btn-bulk-wa:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn-bulk-wa.accept { background: #2d9d6e; }
+        .btn-bulk-wa.interview { background: #2563eb; }
+        .btn-bulk-wa.reject { background: #dc3545; }
+        .btn-toolbar-wa {
+            padding: 8px 14px; border: none; border-radius: 10px;
+            font-family: var(--font); font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: var(--transition); color: #fff;
+        }
+        .btn-toolbar-wa:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn-toolbar-wa.accept { background: #2d9d6e; box-shadow: 0 2px 6px rgba(45,157,110,0.2); }
+        .btn-toolbar-wa.interview { background: #2563eb; box-shadow: 0 2px 6px rgba(37,99,235,0.2); }
+        .btn-toolbar-wa.reject { background: #dc3545; box-shadow: 0 2px 6px rgba(220,53,69,0.2); }
+        @media (max-width: 768px) {
+            .btn-toolbar-wa { padding: 6px 10px; font-size: 11px; }
+            .btn-bulk-wa { padding: 6px 12px; font-size: 11px; }
+        }
 
         /* ===== الجدول ===== */
         .table-wrapper {
@@ -856,6 +878,9 @@
                     <div class="bulk-btns">
                         <button class="btn-bulk-export" id="bulkExportBtn" title="تصدير الطلاب المحددين إلى ملف CSV"><i class="fas fa-download"></i> تصدير المحدد</button>
                         <button class="btn-bulk-export" id="bulkStatusBtn" style="background:#b08f4a;color:#fff;" title="تغيير حالة الطلاب المحددين (جديد/مؤكد/الخ)"><i class="fas fa-tags"></i> تغيير الحالة</button>
+                        <button class="btn-bulk-wa accept" data-wa-bulk="accept" title="إرسال رسالة قبول للطلاب المحددين"><i class="fas fa-check-circle"></i> ✅ قبول</button>
+                        <button class="btn-bulk-wa interview" data-wa-bulk="interview" title="إرسال دعوة مقابلة للطلاب المحددين"><i class="fas fa-handshake"></i> 🎯 مقابلة</button>
+                        <button class="btn-bulk-wa reject" data-wa-bulk="reject" title="إرسال رسالة اعتذار للطلاب المحددين"><i class="fas fa-times-circle"></i> ❌ اعتذار</button>
                         <button class="btn-bulk-delete" id="bulkDeleteBtn" title="نقل الطلاب المحددين إلى سلة المحذوفات"><i class="fas fa-trash"></i> حذف المحدد</button>
                     </div>
                 </div>
@@ -892,6 +917,9 @@
                             <option value="18">18 سنوات</option>
                         </select></div>
                         <button class="btn-export-all" id="exportBtn" title="تصدير جميع الطلاب المفلترين إلى ملف CSV"><i class="fas fa-download"></i> تصدير</button>
+                        <button class="btn-toolbar-wa accept" data-wa-bulk="accept" title="إرسال رسالة قبول لجميع الطلاب المفلترين"><i class="fas fa-check-circle"></i> ✅ قبول</button>
+                        <button class="btn-toolbar-wa interview" data-wa-bulk="interview" title="إرسال دعوة مقابلة لجميع الطلاب المفلترين"><i class="fas fa-handshake"></i> 🎯 مقابلة</button>
+                        <button class="btn-toolbar-wa reject" data-wa-bulk="reject" title="إرسال رسالة اعتذار لجميع الطلاب المفلترين"><i class="fas fa-times-circle"></i> ❌ اعتذار</button>
                     </div>
                     <button class="btn-add-student" id="addStudentBtn" title="إضافة طالب جديد إلى قاعدة البيانات"><i class="fas fa-user-plus"></i> إضافة طالب</button>
                 </div>
@@ -1132,7 +1160,7 @@
                 toast.appendChild(btn);
             }
             document.body.appendChild(toast);
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 6000);
         }
 
         // ===== دالة CSV موحدة =====
@@ -2926,6 +2954,99 @@
         document.getElementById('bulkExportBtn').addEventListener('click', function() {
             // التصدير الافتراضي: CSV لكل الطلاب
             exportData();
+        });
+
+        // ===== إرسال واتساب جماعي =====
+        const waBulkMessages = {
+            accept: `السلام عليكم ورحمة الله وبركاته
+
+عائلة الطالب المحترمة،
+
+يسرنا إعلامكم بقبول طلب تسجيل ابنكم/ابنتكم في مدارس الأرتقاء الأهلية. يرجى التفضل بمراجعة الإدارة لاستكمال إجراءات التسليم.
+
+مع فائق الاحترام والتقدير،
+إدارة مدارس الأرتقاء الأهلية`,
+            interview: `السلام عليكم ورحمة الله وبركاته
+
+عائلة الطالب المحترمة،
+
+يسعدنا دعوتكم لإجراء مقابلة شخصية مع ابنكم/ابنتكم في مدارس الأرتقاء الأهلية؛ وذلك للتعرف على قدراته وإتمام إجراءات التسجيل. نؤمن بأن كل طالب لديه طموحات وإمكانيات تستحق الرعاية والاهتمام.
+
+للحجز والاستفسار: 07850009133
+
+مع خالص التحية والتقدير،
+إدارة مدارس الأرتقاء الأهلية`,
+            reject: `السلام عليكم ورحمة الله وبركاته
+
+عائلة الطالب المحترمة،
+
+نشكركم على اهتمامكم بتسجيل ابنكم/ابنتكم في مدارس الأرتقاء الأهلية. بعد دراسة الطلب، نأسف لإعلامكم بعدم إمكانية القبول للعام الدراسي الحالي نظراً لاكتمال المقاعد المتاحة.
+
+ندعو الله أن يوفقكم في اختيار المدرسة المناسبة، ونتمنى لكم كل التوفيق.
+
+مع فائق الاحترام والتقدير،
+إدارة مدارس الأرتقاء الأهلية`
+        };
+
+        function getFilteredStudentIds() {
+            // يجمع IDs جميع الطلاب المطابقين للفلاتر الحالية (من الكاش)
+            const grade = document.getElementById('toolbarGrade').value;
+            const gender = document.getElementById('toolbarGender').value;
+            const age = document.getElementById('toolbarAge').value;
+            return studentCache
+                .filter(s => !s.deleted)
+                .filter(s => !grade || s.grade === grade)
+                .filter(s => !gender || s.gender === gender)
+                .filter(s => !age || s.age === Number(age))
+                .map(s => s.id);
+        }
+
+        document.addEventListener('click', async function(e) {
+            const btn = e.target.closest('[data-wa-bulk]');
+            if (!btn) return;
+            e.stopPropagation();
+            const type = btn.dataset.waBulk;
+            const message = waBulkMessages[type];
+            if (!message) return;
+
+            const isBulkAction = btn.closest('#bulkActionsBar');
+            let ids;
+            if (isBulkAction) {
+                ids = Array.from(selectedStudentIds);
+                if (ids.length === 0) { showToast('❌ لم يتم تحديد أي طالب.', 'error'); return; }
+            } else {
+                ids = getFilteredStudentIds();
+                if (ids.length === 0) { showToast('❌ لا يوجد طلاب مطابقين للفلاتر.', 'error'); return; }
+            }
+
+            const typeLabel = type === 'accept' ? 'قبول' : type === 'interview' ? 'دعوة مقابلة' : 'اعتذار';
+            const sourceLabel = isBulkAction ? 'المحددين' : 'المفلترين';
+
+            if (!confirm(`📨 إرسال رسالة ${typeLabel}\n\nالعدد: ${ids.length} طالب\n\nسيتم نسخ الرسالة إلى الحافظة وفتح واتساب لأول طالب.\n\n${message}\n\nهل تريد المتابعة؟`)) return;
+
+            // نسخ الرسالة إلى الحافظة
+            try { await navigator.clipboard.writeText(message); } catch (e) { console.warn('تعذر النسخ للحافظة'); }
+
+            // فتح واتساب لأول طالب
+            let opened = 0;
+            for (const id of ids) {
+                const snap = await getDoc(doc(db, 'students', id));
+                if (!snap.exists()) continue;
+                const phone = snap.data().phone;
+                if (!phone) continue;
+                const cleanPhone = phone.replace(/^0+/, '');
+                const waNum = cleanPhone.startsWith('964') || cleanPhone.startsWith('+') ? cleanPhone : '964' + cleanPhone;
+                window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(message)}`, '_blank');
+                opened++;
+                // فتح تبويب واحد فقط - المستخدم ينسخ ويرسل للباقي يدوياً
+                break;
+            }
+
+            if (opened > 0) {
+                showToast(`✅ تم نسخ الرسالة وفتح واتساب لأول طالب. يمكنك إرسالها للباقي باستخدام لصق.`, 'success');
+            } else {
+                showToast('⚠️ لم يتم العثور على أرقام هواتف صالحة.', 'warning');
+            }
         });
 
         // ===== تغيير حالة جماعي =====
