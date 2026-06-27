@@ -2230,8 +2230,8 @@
                     .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); opacity: 0.06; font-size: 120px; color: #063a33; pointer-events: none; z-index: -1; }
                     hr { border: none; border-top: 1px solid #e2e8f0; }
                 </style></head><body>
-                <div class="watermark">🏫</div>
                 <div class="report-header">
+                    <img src="logo.jpg" alt="شعار المدرسة" style="width:70px;height:auto;display:block;margin:0 auto 10px;">
                     <h1>مدارس الأرتقاء الأهلية</h1>
                     <small>Al-Ertiqaa Private Schools</small>
                     <hr style="margin:12px 0;border-color:#b08f4a;">
@@ -2260,6 +2260,7 @@
                 wrapper.style.cssText = 'width:600px;padding:30px 35px;font-family:Cairo;direction:rtl;background:#fff;color:#1a202c;font-size:14px;line-height:1.7;';
                 wrapper.innerHTML = `
                     <div style="text-align:center;margin-bottom:25px;">
+                        <img src="logo.jpg" alt="شعار المدرسة" style="width:65px;height:auto;display:block;margin:0 auto 8px;">
                         <h1 style="color:#063a33;font-size:22px;margin:0;">مدارس الأرتقاء الأهلية</h1>
                         <small style="color:#718096;font-size:13px;">Al-Ertiqaa Private Schools</small>
                         <hr style="border:none;border-top:2px solid #b08f4a;margin:12px 0;">
@@ -2870,22 +2871,37 @@
                         const { default: jsPDF } = await import('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
                         const { default: html2canvas } = await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
                         const container = document.createElement('div');
-                        container.style.cssText = 'padding:20px;font-family:Cairo;direction:rtl;background:#fff;color:#1a202c;width:800px;';
-                        let html = `<h2 style="color:#063a33;text-align:center;">مدارس الأرتقاء الأهلية</h2><h3 style="text-align:center;color:#b08f4a;">تقرير الطلاب</h3><table style="width:100%;border-collapse:collapse;margin-top:15px;font-size:11px;"><thead><tr style="background:#063a33;color:#fff;"><th style="padding:6px;border:1px solid #ddd;">#</th><th style="padding:6px;border:1px solid #ddd;">الاسم</th><th style="padding:6px;border:1px solid #ddd;">الصف</th><th style="padding:6px;border:1px solid #ddd;">الجوال</th><th style="padding:6px;border:1px solid #ddd;">الحالة</th></tr></thead><tbody>`;
+                        container.style.cssText = 'padding:30px 35px;font-family:Cairo;direction:rtl;background:#fff;color:#1a202c;width:600px;font-size:13px;line-height:1.7;';
+                        let html = `
+                            <div style="text-align:center;margin-bottom:20px;">
+                                <img src="logo.jpg" alt="شعار المدرسة" style="width:65px;height:auto;display:block;margin:0 auto 8px;">
+                                <h1 style="color:#063a33;font-size:20px;margin:0;">مدارس الأرتقاء الأهلية</h1>
+                                <small style="color:#718096;font-size:12px;">Al-Ertiqaa Private Schools</small>
+                                <hr style="border:none;border-top:2px solid #b08f4a;margin:10px 0;">
+                            </div>
+                            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                                <thead><tr style="background:#063a33;color:#fff;">
+                                    <th style="padding:6px 8px;border:1px solid #ddd;">#</th>
+                                    <th style="padding:6px 8px;border:1px solid #ddd;">الاسم</th>
+                                    <th style="padding:6px 8px;border:1px solid #ddd;">الصف</th>
+                                    <th style="padding:6px 8px;border:1px solid #ddd;">الجوال</th>
+                                    <th style="padding:6px 8px;border:1px solid #ddd;">الحالة</th>
+                                </tr></thead><tbody>`;
                         docs.forEach((d, i) => {
                             const s = d.data ? d.data() : d;
-                            html += `<tr><td style="padding:5px;border:1px solid #ddd;text-align:center;">${i+1}</td><td style="padding:5px;border:1px solid #ddd;">${escapeHTML(s.fullName || '')}</td><td style="padding:5px;border:1px solid #ddd;">${escapeHTML(s.grade || '')}</td><td style="padding:5px;border:1px solid #ddd;">${escapeHTML(s.phone || '')}</td><td style="padding:5px;border:1px solid #ddd;">${escapeHTML(s.status || 'جديد')}</td></tr>`;
+                            html += `<tr><td style="padding:5px 8px;border:1px solid #ddd;text-align:center;">${i+1}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.fullName || '')}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.grade || '')}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.phone || '')}</td><td style="padding:5px 8px;border:1px solid #ddd;">${escapeHTML(s.status || 'جديد')}</td></tr>`;
                         });
                         html += '</tbody></table>';
+                        html += `<p style="text-align:center;color:#a0aec0;font-size:10px;margin-top:20px;">تم إنشاء التقرير في ${new Date().toLocaleString('ar-EG')}</p>`;
                         container.innerHTML = html;
                         document.body.appendChild(container);
                         const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
                         document.body.removeChild(container);
                         const imgData = canvas.toDataURL('image/png');
                         const pdf = new jsPDF('p', 'mm', 'a4');
-                        const pdfW = pdf.internal.pageSize.getWidth();
+                        const pdfW = pdf.internal.pageSize.getWidth() - 20;
                         const pdfH = (canvas.height * pdfW) / canvas.width;
-                        pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+                        pdf.addImage(imgData, 'PNG', 10, 10, pdfW, pdfH);
                         pdf.save(`${filenameBase}.pdf`);
                     }
                 } else if (format === 'json') {
@@ -3052,7 +3068,7 @@
                         th { background: #063a33; color: #fff; font-weight: 600; }
                         .footer-text { text-align: center; color: #a0aec0; font-size: 11px; margin-top: 30px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
                     </style></head><body>
-                    <div class="header"><h1>مدارس الأرتقاء الأهلية</h1><small>التقرير السنوي - العام الدراسي 2026-2027</small></div>
+                    <div class="header"><img src="logo.jpg" alt="شعار المدرسة" style="width:70px;height:auto;display:block;margin:0 auto 8px;"><h1>مدارس الأرتقاء الأهلية</h1><small>التقرير السنوي - العام الدراسي 2026-2027</small></div>
                     <div class="stats-row">
                         <div class="stat-box"><div class="num">${allDocs.length}</div><div class="label">إجمالي الطلاب</div></div>
                         <div class="stat-box"><div class="num">${males}</div><div class="label">الذكور</div></div>
@@ -3151,7 +3167,12 @@
                     direction: rtl;
                 `;
 
-                // العنوان
+                // الشعار والعنوان
+                const logo = document.createElement('img');
+                logo.src = 'logo.jpg';
+                logo.alt = 'شعار المدرسة';
+                logo.style.cssText = 'width:65px;height:auto;display:block;margin:0 auto 8px;';
+                studentsList.appendChild(logo);
                 const title = document.createElement('h1');
                 title.textContent = 'تقرير جميع الطلاب';
                 title.style.cssText = `
