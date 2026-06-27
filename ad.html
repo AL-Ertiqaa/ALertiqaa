@@ -227,6 +227,8 @@
         }
         .btn-logout { background: var(--danger); color: #fff; }
         .btn-logout:hover { background: var(--danger-dark); }
+        .btn-qr { background: var(--primary); color: #fff; }
+        .btn-qr:hover { background: var(--primary-dark); }
         /* ===== شريط الأدوات الموحد ===== */
         .unified-toolbar {
             background: var(--bg-card);
@@ -844,6 +846,7 @@
                     <div><h1>لوحة تحكم الأرتقاء <small>Al-Ertiqaa Private Schools</small></h1></div>
                 </div>
                 <div class="actions">
+                    <button class="btn-qr" id="qrBtn" title="عرض رمز QR لنموذج التسجيل"><i class="fas fa-qrcode"></i></button>
                     <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</button>
                 </div>
             </div>
@@ -1019,6 +1022,22 @@
                 <p style="color:var(--text-secondary);margin-bottom:20px;">سيتم حذف الطالب وجميع سجلاته بشكل نهائي من قاعدة البيانات.</p>
                 <div><button class="btn-danger" id="confirmDeleteBtn"><i class="fas fa-trash"></i> نعم، احذف نهائياً</button><button class="btn-cancel" data-close="deleteModal"><i class="fas fa-times"></i> إلغاء</button></div>
                 <input type="hidden" id="deleteDocId">
+            </div>
+        </div>
+
+        <!-- ===== QR Code Modal ===== -->
+        <div class="modal-overlay" id="qrModal" role="dialog" aria-modal="true" aria-label="رمز QR لنموذج التسجيل">
+            <div class="modal-box" style="max-width:380px;text-align:center;">
+                <button class="close-modal" data-close="qrModal"><i class="fas fa-times"></i></button>
+                <h2 style="margin-bottom:6px;"><i class="fas fa-qrcode" style="color:var(--accent);margin-left:6px;"></i> رمز التسجيل</h2>
+                <p style="color:var(--text-secondary);font-size:14px;margin-bottom:18px;">امسح الرمز بكاميرا هاتفك للوصول إلى نموذج التسجيل</p>
+                <div id="qrContainer" style="background:#fff;padding:16px;border-radius:16px;display:inline-block;margin:0 auto;">
+                    <img id="qrImage" src="" alt="QR Code" style="width:220px;height:220px;image-rendering:pixelated;">
+                </div>
+                <p style="margin-top:16px;font-size:12px;color:var(--text-muted);word-break:break-all;" id="qrUrlText"></p>
+                <div style="display:flex;gap:10px;justify-content:center;margin-top:15px;">
+                    <button class="btn-cancel" data-close="qrModal" style="padding:10px 30px;"><i class="fas fa-times"></i> إغلاق</button>
+                </div>
             </div>
         </div>
 
@@ -1724,6 +1743,17 @@
             }
         });
         logoutBtn.addEventListener('click', logout);
+
+        // ===== QR Code =====
+        document.getElementById('qrBtn').addEventListener('click', function() {
+            const url = window.location.origin + '/';
+            document.getElementById('qrImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(url);
+            document.getElementById('qrUrlText').textContent = url;
+            document.getElementById('qrModal').classList.add('show');
+        });
+        document.querySelectorAll('[data-close="qrModal"]').forEach(el => {
+            el.addEventListener('click', () => document.getElementById('qrModal').classList.remove('show'));
+        });
 
         // ===== البحث المحلي مع Fuse.js (بحث سريع في الذاكرة) =====
         let fuseInstance = null;
