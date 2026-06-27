@@ -42,7 +42,7 @@
             --bg-dark: #1a202c;
             --text-primary: #0f172a;
             --text-secondary: #475569;
-            --text-muted: #94a3b8;
+            --text-muted: #718096;
             --text-inverse: #ffffff;
             --border: #cbd5e1;
             --border-light: #e2e8f0;
@@ -65,9 +65,9 @@
             --bg: #0f172a;
             --bg-card: #1e293b;
             --bg-dark: #020617;
-            --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
             --border: #334155;
             --border-light: #1e293b;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
@@ -80,9 +80,9 @@
                 --bg: #0f172a;
                 --bg-card: #1e293b;
                 --bg-dark: #020617;
-                --text-primary: #e2e8f0;
-                --text-secondary: #94a3b8;
-                --text-muted: #64748b;
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #94a3b8;
                 --border: #334155;
                 --border-light: #1e293b;
                 --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
@@ -118,7 +118,7 @@
             margin-bottom: 10px;
         }
         #loginScreen h2 { color: var(--primary-dark); font-size: 28px; font-weight: 800; }
-        #loginScreen p { color: var(--text-secondary); }
+        #loginScreen p { color: var(--text-secondary); font-size: 16px; font-weight: 600; }
         #loginScreen input {
             padding: 14px 25px; border: 2px solid var(--border); border-radius: var(--radius-md);
             font-size: 18px; width: 320px; max-width: 100%; font-family: var(--font);
@@ -187,23 +187,24 @@
             display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
         }
         .table-toolbar .toolbar-select {
-            padding: 7px 12px; border: 2px solid var(--border); border-radius: 10px;
-            font-family: var(--font); font-size: 12px; background: var(--bg-card); color: var(--text-primary);
+            padding: 8px 12px; border: 2px solid var(--border); border-radius: 10px;
+            font-family: var(--font); font-size: 13px; background: var(--bg-card); color: var(--text-primary);
             cursor: pointer; transition: var(--transition); min-width: 0;
+            font-weight: 600;
         }
         .table-toolbar .toolbar-select:focus { border-color: var(--primary); outline: none; }
         .table-toolbar .btn-export-all {
-            padding: 8px 18px; background: #2b6cb0; color: #fff; border: none; border-radius: 10px;
-            font-weight: 700; font-family: var(--font); font-size: 13px; cursor: pointer;
-            transition: var(--transition);
+            padding: 10px 20px; background: var(--info); color: #fff; border: none; border-radius: 10px;
+            font-weight: 700; font-family: var(--font); font-size: 14px; cursor: pointer;
+            transition: var(--transition); box-shadow: 0 2px 6px rgba(37,99,235,0.2);
         }
-        .table-toolbar .btn-export-all:hover { background: var(--info-dark); }
+        .table-toolbar .btn-export-all:hover { background: var(--info-dark); transform: translateY(-1px); }
         .table-toolbar .btn-add-student {
-            padding: 8px 18px; background: var(--accent); color: #fff; border: none; border-radius: 10px;
-            font-weight: 700; font-family: var(--font); font-size: 13px; cursor: pointer;
-            transition: var(--transition);
+            padding: 10px 20px; background: var(--accent); color: #fff; border: none; border-radius: 10px;
+            font-weight: 700; font-family: var(--font); font-size: 14px; cursor: pointer;
+            transition: var(--transition); box-shadow: 0 2px 6px rgba(176,143,74,0.2);
         }
-        .table-toolbar .btn-add-student:hover { background: #967e41; }
+        .table-toolbar .btn-add-student:hover { background: #967e41; transform: translateY(-1px); }
         @media (max-width: 768px) {
             .table-toolbar { flex-direction: column; align-items: stretch; }
             .table-toolbar .toolbar-filters { justify-content: center; }
@@ -268,7 +269,7 @@
             background: var(--bg); color: var(--text-primary); transition: var(--transition);
         }
         .filter-section .search-box input:focus { outline: none; border-color: var(--primary); background: var(--bg-card); }
-        .filter-section .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .filter-section .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 18px; }
         .filter-section select {
             padding: 12px 20px; border: 2px solid var(--border); border-radius: 14px;
             font-size: 16px; font-family: var(--font); background: var(--bg);
@@ -276,17 +277,18 @@
         }
         .filter-section select:focus { outline: none; border-color: var(--primary); }
         .filter-section .clear-btn {
-            padding: 10px 22px; background: var(--border); border: none;
-            border-radius: 14px; font-weight: 600; cursor: pointer;
+            padding: 10px 22px; background: #e2e8f0; border: 2px solid #cbd5e1;
+            border-radius: 14px; font-weight: 700; cursor: pointer;
             font-family: var(--font); color: var(--text-primary); transition: var(--transition);
         }
-        .filter-section .clear-btn:hover { background: var(--border); opacity: 0.8; }
+        .filter-section .clear-btn:hover { background: #cbd5e1; }
 
         /* ===== الإجراءات الجماعية ===== */
         .bulk-actions-wrapper {
-            display: none; background: #fffbf0; border: 1px solid var(--accent);
-            padding: 12px 20px; border-radius: 15px; margin-bottom: 15px;
+            display: none; background: #fefcf3; border: 2px solid var(--accent);
+            padding: 14px 20px; border-radius: 15px; margin-bottom: 15px;
             align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(176,143,74,0.1);
         }
         .bulk-actions-wrapper.show { display: flex; }
         .bulk-actions-wrapper .bulk-info { font-weight: 700; color: var(--primary-dark); font-size: 14px; }
@@ -309,7 +311,7 @@
         }
         .table-wrapper table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 800px; line-height: 1.6; }
         .table-wrapper thead { background: var(--primary-dark); color: #fff; }
-        .table-wrapper thead th { padding: 16px 12px; text-align: center; white-space: nowrap; font-weight: 800; font-size: 15px; }
+        .table-wrapper thead th { padding: 16px 12px; text-align: center; white-space: nowrap; font-weight: 800; font-size: 15px; border-bottom: 3px solid var(--accent); }
         .sortable { cursor: pointer; user-select: none; transition: background 0.2s ease; }
         .sortable:hover { background: rgba(255,255,255,0.1); }
         .sortable .sort-icon { font-size: 11px; margin-right: 5px; opacity: 0.4; transition: opacity 0.2s ease; }
@@ -324,15 +326,15 @@
         }
         .table-wrapper tbody tr:hover { background: var(--bg); }
         .table-wrapper tbody .empty-msg {
-            text-align: center; padding: 60px 20px; color: var(--text-muted);
-            font-size: 15px; font-weight: 600;
+            text-align: center; padding: 60px 20px; color: var(--text-secondary);
+            font-size: 15px; font-weight: 700;
         }
         .table-wrapper tbody .empty-msg i:first-child {
             font-size: 44px;
             width: 80px; height: 80px; border-radius: 50%;
-            background: var(--border-light); color: var(--text-muted);
+            background: var(--border-light); color: var(--text-secondary);
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px; opacity: 0.7;
+            margin: 0 auto 16px; opacity: 0.8;
         }
         .badge-grade { background: var(--border); padding: 5px 16px; border-radius: 30px; font-size: 13px; font-weight: 700; color: var(--text-secondary); display: inline-block; }
         .badge-status { padding: 4px 16px; border-radius: 30px; font-size: 13px; font-weight: 700; display: inline-block; white-space: nowrap; }
@@ -408,8 +410,8 @@
         }
         .table-header .title { font-weight: 700; color: var(--primary-dark); font-size: 16px; }
         .table-header .title i { color: var(--accent); margin-left: 8px; }
-        .table-header .count { font-size: 14px; color: var(--text-secondary); }
-        .last-updated-label { font-size: 12px; color: var(--text-muted); font-weight: 600; display: inline-block; margin-right: 10px; }
+        .table-header .count { font-size: 14px; color: #334155; font-weight: 700; }
+        .last-updated-label { font-size: 12px; color: var(--text-secondary); font-weight: 700; display: inline-block; margin-right: 10px; }
 
         /* ===== الترقيم ===== */
         .pagination {
@@ -452,8 +454,8 @@
         }
         .modal-box .close-modal {
             position: absolute; top: 15px; left: 20px; font-size: 28px;
-            cursor: pointer; color: var(--text-muted); transition: var(--transition);
-            background: none; border: none;
+            cursor: pointer; color: var(--text-secondary); transition: var(--transition);
+            background: none; border: none; font-weight: 700;
         }
         .modal-box .close-modal:hover { color: var(--danger); }
         .modal-box h2 { color: var(--primary-dark); margin-bottom: 20px; border-right: 4px solid var(--accent); padding-right: 15px; }
@@ -467,13 +469,13 @@
         .contact-history { border-top: 1px solid var(--border); margin-top: 10px; }
         .contact-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; }
         .contact-item:last-child { border-bottom: none; }
-        .contact-badge { padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+        .contact-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; }
         .contact-badge.اتصال { background: #dbeafe; color: #1e40af; }
         .contact-badge.واتساب { background: #d1fae5; color: #065f46; }
         .contact-badge.زيارة { background: #fef3c7; color: #92400e; }
         .contact-badge.ملاحظة { background: #e2e8f0; color: #475569; }
         .contact-text { flex: 1; font-size: 15px; color: var(--text-primary); min-width: 100px; }
-        .contact-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+        .contact-time { font-size: 12px; color: var(--text-secondary); font-weight: 600; white-space: nowrap; }
         .contact-input-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 
         /* ===== أزرار المودال ===== */
@@ -578,7 +580,7 @@
         .toast.success { background: var(--success); color: #fff; }
         .toast.error { background: var(--danger); color: #fff; }
         .toast.info { background: var(--info); color: #fff; }
-        .toast.warning { background: var(--accent); color: #fff; }
+        .toast.warning { background: #92400e; color: #fff; }
         .toast .toast-text { flex: 1; }
         .toast .toast-btn {
             background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
@@ -629,9 +631,9 @@
         .stat-card.female::before { background: #d53f8c; }
         .stat-card.today::before { background: #4299e1; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-        .stat-card .stat-info h3 { font-size: 14px; color: var(--text-secondary); margin: 0 0 4px; font-weight: 700; }
+        .stat-card .stat-info h3 { font-size: 14px; color: #334155; margin: 0 0 4px; font-weight: 700; }
         .stat-card .stat-info p { font-size: 34px; font-weight: 800; color: var(--text-primary); margin: 0; line-height: 1.2; }
-        .stat-card .stat-icon { font-size: 36px; color: var(--text-muted); opacity: 0.3; }
+        .stat-card .stat-icon { font-size: 36px; color: var(--text-secondary); opacity: 0.5; }
 
         /* ===== CSS Containment لتسريع الجدول ===== */
         .table-wrapper tbody tr {
@@ -697,13 +699,13 @@
 
         /* ===== Calm Design: Advanced Filters Toggle ===== */
         .filter-toggle-btn {
-            background: var(--border); border: none; border-radius: 14px;
-            padding: 10px 18px; font-weight: 600; cursor: pointer;
+            background: var(--border); border: 2px solid var(--border); border-radius: 14px;
+            padding: 10px 18px; font-weight: 700; cursor: pointer;
             font-family: var(--font); color: var(--text-primary);
             transition: var(--transition); font-size: 14px;
             display: flex; align-items: center; gap: 8px;
         }
-        .filter-toggle-btn:hover { background: var(--border); opacity: 0.8; }
+        .filter-toggle-btn:hover { background: #cbd5e1; border-color: #94a3b8; }
         .filter-toggle-btn i { transition: transform 0.3s ease; }
         .filter-toggle-btn.open i { transform: rotate(180deg); }
         .advanced-filters {
@@ -784,8 +786,8 @@
 
             <!-- ===== شريط التبويب ===== -->
             <div class="tab-bar">
-                <button class="tab-btn active" data-tab="tabHome"><i class="fas fa-home"></i> الرئيسية</button>
-                <button class="tab-btn" data-tab="tabTrash"><i class="fas fa-trash-alt"></i> سلة المحذوفات <span id="trashBadge" class="tab-badge">0</span></button>
+                <button class="tab-btn active" data-tab="tabHome" title="الصفحة الرئيسية للوحة التحكم"><i class="fas fa-home"></i> الرئيسية</button>
+                <button class="tab-btn" data-tab="tabTrash" title="عرض الطلاب المحذوفين"><i class="fas fa-trash-alt"></i> سلة المحذوفات <span id="trashBadge" class="tab-badge">0</span></button>
             </div>
 
             <!-- ===== شريط التنقل السفلي للجوال ===== -->
@@ -806,17 +808,17 @@
                 <div class="control-section">
                     <div class="label"><i class="fas fa-toggle-on"></i> حالة بوابة التسجيل</div>
                     <div class="switch-container">
-                        <span style="color:#2d9d6e;font-weight:700;">مفتوح</span>
-                        <label class="switch"><input type="checkbox" id="toggleSwitch"><span class="slider"></span></label>
-                        <span style="color:#dc3545;font-weight:700;">مغلق</span>
+                        <span style="color:#2d9d6e;font-weight:800;">مفتوح</span>
+                        <label class="switch"><input type="checkbox" id="toggleSwitch" title="فتح/إغلاق بوابة التسجيل للطلاب الجدد"><span class="slider"></span></label>
+                        <span style="color:#dc3545;font-weight:800;">مغلق</span>
                         <span id="statusBadge" class="status-badge open">مفتوح ✅</span>
                     </div>
-                    <p style="font-size:13px;color:#718096;margin:0;flex:1 1 100%;text-align:center;"><i class="fas fa-sync-alt"></i> ينعكس فوراً على استمارة التسجيل</p>
+                    <p style="font-size:14px;color:#475569;margin:0;flex:1 1 100%;text-align:center;font-weight:600;"><i class="fas fa-sync-alt"></i> ينعكس فوراً على استمارة التسجيل</p>
                 </div>
 
                 <div class="filter-section">
-                    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث بالاسم الكامل للطالب (يبدأ بـ)..."></div>
-                    <button class="filter-toggle-btn" id="filterToggleBtn" type="button"><i class="fas fa-chevron-down"></i> فلترة متقدمة</button>
+                    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث بالاسم الكامل للطالب (يبدأ بـ)..." title="أدخل أول حرفين من اسم الطالب للبحث"></div>
+                    <button class="filter-toggle-btn" id="filterToggleBtn" type="button" title="إظهار/إخفاء فلاتر إضافية للبحث المتقدم"><i class="fas fa-chevron-down"></i> فلترة متقدمة</button>
                     <div class="advanced-filters hidden" id="advancedFilters">
                         <div class="filter-field"><label>الصف الدراسي</label><select id="filterGrade"><option value="">جميع الصفوف</option><option>الصف التمهيدي</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option><option>الثالث ابتدائي</option><option>الرابع ابتدائي</option><option>الخامس ابتدائي</option><option>السادس ابتدائي</option><option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option></select></div>
                         <div class="filter-field"><label>الجنس</label><select id="filterGender"><option value="">الجميع</option><option value="ذكر">ذكور</option><option value="أنثى">إناث</option></select></div>
@@ -831,9 +833,9 @@
                 <div class="bulk-actions-wrapper" id="bulkActionsBar">
                     <span class="bulk-info" id="bulkSelectedCount">تم تحديد 0 طالب</span>
                     <div class="bulk-btns">
-                        <button class="btn-bulk-export" id="bulkExportBtn"><i class="fas fa-download"></i> تصدير المحدد</button>
-                        <button class="btn-bulk-export" id="bulkStatusBtn" style="background:#b08f4a;color:#fff;"><i class="fas fa-tags"></i> تغيير الحالة</button>
-                        <button class="btn-bulk-delete" id="bulkDeleteBtn"><i class="fas fa-trash"></i> حذف المحدد</button>
+                        <button class="btn-bulk-export" id="bulkExportBtn" title="تصدير الطلاب المحددين إلى ملف CSV"><i class="fas fa-download"></i> تصدير المحدد</button>
+                        <button class="btn-bulk-export" id="bulkStatusBtn" style="background:#b08f4a;color:#fff;" title="تغيير حالة الطلاب المحددين (جديد/مؤكد/الخ)"><i class="fas fa-tags"></i> تغيير الحالة</button>
+                        <button class="btn-bulk-delete" id="bulkDeleteBtn" title="نقل الطلاب المحددين إلى سلة المحذوفات"><i class="fas fa-trash"></i> حذف المحدد</button>
                     </div>
                 </div>
 
@@ -868,9 +870,9 @@
                             <option value="17">17 سنوات</option>
                             <option value="18">18 سنوات</option>
                         </select></div>
-                        <button class="btn-export-all" id="exportBtn"><i class="fas fa-download"></i> تصدير</button>
+                        <button class="btn-export-all" id="exportBtn" title="تصدير جميع الطلاب المفلترين إلى ملف CSV"><i class="fas fa-download"></i> تصدير</button>
                     </div>
-                    <button class="btn-add-student" id="addStudentBtn"><i class="fas fa-user-plus"></i> إضافة طالب</button>
+                    <button class="btn-add-student" id="addStudentBtn" title="إضافة طالب جديد إلى قاعدة البيانات"><i class="fas fa-user-plus"></i> إضافة طالب</button>
                 </div>
 
                 <div class="table-wrapper">
@@ -882,7 +884,7 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width:40px;"><input type="checkbox" id="selectAllCheck" style="width:18px;height:18px;cursor:pointer;"></th>
+                                    <th style="width:40px;"><input type="checkbox" id="selectAllCheck" style="width:18px;height:18px;cursor:pointer;" title="تحديد/إلغاء تحديد جميع الطلاب في هذه الصفحة"></th>
                                     <th>#</th>
                                     <th class="sortable" data-sort="fullName"><span>الاسم الكامل</span><i class="fas fa-sort sort-icon"></i></th>
                                     <th class="sortable" data-sort="grade"><span>الصف</span><i class="fas fa-sort sort-icon"></i></th>
@@ -902,8 +904,8 @@
                     </div>
                     <div class="pagination" id="paginationContainer">
                         <div class="controls">
-                            <button id="prevPageBtn" disabled><i class="fas fa-chevron-right"></i> السابق</button>
-                            <button id="nextPageBtn" disabled>التالي <i class="fas fa-chevron-left"></i></button>
+                            <button id="prevPageBtn" disabled title="الصفحة السابقة"><i class="fas fa-chevron-right"></i> السابق</button>
+                            <button id="nextPageBtn" disabled title="الصفحة التالية">التالي <i class="fas fa-chevron-left"></i></button>
                         </div>
                         <span class="info" id="pageInfo">الصفحة 1</span>
                     </div>
@@ -918,7 +920,7 @@
                 </div>
                 <div class="table-wrapper">
                     <div class="table-header">
-                        <span class="title"><i class="fas fa-trash-alt"></i> الطلاب المحذوفون</span>
+                        <span class="title" title="الطلاب المحذوفون - يمكن استعادتهم"><i class="fas fa-trash-alt"></i> الطلاب المحذوفون</span>
                         <span class="count" id="trashCount">(0 طالب)</span>
                     </div>
                     <table>
@@ -936,12 +938,12 @@
                 <button class="close-modal" data-close="detailModal"><i class="fas fa-times"></i></button>
                 <h2><i class="fas fa-user-graduate" style="color:#b08f4a;"></i> بيانات الطالب المرفقة</h2>
                 <div class="modal-actions-bar">
-                    <button class="btn-print-report" onclick="printStudentReport()"><i class="fas fa-print"></i> طباعة</button>
-                    <button class="btn-pdf-report" onclick="saveAsPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-                    <button class="btn-print-report" id="whatsappContactBtn" style="background:#25d366;"><i class="fab fa-whatsapp"></i> واتساب</button>
-                    <button class="btn-print-report btn-wa-action" data-template="approved" style="background:#2d9d6e;" title="إرسال رسالة قبول للطالب"><i class="fas fa-check-circle"></i> ✅ قبول</button>
-                    <button class="btn-print-report btn-wa-action" data-template="interview" style="background:#2563eb;" title="دعوة الطالب للمقابلة"><i class="fas fa-handshake"></i> 🎯 دعوة للمقابلة</button>
-                    <button class="btn-print-report btn-wa-action" data-template="rejected" style="background:#dc3545;" title="إرسال اعتذار للطالب"><i class="fas fa-times-circle"></i> ❌ عدم القبول</button>
+                    <button class="btn-print-report" onclick="printStudentReport()" title="طباعة تقرير الطالب"><i class="fas fa-print"></i> طباعة</button>
+                    <button class="btn-pdf-report" onclick="saveAsPDF()" title="حفظ بيانات الطالب كملف PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="btn-print-report" id="whatsappContactBtn" style="background:#25d366;" title="مراسلة الطالب عبر واتساب"><i class="fab fa-whatsapp"></i> واتساب</button>
+                    <button class="btn-print-report btn-wa-action" data-template="approved" style="background:#2d9d6e;" title="إرسال رسالة قبول رسمية للطالب"><i class="fas fa-check-circle"></i> ✅ قبول</button>
+                    <button class="btn-print-report btn-wa-action" data-template="interview" style="background:#2563eb;" title="دعوة الطالب للمقابلة الشخصية"><i class="fas fa-handshake"></i> 🎯 دعوة للمقابلة</button>
+                    <button class="btn-print-report btn-wa-action" data-template="rejected" style="background:#dc3545;" title="إرسال رسالة اعتذار للطالب"><i class="fas fa-times-circle"></i> ❌ عدم القبول</button>
                 </div>
                 <div id="detailContent"></div>
             </div>
