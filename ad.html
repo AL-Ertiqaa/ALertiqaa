@@ -198,12 +198,12 @@
             white-space: nowrap; padding: 4px 10px;
             background: var(--bg); border-radius: 8px;
         }
-        .unified-toolbar .bottom-row button {
+        .unified-toolbar .actions-row button {
             padding: 8px 14px; border: none; border-radius: 10px;
             font-family: var(--font); font-weight: 700; font-size: 13px;
             cursor: pointer; transition: var(--transition); white-space: nowrap;
         }
-        .unified-toolbar .bottom-row button:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .unified-toolbar .actions-row button:hover { transform: translateY(-1px); filter: brightness(1.1); }
         .btn-export-all { background: var(--info); color: #fff; box-shadow: 0 2px 6px rgba(37,99,235,0.2); }
         .btn-export-all:hover { background: var(--info-dark) !important; }
         .btn-toolbar-accept { background: #2d9d6e; color: #fff; }
@@ -219,29 +219,13 @@
         .btn-toolbar-delete { background: #fed7d7; color: #9b2c2c; }
         .btn-toolbar-delete:hover { background: #feb2b2 !important; }
         @media (max-width: 768px) {
-            .unified-toolbar .top-row { flex-direction: column; align-items: stretch; }
-            .unified-toolbar .bottom-row { justify-content: center; }
+            .unified-toolbar .filters-row { flex-direction: column; align-items: stretch; }
+            .unified-toolbar .actions-row { justify-content: center; }
             .unified-toolbar .toolbar-select { font-size: 11px; padding: 6px 8px; }
-            .unified-toolbar .bottom-row button { font-size: 11px; padding: 6px 10px; }
+            .unified-toolbar .toolbar-date { font-size: 11px; padding: 6px 8px; }
+            .unified-toolbar .actions-row button { font-size: 11px; padding: 6px 10px; }
         }
-        /* ===== الإحصائيات ===== */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card {
-            background: var(--bg-card); padding: 18px 20px; border-radius: 18px;
-            box-shadow: var(--shadow-sm); display: flex; justify-content: space-between;
-            align-items: center; border-right: 5px solid var(--accent);
-            transition: var(--transition);
-        }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .stat-card .stat-info h3 { font-size: 13px; color: var(--text-secondary); font-weight: 600; margin: 0; }
-        .stat-card .stat-info p { font-size: 28px; font-weight: 800; color: var(--primary-dark); margin: 2px 0 0; }
-        .stat-card .stat-icon { font-size: 32px; color: var(--accent); opacity: 0.7; }
-        .stat-card.today { border-right-color: #4299e1; }
-        .stat-card.today .stat-icon { color: #4299e1; }
-        .stat-card.male { border-right-color: var(--info); }
-        .stat-card.male .stat-icon { color: var(--info); }
-        .stat-card.female { border-right-color: #d53f8c; }
-        .stat-card.female .stat-icon { color: #d53f8c; }
+        /* ===== الإحصائيات (Bento Grid) ===== */
 
         /* ===== قسم التحكم ===== */
         .control-section {
@@ -270,34 +254,26 @@
         .status-badge.open { background: #c6f6d5; color: #22543d; }
         .status-badge.closed { background: #fed7d7; color: #742a2a; }
 
-        /* ===== الفلاتر ===== */
-        .filter-section {
-            background: var(--bg-card); border-radius: var(--radius-lg);
-            padding: 18px 25px; margin-bottom: 25px; box-shadow: var(--shadow-sm);
-            display: flex; flex-wrap: wrap; align-items: center; gap: 15px;
+        /* ===== الفلاتر (في الشريط الموحد) ===== */
+        .unified-toolbar .toolbar-date {
+            padding: 7px 10px; border: 2px solid var(--border); border-radius: 10px;
+            font-family: var(--font); font-size: 13px; font-weight: 600;
+            background: var(--bg-card); color: var(--text-primary); min-width: 0;
+            transition: var(--transition);
         }
-        .filter-section .search-box { flex: 1 1 250px; position: relative; }
-        .filter-section .search-box input {
-            width: 100%; padding: 12px 20px 12px 45px; border: 2px solid var(--border);
-            border-radius: 14px; font-size: 16px; font-family: var(--font);
-            background: var(--bg); color: var(--text-primary); transition: var(--transition);
+        .unified-toolbar .toolbar-date:focus { border-color: var(--primary); outline: none; }
+        .unified-toolbar .clear-btn {
+            padding: 7px 10px; background: #e2e8f0; border: 2px solid #cbd5e1;
+            border-radius: 10px; font-weight: 700; cursor: pointer; align-self: flex-end;
+            font-family: var(--font); color: var(--text-primary); font-size: 16px;
+            transition: var(--transition);
         }
-        .filter-section .search-box input:focus { outline: none; border-color: var(--primary); background: var(--bg-card); }
-        .filter-section .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 18px; }
-        .filter-section select {
-            padding: 12px 20px; border: 2px solid var(--border); border-radius: 14px;
-            font-size: 16px; font-family: var(--font); background: var(--bg);
-            color: var(--text-primary); min-width: 140px; cursor: pointer; transition: var(--transition);
+        .unified-toolbar .clear-btn:hover { background: #cbd5e1; }
+        .unified-toolbar .search-box { position: relative; }
+        .unified-toolbar .search-box i {
+            position: absolute; left: 10px; top: 50%;
+            transform: translateY(-50%); color: var(--text-secondary); font-size: 15px;
         }
-        .filter-section select:focus { outline: none; border-color: var(--primary); }
-        .filter-section .clear-btn {
-            padding: 10px 22px; background: #e2e8f0; border: 2px solid #cbd5e1;
-            border-radius: 14px; font-weight: 700; cursor: pointer;
-            font-family: var(--font); color: var(--text-primary); transition: var(--transition);
-        }
-        .filter-section .clear-btn:hover { background: #cbd5e1; }
-
-        /* ===== الإجراءات الجماعية (موجود في الشريط الموحد) ===== */
 
         /* ===== الجدول ===== */
         .table-wrapper {
@@ -714,30 +690,13 @@
             transform: scale(1.005);
         }
 
-        /* ===== Calm Design: Advanced Filters Toggle ===== */
-        .filter-toggle-btn {
-            background: var(--border); border: 2px solid var(--border); border-radius: 14px;
-            padding: 10px 18px; font-weight: 700; cursor: pointer;
-            font-family: var(--font); color: var(--text-primary);
-            transition: var(--transition); font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .filter-toggle-btn:hover { background: #cbd5e1; border-color: #94a3b8; }
-        .filter-toggle-btn i { transition: transform 0.3s ease; }
-        .filter-toggle-btn.open i { transform: rotate(180deg); }
-        .advanced-filters {
-            display: flex; flex-wrap: wrap; align-items: center; gap: 15px;
-            width: 100%;
-        }
-        .advanced-filters.hidden { display: none; }
+        /* ===== حقل الفلترة (عنوان) ===== */
         .filter-field { display: flex; flex-direction: column; gap: 4px; }
-        .filter-field label { font-size: 12px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.3px; }
-        .filter-date-range { min-width: 130px; }
 
         /* ===== Print Styles ===== */
         @media print {
             body { background: #fff !important; padding: 0 !important; }
-            .admin-header, .actions, .tab-bar, .unified-toolbar, .filter-section, .bulk-actions-wrapper,
+            .admin-header, .actions, .tab-bar, .unified-toolbar,
             .pagination, .control-section, .table-wrapper thead, .action-btns,
             .btn-print-report, .btn-pdf-report, .close-modal, #toast-container { display: none !important; }
             .modal-overlay { position: static !important; background: none !important; backdrop-filter: none !important; }
@@ -833,22 +792,8 @@
                     <p style="font-size:14px;color:#475569;margin:0;flex:1 1 100%;text-align:center;font-weight:600;"><i class="fas fa-sync-alt"></i> ينعكس فوراً على استمارة التسجيل</p>
                 </div>
 
-                <div class="filter-section">
-                    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث بالاسم الكامل للطالب (يبدأ بـ)..." title="أدخل أول حرفين من اسم الطالب للبحث"></div>
-                    <button class="filter-toggle-btn" id="filterToggleBtn" type="button" title="إظهار/إخفاء فلاتر إضافية للبحث المتقدم"><i class="fas fa-chevron-down"></i> فلترة متقدمة</button>
-                    <div class="advanced-filters hidden" id="advancedFilters">
-                        <div class="filter-field"><label>الصف الدراسي</label><select id="filterGrade"><option value="">جميع الصفوف</option><option>الصف التمهيدي</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option><option>الثالث ابتدائي</option><option>الرابع ابتدائي</option><option>الخامس ابتدائي</option><option>السادس ابتدائي</option><option>الأول متوسط</option><option>الثاني متوسط</option><option>الثالث متوسط</option></select></div>
-                        <div class="filter-field"><label>الجنس</label><select id="filterGender"><option value="">الجميع</option><option value="ذكر">ذكور</option><option value="أنثى">إناث</option></select></div>
-                        <div class="filter-field"><label>الحالة</label><select id="filterStatus"><option value="">جميع الحالات</option><option value="جديد">جديد</option><option value="تم الاتصال">تم الاتصال</option><option value="مؤكد">مؤكد</option><option value="منسحب">منسحب</option><option value="ملغي">ملغي</option></select></div>
-                        <div class="filter-field"><label>السنة الدراسية</label><select id="filterAcademicYear"><option value="">كل السنوات</option><option value="2026-2027">2026-2027</option></select></div>
-                        <div class="filter-field filter-date-range"><label>من تاريخ</label><input type="date" id="filterDateFrom" style="padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text-primary);min-width:130px;"></div>
-                        <div class="filter-field filter-date-range"><label>إلى تاريخ</label><input type="date" id="filterDateTo" style="padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-family:var(--font);font-size:14px;background:var(--bg);color:var(--text-primary);min-width:130px;"></div>
-                        <button class="clear-btn" id="clearFiltersBtn"><i class="fas fa-undo"></i> إعادة ضبط</button>
-                    </div>
-                </div>
-
                 <div class="unified-toolbar" id="unifiedToolbar">
-                    <div class="toolbar-row top-row">
+                    <div class="toolbar-row filters-row">
                         <div class="filter-wrapper"><label>الصف</label><select id="toolbarGrade" class="toolbar-select">
                             <option value="">الكل</option>
                             <option>الصف التمهيدي</option><option>الأول ابتدائي</option><option>الثاني ابتدائي</option>
@@ -868,9 +813,20 @@
                             <option value="14">14</option><option value="15">15</option><option value="16">16</option>
                             <option value="17">17</option><option value="18">18</option>
                         </select></div>
-                        <div class="search-box" style="flex:1;min-width:150px;"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث بالاسم..." title="أدخل أول حرفين من اسم الطالب للبحث" style="padding:8px 14px 8px 36px;border:2px solid var(--border);border-radius:10px;font-family:var(--font);font-size:13px;width:100%;background:var(--bg-card);color:var(--text-primary);"></div>
+                        <div class="filter-wrapper"><label>الحالة</label><select id="filterStatus" class="toolbar-select">
+                            <option value="">الكل</option><option value="جديد">جديد</option>
+                            <option value="تم الاتصال">تم الاتصال</option><option value="مؤكد">مؤكد</option>
+                            <option value="منسحب">منسحب</option><option value="ملغي">ملغي</option>
+                        </select></div>
+                        <div class="filter-wrapper"><label>السنة</label><select id="filterAcademicYear" class="toolbar-select">
+                            <option value="">الكل</option><option value="2026-2027">2026-2027</option>
+                        </select></div>
+                        <div class="filter-wrapper"><label>من</label><input type="date" id="filterDateFrom" class="toolbar-date"></div>
+                        <div class="filter-wrapper"><label>إلى</label><input type="date" id="filterDateTo" class="toolbar-date"></div>
+                        <div class="search-box" style="flex:1;min-width:140px;"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="ابحث بالاسم..." title="أدخل أول حرفين من اسم الطالب للبحث" style="padding:7px 12px 7px 34px;border:2px solid var(--border);border-radius:10px;font-family:var(--font);font-size:13px;width:100%;background:var(--bg-card);color:var(--text-primary);"></div>
+                        <button class="clear-btn" id="clearFiltersBtn" title="إعادة ضبط جميع الفلاتر"><i class="fas fa-undo"></i></button>
                     </div>
-                    <div class="toolbar-row bottom-row">
+                    <div class="toolbar-row actions-row">
                         <span class="bulk-info" id="bulkSelectedCount"><i class="fas fa-check-square"></i> 0</span>
                         <button class="btn-export-all" id="exportBtn" title="تصدير الظاهرين"><i class="fas fa-download"></i> تصدير</button>
                         <button class="btn-toolbar-accept" data-wa-bulk="accept" title="إرسال قبول"><i class="fas fa-check-circle"></i> قبول</button>
@@ -1296,8 +1252,8 @@
         const femaleCount = document.getElementById('femaleCount');
         const todayCount = document.getElementById('todayCount');
         const searchInput = document.getElementById('searchInput');
-        const filterGrade = document.getElementById('filterGrade');
-        const filterGender = document.getElementById('filterGender');
+        const toolbarGrade = document.getElementById('toolbarGrade');
+        const toolbarGender = document.getElementById('toolbarGender');
         const filterAcademicYear = document.getElementById('filterAcademicYear');
         const filterStatus = document.getElementById('filterStatus');
         const filterDateFrom = document.getElementById('filterDateFrom');
@@ -1635,8 +1591,8 @@
         // ===== بناء قيود الاستعلام (محسّن بدون select) =====
         function buildConstraints(isLocalSearch = false) {
             const constraints = [];
-            const grade = filterGrade.value || document.getElementById('toolbarGrade')?.value;
-            const gender = filterGender.value || document.getElementById('toolbarGender')?.value;
+            const grade = toolbarGrade?.value || '';
+            const gender = toolbarGender?.value || '';
             const ageVal = document.getElementById('toolbarAge')?.value;
             const year = filterAcademicYear.value;
 
@@ -1972,7 +1928,7 @@
         }
 
         function setupFilterDebounce() {
-            const filters = [filterGrade, filterGender, filterAcademicYear, filterStatus, filterDateFrom, filterDateTo];
+            const filters = [toolbarGrade, toolbarGender, filterAcademicYear, filterStatus, filterDateFrom, filterDateTo];
             filters.forEach(filter => {
                 if (!filter) return;
                 filter.addEventListener('change', () => {
@@ -1992,11 +1948,6 @@
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('change', () => {
-                        // مزامنة مع الفلاتر المتقدمة
-                        const gradeEl = document.getElementById('toolbarGrade');
-                        const genderEl = document.getElementById('toolbarGender');
-                        if (gradeEl && filterGrade) filterGrade.value = gradeEl.value;
-                        if (genderEl && filterGender) filterGender.value = genderEl.value;
                         currentPage = 0; lastVisible = null;
                         loadStudents(true);
                     });
@@ -2639,23 +2590,16 @@
         }
         document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
 
-        // ===== أحداث الفلاتر =====
-        document.getElementById('filterToggleBtn').addEventListener('click', function() {
-            const container = document.getElementById('advancedFilters');
-            container.classList.toggle('hidden');
-            this.classList.toggle('open');
-        });
+        // ===== أحداث الفلاتر (كلها في الشريط الموحد) =====
         clearFiltersBtn.addEventListener('click', () => {
             searchInput.value = '';
-            filterGrade.value = '';
-            filterGender.value = '';
+            toolbarGrade.value = '';
+            toolbarGender.value = '';
+            document.getElementById('toolbarAge').value = '';
             filterAcademicYear.value = '';
             filterStatus.value = '';
             filterDateFrom.value = '';
             filterDateTo.value = '';
-            document.getElementById('toolbarGrade').value = '';
-            document.getElementById('toolbarGender').value = '';
-            document.getElementById('toolbarAge').value = '';
             currentPage = 0;
             lastVisible = null;
             loadStudents(true);
