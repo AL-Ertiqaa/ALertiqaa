@@ -2226,7 +2226,7 @@
                     .report-header small { color: #718096; font-size: 13px; }
                     .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #edf2f7; font-size: 15px; }
                     .detail-row .key { font-weight: 600; color: #4a5568; min-width: 40%; }
-                    .detail-row .value { color: #1a202c; text-align: left; }
+                    .detail-row .value { color: #1a202c; text-align: left; max-width: 60%; word-break: break-word; }
                     .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); opacity: 0.06; font-size: 120px; color: #063a33; pointer-events: none; z-index: -1; }
                     hr { border: none; border-top: 1px solid #e2e8f0; }
                 </style></head><body>
@@ -2257,7 +2257,7 @@
             try {
                 // إنشاء نسخة مصممة للطباعة
                 const wrapper = document.createElement('div');
-                wrapper.style.cssText = 'width:600px;padding:30px 35px;font-family:Cairo;direction:rtl;background:#fff;color:#1a202c;font-size:14px;line-height:1.7;';
+                wrapper.style.cssText = 'width:700px;padding:30px 35px;font-family:Cairo;direction:rtl;background:#fff;color:#1a202c;font-size:14px;line-height:1.7;';
                 wrapper.innerHTML = `
                     <div style="text-align:center;margin-bottom:25px;">
                         <img src="logo.jpg" alt="شعار المدرسة" style="width:65px;height:auto;display:block;margin:0 auto 8px;">
@@ -2265,6 +2265,12 @@
                         <small style="color:#718096;font-size:13px;">Al-Ertiqaa Private Schools</small>
                         <hr style="border:none;border-top:2px solid #b08f4a;margin:12px 0;">
                     </div>
+                    <style>
+                        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #edf2f7; font-size: 15px; }
+                        .detail-row .key { font-weight: 600; color: #4a5568; min-width: 35%; }
+                        .detail-row .value { color: #1a202c; text-align: left; max-width: 65%; word-break: break-word; }
+                        .contact-input-row { display: none !important; }
+                    </style>
                     ${content.innerHTML}
                     <hr style="border:none;border-top:1px solid #e2e8f0;margin-top:25px;">
                     <p style="text-align:center;color:#a0aec0;font-size:11px;">تم إنشاء التقرير في ${new Date().toLocaleString('ar-EG')}</p>
